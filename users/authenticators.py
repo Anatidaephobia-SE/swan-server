@@ -24,6 +24,9 @@ class JWTAuthenticator(BaseAuthentication):
         user = User.objects.filter(email=payload['email']).first()
         if(user is None):
             raise exceptions.AuthenticationFailed("user not found")
+        if not(user.verified):
+            user.verified = True
+            user.save()
         return user, access_token
 
 def authenticate(token):
@@ -31,6 +34,9 @@ def authenticate(token):
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
         user = User.objects.filter(email=payload['email']).first()
+        if not(user.verified):
+            user.verified = True
+            user.save()
     except:
         user = AnonymousUser()
     return user
@@ -46,6 +52,9 @@ class SimpleAuthenticator(BaseAuthentication):
             access_token = authorized_header.split(' ')[1]
             payload = jwt.decode(access_token, settings.SECRET_KEY, algorithms=['HS256'])
             user = User.objects.filter(email=payload['email']).first()
+            if not(user.verified):
+                user.verified = True
+                user.save()
         except:
             user = AnonymousUser()
         return user, access_token

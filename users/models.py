@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 
 def get_user_directory(instance, filename):
-    return f'uploads/userprofile/{instance.username}/{filename}'
+    return f'uploads/userprofile/{instance.email}/{filename}'
 
 class User(AbstractUser):
     email = models.EmailField(max_length=254, unique=True, db_index=True, primary_key=True)
