@@ -1,7 +1,7 @@
 from django.db import models
 
 def get_teamlogo_directory(instance, filename):
-    return f'uploads/teamlogo/{instance0\.url}/{filename}'
+    return f'uploads/teamlogo/{instance.url}/{filename}'
 
 
 class team(models.Model):
