@@ -7,6 +7,7 @@ from rest_framework import status
 import users.authenticators as Authenticator
 import users.email_managment as EmailManager
 from .serializers import UserSerializer
+from django.contrib.auth import authenticate
 # Create your views here.
 
 
@@ -49,13 +50,16 @@ def login_view(request):
     if(email is None):
         return JsonResponse({"message" : "First name not submitted."}, status=status.HTTP_400_BAD_REQUEST)
     User = get_user_model()
-    user = User.objects.filter(email=email).first()
-    if not User.check_password(user, password):
+    try:
+        user = authenticate(email=email, password=password)
+        if user is None:
+            return JsonResponse({"message" : "Wrong user name password"}, status=status.HTTP_401_UNAUTHORIZED)
+        token = Authenticator.generate_access_token(user)
+        if(user.verified):
+            return JsonResponse({"access_token" : token}, status=status.HTTP_200_OK)
+        else:
+            EmailManager.send_mail(token, email)
+            return JsonResponse({"message" : "User not verified. Mail sent to email."}, status=status.HTTP_403_FORBIDDEN)
+    except User.DoesNotExist:
         return JsonResponse({"message" : "Wrong user name password"}, status=status.HTTP_401_UNAUTHORIZED)
-    token = Authenticator.generate_access_token(user)
-    if(user.verified):
-        return JsonResponse({"access_token" : token}, status=status.HTTP_200_OK)
-    else:
-        EmailManager.send_mail(token, email)
-        return JsonResponse({"message" : "User not verified. Mail sent to email."}, status=status.HTTP_403_FORBIDDEN)
     
