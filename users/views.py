@@ -7,6 +7,7 @@ from rest_framework.response import Response
 
 from users import authenticators
 from users import email_managment
+from .models import User
 from .serializers import UserSerializer
 
 
@@ -52,8 +53,16 @@ def update_profile(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_profile(request):
-    user = request.user
+def get_profile(request, user_email=None):
+    print(user_email)
+    if user_email is None:
+        user = request.user
+    else:
+        try:
+            user = User.objects.get(email=user_email)
+        except User.DoesNotExist:
+            return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
     serializer = UserSerializer(user)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
