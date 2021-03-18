@@ -43,6 +43,19 @@ def update_profile(request):
     user.save()
     return JsonResponse({"user" : UserSerializer(user).data}, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+def get_profile(request):
+    email = request.query_params.get('email', None)
+    if email is None:
+        return JsonResponse({"message" : "Could not parse email field."}, status=status.HTTP_400_BAD_REQUEST)
+    User = get_user_model()
+    try:
+        user = User.objects.get(email=email)
+        return JsonResponse({"user" : UserSerializer(user).data}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return JsonResponse({"message" : "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    
 @api_view(['POST'])
 def login_view(request):
     email = request.data.get('email', None)
