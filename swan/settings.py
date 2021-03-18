@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'users',
     'team',
+    'request_checker',
 ]
 
 MIDDLEWARE = [

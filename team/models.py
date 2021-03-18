@@ -9,5 +9,6 @@ class team(models.Model):
     url = models.CharField(primary_key = True, max_length = 100)
     logo = models.ImageField(upload_to = get_teamlogo_directory, null = True)
     users = models.ManyToManyField('users.User', related_name = 'users')
+    pending_users = models.ManyToManyField('users.User', related_name = 'pending_users')
     head = models.ForeignKey('users.User', related_name = 'head', on_delete = models.CASCADE, null = True) # temparary
     created_at = models.DateField(auto_now_add = True)
