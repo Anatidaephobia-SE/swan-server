@@ -3,10 +3,11 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 
 def get_user_directory(instance, filename):
-    return f'uploads/userprofile/{instance.username}/{filename}'
+    return f'uploads/userprofile/{instance.email}/{filename}'
 
 class User(AbstractUser):
     email = models.EmailField(max_length=254, unique=True, db_index=True, primary_key=True)
+    username=models.CharField(unique=False, max_length=52)
     verified = models.BooleanField(default=False)
     created_at = models.TimeField(auto_now_add=True)
     profile_picture = models.ImageField(upload_to=get_user_directory, null=True)
