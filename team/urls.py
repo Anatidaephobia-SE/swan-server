@@ -1,15 +1,15 @@
-from django.conf.urls import url
+from django.urls import path
 from .views import *
 
 urlpatterns = [
-    url(r'^create_team', create_team),
-    url(r'^invite_user', invite_user),
-    url(r'^accept_invite', accept_invite),
-    url(r'^reject_invite', reject_invite),
-    url(r'^remove_user', remove_user),
-    url(r'^leave_team', leave_team),
-    url(r'^get_invites', get_invites),
-    url(r'^get_team_info', get_team_info),
-    url(r'^get_members', get_members),
-    url(r'^get_user_teams', get_user_teams),
+    path('create_team', create_team),
+    path('invite_user', invite_user),
+    path('accept_invite', accept_invite),
+    path('reject_invite/<team_url>/', reject_invite),
+    path('remove_user', remove_user),
+    path('leave_team/<team_url>/', leave_team),
+    path('get_invites', get_invites),
+    path('get_team_info', get_team_info),
+    path('get_members', get_members),
+    path('get_user_teams', get_user_teams),
 ]
