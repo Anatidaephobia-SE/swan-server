@@ -29,7 +29,7 @@ def create_team(request):
     new_team = Team(name = name, url = url, logo = logo, head = user)
     new_team.save()
 
-    return JsonResponse({"message" : "Team created successfuly"})
+    return JsonResponse({'team' : TeamSerializer(new_team).data})
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
