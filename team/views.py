@@ -163,10 +163,10 @@ def get_invites(request):
 @permission_classes([AllowAny])
 def get_team_info(request):
 
-    req_check = have_parameters(request, 'team_url')
+    req_check = have_queryparams(request, 'team_url')
     if not req_check.have_all: return JsonResponse({'error' : req_check.error_message}, status = status.HTTP_400_BAD_REQUEST)
 
-    team_url = request.data.get('team_url')
+    team_url = request.query_params.get('team_url')
 
     team = Team.objects.filter(url = team_url).first()
     if team is None:
@@ -179,10 +179,10 @@ def get_team_info(request):
 @permission_classes([AllowAny])
 def get_members(request):
 
-    req_check = have_parameters(request, 'team_url')
+    req_check = have_queryparams(request, 'team_url')
     if not req_check.have_all: return JsonResponse({'error' : req_check.error_message}, status = status.HTTP_400_BAD_REQUEST)
     
-    team_url = request.data.get('team_url')
+    team_url = request.query_params.get('team_url')
 
     team = Team.objects.filter(url = team_url).first()
     if team is None:

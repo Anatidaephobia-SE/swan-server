@@ -21,7 +21,7 @@ def have_parameters(request, *parameters):
 def have_queryparams(request, *queryparams):
     ex_params = []
     for param in queryparams:
-        if not(param in request.data.keys()):
+        if not(param in request.query_params.keys()):
             ex_params.append(param)
     response = ''
     for param in ex_params:
