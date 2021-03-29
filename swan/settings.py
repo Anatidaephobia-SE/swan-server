@@ -37,7 +37,7 @@ load_dotenv()
 ALLOWED_HOSTS = ['anatidaephobia.pythonanywhere.com', 'localhost']
 allowed_hosts_string = os.getenv("ALLOWED_HOSTS")
 
-if len(allowed_hosts_string) != 0 and allowed_hosts_string != None:
+if  allowed_hosts_string != None and len(allowed_hosts_string) != 0:
     allowed_host_list = allowed_hosts_string.split(", ")
 
     for allowed_host in allowed_host_list:
