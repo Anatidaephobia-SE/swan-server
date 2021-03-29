@@ -1,0 +1,44 @@
+version: "3"
+   
+services:
+  postgres:
+    image: postgres
+    container_name: swan_postgares
+    hostname: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    expose: 
+      - "5432"
+    env_file:
+      - pg.env
+    networks: 
+      - swan
+
+  pg-admin:
+    image: dpage/pgadmin4
+    container_name: swan_pgadmin
+    hostname: pgadmin4
+    ports:
+      - "9090:80"
+    env_file: 
+      - pgadmin.env
+    depends_on:
+      - postgres
+    networks: 
+      - swan
+
+  swan:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8080
+    volumes:
+      - .:/code
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks: 
+      - swan
+
+networks: 
+  swan:
