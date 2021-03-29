@@ -27,8 +27,21 @@ SECRET_KEY = '!)vy8ut^x=*j@8l+hm20ceq98dyv!wfs1@a5@k9802&z!_j*+_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+
 #ALLOWED_HOSTS = []
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 ALLOWED_HOSTS = ['anatidaephobia.pythonanywhere.com', 'localhost']
+allowed_hosts_string = os.getenv("ALLOWED_HOSTS")
+
+allowed_host_list = allowed_hosts_string.split(", ")
+
+for allowed_host in allowed_host_list:
+    if len(allowed_host) != 0:
+        ALLOWED_HOSTS.append(str(allowed_host).strip())
 
 # Application definition
 
@@ -82,8 +95,12 @@ WSGI_APPLICATION = 'swan.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'postgres',
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': 'postgres',
+        'PORT': 5432,
     }
 }
 
