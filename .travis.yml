@@ -18,6 +18,7 @@ check-tests: &CHECK_TESTS
   script:
     - python manage.py test   
 
+
 stage-deploy: &STAGE_DEPLOY
 
   script:
