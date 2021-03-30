@@ -94,7 +94,7 @@ jobs:
     - name: Push image
       run: |
         docker login ${{ secrets.REGISTRY_URL }} --username "${{ secrets.REGISTRY_USERNAME }}" --password "${{ secrets.REGISTRY_PASSWORD }}"
-        docker push ${{ secrets.REGISTRY_URL }}/swan
+        docker push ${{ secrets.REGISTRY_URL }}/swan:latest
         
 
   deploy:
