@@ -70,22 +70,22 @@ jobs:
 
     - name: add swan service env
       run: |
-        echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> swan.env
-        echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> swan.env
-        echo POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} >> swan.env
-        echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> swan.env
+        echo POSTGRES_USER="${{ secrets.POSTGRES_USER }}" >> swan.env
+        echo POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" >> swan.env
+        echo POSTGRES_HOST="${{ secrets.POSTGRES_HOST }}" >> swan.env
+        echo ALLOWED_HOSTS="${{ secrets.ALLOWED_HOSTS }}" >> swan.env
 
     - name: add postgres service env
       run: |
-        echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> pg.env
-        echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> pg.env
-        echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> pg.env
+        echo POSTGRES_USER="${{ secrets.POSTGRES_USER }}" >> pg.env
+        echo POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" >> pg.env
+        echo POSTGRES_DB="${{ secrets.POSTGRES_DB }}" >> pg.env
 
     - name: add pgadmin service env
       run: |
-        echo PGADMIN_DEFAULT_EMAIL=${{ secrets.PGADMIN_DEFAULT_EMAIL }} >> pgadmin.env
-        echo PGADMIN_DEFAULT_PASSWORD=${{ secrets.PGADMIN_DEFAULT_PASSWORD }} >> pgadmin.env
-        echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> pgadmin.env
+        echo PGADMIN_DEFAULT_EMAIL="${{ secrets.PGADMIN_DEFAULT_EMAIL }}" >> pgadmin.env
+        echo PGADMIN_DEFAULT_PASSWORD="${{ secrets.PGADMIN_DEFAULT_PASSWORD }}" >> pgadmin.env
+        echo POSTGRES_DB="${{ secrets.POSTGRES_DB }}" >> pgadmin.env
 
 
     - name: Build image
@@ -93,7 +93,7 @@ jobs:
         docker-compose -f stage-docker-compose.yaml build
     - name: Push image
       run: |
-        docker login ${{ secrets.REGISTRY_URL }} --username ${{ secrets.REGISTRY_USERNAME }} --password ${{ secrets.REGISTRY_PASSWORD }}
+        docker login ${{ secrets.REGISTRY_URL }} --username "${{ secrets.REGISTRY_USERNAME }}" --password "${{ secrets.REGISTRY_PASSWORD }}"
         docker push ${{ secrets.REGISTRY_URL }}/swan
         
 
@@ -104,29 +104,29 @@ jobs:
     steps:
       - name: add server utils env
         run: |
-          echo REGISTRY_USERNAME=${{ secrets.REGISTRY_USERNAME }} >> server.env
-          echo REGISTRY_PASSWORD=${{ secrets.REGISTRY_PASSWORD }} >> server.env
-          echo REGISTRY_URL=${{ secrets.REGISTRY_URL }} >> server.env
-          echo SWAN_IMAGE=${{ secrets.REGISTRY_URL }}/swan >> server.env
+          echo REGISTRY_USERNAME="${{ secrets.REGISTRY_USERNAME }}" >> server.env
+          echo REGISTRY_PASSWORD="${{ secrets.REGISTRY_PASSWORD }}" >> server.env
+          echo REGISTRY_URL="${{ secrets.REGISTRY_URL }}" >> server.env
+          echo SWAN_IMAGE="${{ secrets.REGISTRY_URL }}"/swan >> server.env
 
       - name: add swan service env
         run: |
-          echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> swan.env
-          echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> swan.env
-          echo POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} >> swan.env
-          echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> swan.env
+          echo POSTGRES_USER="${{ secrets.POSTGRES_USER }}" >> swan.env
+          echo POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" >> swan.env
+          echo POSTGRES_HOST="${{ secrets.POSTGRES_HOST }}" >> swan.env
+          echo ALLOWED_HOSTS="${{ secrets.ALLOWED_HOSTS }}" >> swan.env
 
-      - name: add postgres service env
-        run: |
-          echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> pg.env
-          echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> pg.env
-          echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> pg.env
+    - name: add postgres service env
+      run: |
+        echo POSTGRES_USER="${{ secrets.POSTGRES_USER }}" >> pg.env
+        echo POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" >> pg.env
+        echo POSTGRES_DB="${{ secrets.POSTGRES_DB }}" >> pg.env
 
-      - name: add pgadmin service env
-        run: |
-          echo PGADMIN_DEFAULT_EMAIL=${{ secrets.PGADMIN_DEFAULT_EMAIL }} >> pgadmin.env
-          echo PGADMIN_DEFAULT_PASSWORD=${{ secrets.PGADMIN_DEFAULT_PASSWORD }} >> pgadmin.env
-          echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> pgadmin.env
+    - name: add pgadmin service env
+      run: |
+        echo PGADMIN_DEFAULT_EMAIL="${{ secrets.PGADMIN_DEFAULT_EMAIL }}" >> pgadmin.env
+        echo PGADMIN_DEFAULT_PASSWORD="${{ secrets.PGADMIN_DEFAULT_PASSWORD }}" >> pgadmin.env
+        echo POSTGRES_DB="${{ secrets.POSTGRES_DB }}" >> pgadmin.env
 
       - name: Add the private SSH key to the ssh-agent
         env:
@@ -142,7 +142,7 @@ jobs:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
           scp  -o StrictHostKeyChecking=no -r ./server.env ./swan.env ./pg.env ./pgadmin.env ./stage-docker-compose.yaml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/swan
-          ssh -o StrictHostKeyChecking=no root@${{ secrets.DEPLOY_HOST }} << 'ENDSSH'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'ENDSSH'
             cd /swan
             source server.env
             source swan.env
