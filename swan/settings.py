@@ -45,6 +45,7 @@ if  allowed_hosts_string != None and len(allowed_hosts_string) != 0:
         if len(allowed_host) != 0:
             ALLOWED_HOSTS.append(str(allowed_host).strip())
 
+
 # Application definition
 
 INSTALLED_APPS = [
