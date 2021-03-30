@@ -28,14 +28,15 @@ jobs:
   include:
     - stage: tests
     - <<: *CHECK_TESTS
-    name: "checking tests"
-    if: branch IN (master, develop, dockerize)
+
     - stage: deploy
     - <<: *STAGE_DEPLOY
-    name: "deploy"
-    if: type=push AND branch IN (master, develop, dockerize)
      
 
 
 stages:
-  - tests
+  - name: tests
+    if: branch IN (master, develop, dockerize)
+
+  - name: deploy
+    if: type=push AND branch IN (master, develop, dockerize)
