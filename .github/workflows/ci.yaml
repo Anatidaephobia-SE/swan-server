@@ -58,6 +58,8 @@ jobs:
         POSTGRES_DB: github_actions
 
   deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
     needs: build
 
     steps:
