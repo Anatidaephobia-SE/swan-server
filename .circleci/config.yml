@@ -5,6 +5,10 @@ jobs:
       - image: circleci/python:3.6
     steps:
       - checkout
+      - run:
+          name: checking-build-Branch
+          command: |
+            ([[ $CIRCLE_PULL_REQUESTS == "" ]]) && echo $CIRCLE_BRANCH | grep -Evq "^(master)|(develop)" && echo "not a PR / branch to build" && circleci step halt || echo "will build"
       - restore_cache:
           key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
       - run:
