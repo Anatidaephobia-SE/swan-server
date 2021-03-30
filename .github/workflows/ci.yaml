@@ -13,6 +13,10 @@ on:
       - develop
       - dockerize
 
+env:
+  SWAN_IMAGE: docker.pkg.github.com/$GITHUB_REPOSITORY/web
+
+
 jobs:
   build:
 
@@ -63,12 +67,69 @@ jobs:
         POSTGRES_HOST_AUTH_METHOD: trust
         POSTGRES_HOST: localhost
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
+    - name: Build image
+      run: |
+        docker-compose -f stage-docker-compose.yml build
+    - name: Push image
+      run: |
+        docker login ${{ secrets.REGISTRY_URL }} --username ${{ secrets.REGISTRY_USERNAME }} --password ${{ secrets.REGISTRY_PASSWORD }}
+        docker push ${{ secrets.REGISTRY_URL }}/swan
+        
 
   deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-    needs: build
+    needs: [build]
 
     steps:
-      - name: "depoly"
-        run: echo "haha"
+      - name: add server utils env
+        run: |
+          echo REGISTRY_USERNAME=${{ secrets.REGISTRY_USERNAME }} >> server.env
+          echo REGISTRY_PASSWORD=${{ secrets.REGISTRY_PASSWORD }} >> server.env
+          echo REGISTRY_URL=${{ secrets.REGISTRY_URL }} >> server.env
+          echo SWAN_IMAGE=${{ secrets.REGISTRY_URL }}/swan >> server.env
+
+      - name: add swan service env
+        run: |
+          echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> swan.env
+          echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> swan.env
+          echo POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} >> swan.env
+          echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> swan.env
+
+      - name: add postgres service env
+        run: |
+          echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> pg.env
+          echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> pg.env
+          echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> pg.env
+
+      - name: add pgadmin service env
+        run: |
+          echo PGADMIN_DEFAULT_EMAIL=${{ secrets.PGADMIN_DEFAULT_EMAIL }} >> pgadmin.env
+          echo PGADMIN_DEFAULT_PASSWORD=${{ secrets.PGADMIN_DEFAULT_PASSWORD }} >> pgadmin.env
+          echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> pgadmin.env
+
+      - name: Add the private SSH key to the ssh-agent
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          mkdir -p ~/.ssh
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          ssh-add - <<< "${{ secrets.DEPLOY_KEY }}"
+      
+      - name: Build and deploy images on DigitalOcean
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          scp  -o StrictHostKeyChecking=no -r ./server.env ./swan.env ./pg.env ./pgadmin.env ./stage-docker-compose.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/swan
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.DEPLOY_HOST }} << 'ENDSSH'
+            cd /swan
+            source server.env
+            source swan.env
+            source pg.env
+            source pgadmin.env
+            docker login $REGISTRY_URL --username $REGISTRY_USERNAME --password $REGISTRY_PASSWORD
+            docker pull $SWAN_IMAGE
+            docker-compose -f stage-docker-compose.yml up -d
+          ENDSSH
+
+
