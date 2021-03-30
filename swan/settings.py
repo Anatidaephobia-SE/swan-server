@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+
 from pathlib import Path
 import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -43,6 +44,7 @@ if  allowed_hosts_string != None and len(allowed_hosts_string) != 0:
     for allowed_host in allowed_host_list:
         if len(allowed_host) != 0:
             ALLOWED_HOSTS.append(str(allowed_host).strip())
+
 
 # Application definition
 
