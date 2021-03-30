@@ -67,6 +67,27 @@ jobs:
         POSTGRES_HOST_AUTH_METHOD: trust
         POSTGRES_HOST: localhost
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
+
+    - name: add swan service env
+      run: |
+        echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> swan.env
+        echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> swan.env
+        echo POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} >> swan.env
+        echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> swan.env
+
+    - name: add postgres service env
+      run: |
+        echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> pg.env
+        echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> pg.env
+        echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> pg.env
+
+    - name: add pgadmin service env
+      run: |
+        echo PGADMIN_DEFAULT_EMAIL=${{ secrets.PGADMIN_DEFAULT_EMAIL }} >> pgadmin.env
+        echo PGADMIN_DEFAULT_PASSWORD=${{ secrets.PGADMIN_DEFAULT_PASSWORD }} >> pgadmin.env
+        echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> pgadmin.env
+
+
     - name: Build image
       run: |
         docker-compose -f stage-docker-compose.yaml build
