@@ -27,16 +27,16 @@ stage-deploy: &STAGE_DEPLOY
 jobs:
   include:
     - stage: tests
-    - <<: *CHECK_TESTS
+      <<: *CHECK_TESTS
 
     - stage: deploy
-    - <<: *STAGE_DEPLOY
+      <<: *STAGE_DEPLOY
      
 
 
 stages:
-  - name: tests
+  - name: Tests
     if: branch IN (master, develop, dockerize)
 
-  - name: deploy
+  - name: Deploy
     if: type=push AND branch IN (master, develop, dockerize)
