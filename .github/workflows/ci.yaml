@@ -18,9 +18,12 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    container:
+      image: ubuntu:latest
+
     services:
       postgres:
-        image: postgres:10.8
+        image: postgres:11
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -52,7 +55,7 @@ jobs:
         POSTGRES_PASSWORD: postgres
         POSTGRES_DB: github_actions
         POSTGRES_HOST_AUTH_METHOD: trust
-        POSTGRES_HOST: localhost
+        POSTGRES_HOST: postgres
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
     - name: Run tests
       run: python manage.py test
@@ -61,7 +64,7 @@ jobs:
         POSTGRES_PASSWORD: postgres
         POSTGRES_DB: github_actions
         POSTGRES_HOST_AUTH_METHOD: trust
-        POSTGRES_HOST: localhost
+        POSTGRES_HOST: postgres
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
 
   deploy:
