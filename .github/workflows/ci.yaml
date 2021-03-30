@@ -147,9 +147,6 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'ENDSSH'
             cd ~/swan
             source server.env
-            source swan.env
-            source pg.env
-            source pgadmin.env
             docker login $REGISTRY_URL --username $REGISTRY_USERNAME --password $REGISTRY_PASSWORD
             docker pull $SWAN_IMAGE
             export SWAN_IMAGE=$SWAN_IMAGE
