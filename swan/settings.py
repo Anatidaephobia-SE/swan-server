@@ -99,10 +99,10 @@ WSGI_APPLICATION = 'swan.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.getenv('POSTGRES_HOST'),
+        'NAME': 'postgres',
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': 'postgres',
+        'HOST': os.getenv('POSTGRES_HOST')',
         'PORT': 5432,
     }
 }
