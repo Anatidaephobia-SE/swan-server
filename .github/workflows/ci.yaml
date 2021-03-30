@@ -14,7 +14,7 @@ on:
       - dockerize
 
 env:
-  SWAN_IMAGE: ${{ secrets.REGISTRY_URL }}/swan:latest
+  SWAN_IMAGE: "${{ secrets.REGISTRY_URL }}"/swan:latest
 
 
 jobs:
