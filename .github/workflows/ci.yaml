@@ -14,7 +14,8 @@ on:
       - dockerize
 
 env:
-  SWAN_IMAGE: ${{ secrets.REGISTRY_URL }}/swan
+  SWAN_IMAGE: swan
+  SWAN_IMAGE_WITH_URL: ${{ secrets.REGISTRY_URL }}/swan
 
 
 jobs:
@@ -94,7 +95,8 @@ jobs:
     - name: Push image
       run: |
         docker login ${{ secrets.REGISTRY_URL }} --username "${{ secrets.REGISTRY_USERNAME }}" --password "${{ secrets.REGISTRY_PASSWORD }}"
-        docker push ${{ env.SWAN_IMAGE }}
+        docker tag ${{ env.SWAN_IMAGE }} ${{ env.SWAN_IMAGE_WITH_URL }}:$GITHUB_SHA
+        docker push ${{ env.SWAN_IMAGE_WITH_URL }}:$GITHUB_SHA
         
 
   deploy:
@@ -109,7 +111,8 @@ jobs:
           echo "REGISTRY_USERNAME=${{ secrets.REGISTRY_USERNAME }}" >> server.env
           echo "REGISTRY_PASSWORD=${{ secrets.REGISTRY_PASSWORD }}" >> server.env
           echo "REGISTRY_URL=${{ secrets.REGISTRY_URL }}" >> server.env
-          echo "SWAN_IMAGE=${{ secrets.REGISTRY_URL }}"/swan >> server.env
+          echo "SWAN_IMAGE=swan" >> server.env
+          echo "SWAN_IMAGE_WITH_URL=${{ secrets.REGISTRY_URL }}/swan:$GITHUB_SHA" >> server.env
 
       - name: add swan service env
         run: |
@@ -148,7 +151,7 @@ jobs:
             cd ~/swan
             source server.env
             docker login $REGISTRY_URL --username $REGISTRY_USERNAME --password $REGISTRY_PASSWORD
-            docker pull $SWAN_IMAGE
+            docker pull $SWAN_IMAGE_WITH_URL
             export SWAN_IMAGE=$SWAN_IMAGE
             docker-compose -f stage-docker-compose.yaml up -d
           ENDSSH
