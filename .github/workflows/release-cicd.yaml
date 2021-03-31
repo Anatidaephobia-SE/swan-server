@@ -1,26 +1,30 @@
-name: Swan application
+name: Swan Release CI/CD
 
 on:
+  
+  create:
+    branches:
+      - release-**
 
   pull_request:
     branches:
-      - develop
+      - release-**
 
   push:
     branches:
-      - develop
+      - release-**
 
 env:
   COMPOSE_FILE: stage-docker-compose.yaml
-  SWAN_IMAGE: swan-dev
-  SWAN_IMAGE_WITH_URL: ${{ secrets.REGISTRY_URL }}/swan-dev
+  SWAN_IMAGE: swan-stage
+  SWAN_IMAGE_WITH_URL: ${{ secrets.REGISTRY_URL }}/swan-stage
 
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/develop' #for pull request only
+    if: github.ref != 'refs/heads/release-**' #for pull request only
 
     services:
       postgres:
@@ -94,13 +98,13 @@ jobs:
     - name: Push image
       run: |
         docker login ${{ secrets.REGISTRY_URL }} --username "${{ secrets.REGISTRY_USERNAME }}" --password "${{ secrets.REGISTRY_PASSWORD }}"
-        docker tag ${{ env.SWAN_IMAGE }} ${{ env.SWAN_IMAGE_WITH_URL }}:$GITHUB_SHA
-        docker push ${{ env.SWAN_IMAGE_WITH_URL }}:$GITHUB_SHA
+        docker tag ${{ env.SWAN_IMAGE }} ${{ env.SWAN_IMAGE_WITH_URL }}:${GITHUB_REF##*/}
+        docker push ${{ env.SWAN_IMAGE_WITH_URL }}:${GITHUB_REF##*/}
         
 
   deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop' #for push only
+    if: github.ref == 'refs/heads/release-**' #for push only
 
     steps:
       - name: Checkout
@@ -111,7 +115,7 @@ jobs:
           echo "REGISTRY_PASSWORD=${{ secrets.REGISTRY_PASSWORD }}" >> server.env
           echo "REGISTRY_URL=${{ secrets.REGISTRY_URL }}" >> server.env
           echo "SWAN_IMAGE=${{ env.SWAN_IMAGE }}" >> server.env
-          echo "SWAN_IMAGE_WITH_URL=${{ env.SWAN_IMAGE_WITH_URL }}:$GITHUB_SHA" >> server.env
+          echo "SWAN_IMAGE_WITH_URL=${{ env.SWAN_IMAGE_WITH_URL }}:${GITHUB_REF##*/}" >> server.env
           echo "COMPOSE_FILE=${{ env.COMPOSE_FILE }}" >> server.env
 
       - name: add swan service env
