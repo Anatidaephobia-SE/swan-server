@@ -30,6 +30,7 @@ DEBUG = True
 
 
 #ALLOWED_HOSTS = []
+
 import os
 from dotenv import load_dotenv
 
@@ -102,8 +103,8 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': 'postgres',
-        'PORT': 5432,
+        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
+        'PORT': os.getenv('POSTGRES_PORT', 5432),
     }
 }
 
