@@ -9,18 +9,18 @@ on:
   push:
     branches:
       - develop
-      - dockerize
 
 env:
   COMPOSE_FILE: stage-docker-compose.yaml
-  SWAN_IMAGE: swan
-  SWAN_IMAGE_WITH_URL: ${{ secrets.REGISTRY_URL }}/swan
+  SWAN_IMAGE: swan-dev
+  SWAN_IMAGE_WITH_URL: ${{ secrets.REGISTRY_URL }}/swan-dev
 
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/develop' #for pull request only
 
     services:
       postgres:
@@ -100,6 +100,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' #for push only
     needs: [build]
 
     steps:
