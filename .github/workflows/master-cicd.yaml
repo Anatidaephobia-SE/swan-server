@@ -101,7 +101,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master' #for push only
-    needs: [build]
 
     steps:
       - name: Checkout
