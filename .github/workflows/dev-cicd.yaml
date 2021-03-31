@@ -1,19 +1,18 @@
-name: Python application
+name: Swan application
 
 on:
 
   pull_request:
     branches:
       - develop
-      - master
 
   push:
     branches:
-      - master
       - develop
       - dockerize
 
 env:
+  COMPOSE_FILE: stage-docker-compose.yaml
   SWAN_IMAGE: swan
   SWAN_IMAGE_WITH_URL: ${{ secrets.REGISTRY_URL }}/swan
 
@@ -91,7 +90,7 @@ jobs:
 
     - name: Build image
       run: |
-        docker-compose -f stage-docker-compose.yaml build
+        docker-compose -f ${{ env.COMPOSE_FILE }} build
     - name: Push image
       run: |
         docker login ${{ secrets.REGISTRY_URL }} --username "${{ secrets.REGISTRY_USERNAME }}" --password "${{ secrets.REGISTRY_PASSWORD }}"
@@ -111,8 +110,9 @@ jobs:
           echo "REGISTRY_USERNAME=${{ secrets.REGISTRY_USERNAME }}" >> server.env
           echo "REGISTRY_PASSWORD=${{ secrets.REGISTRY_PASSWORD }}" >> server.env
           echo "REGISTRY_URL=${{ secrets.REGISTRY_URL }}" >> server.env
-          echo "SWAN_IMAGE=swan" >> server.env
-          echo "SWAN_IMAGE_WITH_URL=${{ secrets.REGISTRY_URL }}/swan:$GITHUB_SHA" >> server.env
+          echo "SWAN_IMAGE=${{ env.SWAN_IMAGE }}" >> server.env
+          echo "SWAN_IMAGE_WITH_URL=${{ env.SWAN_IMAGE_WITH_URL }}:$GITHUB_SHA" >> server.env
+          echo "COMPOSE_FILE=${{ env.COMPOSE_FILE }}:$GITHUB_SHA" >> server.env
 
       - name: add swan service env
         run: |
@@ -146,14 +146,14 @@ jobs:
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          scp  -o StrictHostKeyChecking=no -r ./server.env ./swan.env ./pg.env ./pgadmin.env ./stage-docker-compose.yaml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/swan
+          scp  -o StrictHostKeyChecking=no -r ./server.env ./swan.env ./pg.env ./pgadmin.env ./${{ env.COMPOSE_FILE }} ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/swan
           ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'ENDSSH'
             cd ~/swan
             source server.env
             docker login $REGISTRY_URL --username $REGISTRY_USERNAME --password $REGISTRY_PASSWORD
             docker pull $SWAN_IMAGE_WITH_URL
             export SWAN_IMAGE=$SWAN_IMAGE_WITH_URL
-            docker-compose -f stage-docker-compose.yaml up -d
+            docker-compose -f $COMPOSE_FILE up -d
           ENDSSH
 
 
