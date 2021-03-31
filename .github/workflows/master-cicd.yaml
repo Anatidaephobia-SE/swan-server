@@ -156,7 +156,7 @@ jobs:
         run: |
           scp  -o StrictHostKeyChecking=no -r ./server.env ./swan.env ./pg.env ./pgadmin.env ./${{ env.COMPOSE_FILE }} ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/swan-prod
           ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'ENDSSH'
-            cd ~/swan
+            cd ~/swan-prod
             source server.env
             docker login $REGISTRY_URL --username $REGISTRY_USERNAME --password $REGISTRY_PASSWORD
             docker pull $SWAN_IMAGE_WITH_URL:$DOCKER_PRODUCTION_TAG
