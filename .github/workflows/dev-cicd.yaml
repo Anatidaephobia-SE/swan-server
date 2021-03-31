@@ -112,14 +112,16 @@ jobs:
         uses: actions/checkout@v1
       - name: add server utils env
         run: |
-          echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1 |sed 's/\"//g'
+          echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head -1 |sed 's/\"//g' >> extracted_tag.txt
+          export TAG=$(cat extracted_tag.txt)
+          echo $TAG
           echo "REGISTRY_USERNAME=${{ secrets.REGISTRY_USERNAME }}" >> server.env
           echo "REGISTRY_PASSWORD=${{ secrets.REGISTRY_PASSWORD }}" >> server.env
           echo "REGISTRY_URL=${{ secrets.REGISTRY_URL }}" >> server.env
           echo "SWAN_IMAGE=${{ env.SWAN_IMAGE }}" >> server.env
           echo "SWAN_IMAGE_WITH_URL=${{ env.SWAN_IMAGE_WITH_URL }}" >> server.env
           echo "COMPOSE_FILE=${{ env.COMPOSE_FILE }}" >> server.env
-          echo "DOCKER_DEV_TAG=$(\"$GITHUB_CONTEXT\"| jq '.event.commits[].id' | tail -2 | head -1 |sed 's/\"//g')" >> server.env
+          echo "DOCKER_DEV_TAG=$TAG" >> server.env
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
 
