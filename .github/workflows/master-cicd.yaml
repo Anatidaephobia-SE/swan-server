@@ -37,6 +37,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
     - name: Set up Python 3.7
       uses: actions/setup-python@v1
       with:
@@ -93,9 +95,12 @@ jobs:
         docker-compose -f ${{ env.COMPOSE_FILE }} build
     - name: Push image
       run: |
+        export DOCKER_PRODUCTION_TAG=${{ github.head_ref }}
         docker login ${{ secrets.REGISTRY_URL }} --username "${{ secrets.REGISTRY_USERNAME }}" --password "${{ secrets.REGISTRY_PASSWORD }}"
-        docker tag ${{ env.SWAN_IMAGE }} ${{ env.SWAN_IMAGE_WITH_URL }}:$GITHUB_SHA
-        docker push ${{ env.SWAN_IMAGE_WITH_URL }}:$GITHUB_SHA
+        docker tag ${{ env.SWAN_IMAGE }} ${{ env.SWAN_IMAGE_WITH_URL }}:$DOCKER_PRODUCTION_TAG
+        docker push ${{ env.SWAN_IMAGE_WITH_URL }}:$DOCKER_PRODUCTION_TAG
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
         
 
   deploy:
@@ -113,6 +118,9 @@ jobs:
           echo "SWAN_IMAGE=${{ env.SWAN_IMAGE }}" >> server.env
           echo "SWAN_IMAGE_WITH_URL=${{ env.SWAN_IMAGE_WITH_URL }}:$GITHUB_SHA" >> server.env
           echo "COMPOSE_FILE=${{ env.COMPOSE_FILE }}" >> server.env
+          echo "DOCKER_PRODUCTION_TAG=${{ github.head_ref }}" >> server.env
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
 
       - name: add swan service env
         run: |
@@ -151,9 +159,10 @@ jobs:
             cd ~/swan
             source server.env
             docker login $REGISTRY_URL --username $REGISTRY_USERNAME --password $REGISTRY_PASSWORD
-            docker pull $SWAN_IMAGE_WITH_URL
-            export SWAN_IMAGE=$SWAN_IMAGE_WITH_URL
+            docker pull $SWAN_IMAGE_WITH_URL:$DOCKER_PRODUCTION_TAG
+            export SWAN_IMAGE=$SWAN_IMAGE_WITH_URL:$DOCKER_PRODUCTION_TAG
             docker-compose -f $COMPOSE_FILE up -d
+            rm -rf server.env
           ENDSSH
 
 
