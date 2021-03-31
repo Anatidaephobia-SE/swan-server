@@ -4,11 +4,11 @@ on:
 
   pull_request:
     branches:
-      - develop
+      - develop-test
 
   push:
     branches:
-      - develop
+      - develop-test
 
 env:
   COMPOSE_FILE: stage-docker-compose.yaml
@@ -20,7 +20,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/develop' #for pull request only
+    if: github.ref != 'refs/heads/develop-test' #for pull request only
 
     services:
       postgres:
@@ -103,7 +103,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop' #for push only
+    if: github.ref == 'refs/heads/develop-test' #for push only
 
     steps:
       - name: Checkout
@@ -116,9 +116,7 @@ jobs:
           echo "SWAN_IMAGE=${{ env.SWAN_IMAGE }}" >> server.env
           echo "SWAN_IMAGE_WITH_URL=${{ env.SWAN_IMAGE_WITH_URL }}" >> server.env
           echo "COMPOSE_FILE=${{ env.COMPOSE_FILE }}" >> server.env
-          touch extracted_tag.txt
-          "$GITHUB_CONTEXT" | jq '.event.commits[].id' | tail -2 | head -1 |sed 's/\"//g' >> extracted_tag.txt
-          echo "DOCKER_DEV_TAG=$(cat extracted_tag.txt)" >> server.env
+          echo "DOCKER_DEV_TAG=$("$GITHUB_CONTEXT" | jq '.event.commits[].id' | tail -2 | head -1 |sed 's/\"//g')" >> server.env
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
 
@@ -156,7 +154,7 @@ jobs:
         run: |
           scp  -o StrictHostKeyChecking=no -r ./server.env ./swan.env ./pg.env ./pgadmin.env ./${{ env.COMPOSE_FILE }} ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/swan-stage
           ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'ENDSSH'
-            cd ~/swan
+            cd ~/swan-stage
             source server.env
             docker login $REGISTRY_URL --username $REGISTRY_USERNAME --password $REGISTRY_PASSWORD
             docker pull $SWAN_IMAGE_WITH_URL:$DOCKER_DEV_TAG
