@@ -93,7 +93,7 @@ jobs:
         docker-compose -f ${{ env.COMPOSE_FILE }} build
     - name: Push image
       run: |
-        export DOCKER_DEV_TAG={{ github.event.after }}
+        export DOCKER_DEV_TAG=${{ github.event.after }}
         docker login ${{ secrets.REGISTRY_URL }} --username "${{ secrets.REGISTRY_USERNAME }}" --password "${{ secrets.REGISTRY_PASSWORD }}"
         docker tag ${{ env.SWAN_IMAGE }} ${{ env.SWAN_IMAGE_WITH_URL }}:$DOCKER_DEV_TAG
         docker push ${{ env.SWAN_IMAGE_WITH_URL }}:$DOCKER_DEV_TAG
