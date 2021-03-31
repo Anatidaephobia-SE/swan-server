@@ -1,30 +1,26 @@
-name: Swan Release CI/CD
+name: Swan Develop CI/CD
 
 on:
-  
-  create:
-    branches:
-      - release-**
 
   pull_request:
     branches:
-      - release-**
+      - develop
 
   push:
     branches:
-      - release-**
+      - develop
 
 env:
   COMPOSE_FILE: stage-docker-compose.yaml
-  SWAN_IMAGE: swan-alpha
-  SWAN_IMAGE_WITH_URL: ${{ secrets.REGISTRY_URL }}/swan-alpha
+  SWAN_IMAGE: swan-stage
+  SWAN_IMAGE_WITH_URL: ${{ secrets.REGISTRY_URL }}/swan-stage
 
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/release-**' #for pull request only
+    if: github.ref != 'refs/heads/develop' #for pull request only
 
     services:
       postgres:
@@ -97,14 +93,17 @@ jobs:
         docker-compose -f ${{ env.COMPOSE_FILE }} build
     - name: Push image
       run: |
+        export DOCKER_DEV_TAG={{ github.event.after }}
         docker login ${{ secrets.REGISTRY_URL }} --username "${{ secrets.REGISTRY_USERNAME }}" --password "${{ secrets.REGISTRY_PASSWORD }}"
-        docker tag ${{ env.SWAN_IMAGE }} ${{ env.SWAN_IMAGE_WITH_URL }}:${{ github.base_ref }}
-        docker push ${{ env.SWAN_IMAGE_WITH_URL }}:${{ github.base_ref }}
+        docker tag ${{ env.SWAN_IMAGE }} ${{ env.SWAN_IMAGE_WITH_URL }}:$DOCKER_DEV_TAG
+        docker push ${{ env.SWAN_IMAGE_WITH_URL }}:$DOCKER_DEV_TAG
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
         
 
   deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/release-**' #for push only
+    if: github.ref == 'refs/heads/develop' #for push only
 
     steps:
       - name: Checkout
@@ -115,8 +114,11 @@ jobs:
           echo "REGISTRY_PASSWORD=${{ secrets.REGISTRY_PASSWORD }}" >> server.env
           echo "REGISTRY_URL=${{ secrets.REGISTRY_URL }}" >> server.env
           echo "SWAN_IMAGE=${{ env.SWAN_IMAGE }}" >> server.env
-          echo "SWAN_IMAGE_WITH_URL=${{ env.SWAN_IMAGE_WITH_URL }}:${{ github.base_ref }}" >> server.env
+          echo "SWAN_IMAGE_WITH_URL=${{ env.SWAN_IMAGE_WITH_URL }}" >> server.env
           echo "COMPOSE_FILE=${{ env.COMPOSE_FILE }}" >> server.env
+          echo "DOCKER_DEV_TAG=$GITHUB_CONTEXT| jq '.event.commits[].id' | tail -2 | head -1 |sed 's/\"//g'" >> server.env
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
 
       - name: add swan service env
         run: |
@@ -150,13 +152,13 @@ jobs:
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          scp  -o StrictHostKeyChecking=no -r ./server.env ./swan.env ./pg.env ./pgadmin.env ./${{ env.COMPOSE_FILE }} ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/swan-alpha
+          scp  -o StrictHostKeyChecking=no -r ./server.env ./swan.env ./pg.env ./pgadmin.env ./${{ env.COMPOSE_FILE }} ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/swan-stage
           ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'ENDSSH'
             cd ~/swan
             source server.env
             docker login $REGISTRY_URL --username $REGISTRY_USERNAME --password $REGISTRY_PASSWORD
-            docker pull $SWAN_IMAGE_WITH_URL
-            export SWAN_IMAGE=$SWAN_IMAGE_WITH_URL
+            docker pull $SWAN_IMAGE_WITH_URL:$DOCKER_DEV_TAG
+            export SWAN_IMAGE=$SWAN_IMAGE_WITH_URL:$DOCKER_DEV_TAG
             docker-compose -f $COMPOSE_FILE up -d
           ENDSSH
 
