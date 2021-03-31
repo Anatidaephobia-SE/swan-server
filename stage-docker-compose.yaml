@@ -3,7 +3,7 @@ version: "3"
 services:
   postgres:
     image: postgres
-    container_name: swan_postgares
+    container_name: swan-stage_postgares
     hostname: postgres
     volumes:
       - ./data/db:/var/lib/postgresql/data
@@ -16,7 +16,7 @@ services:
 
   pg-admin:
     image: dpage/pgadmin4
-    container_name: swan_pgadmin
+    container_name: swan-stage_pgadmin
     hostname: pgadmin4
     ports:
       - "9090:80"

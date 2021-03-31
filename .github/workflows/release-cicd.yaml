@@ -1,10 +1,6 @@
 name: Swan Release CI/CD
 
 on:
-  
-  create:
-    branches:
-      - release-**
 
   pull_request:
     branches:
@@ -15,7 +11,7 @@ on:
       - release-**
 
 env:
-  COMPOSE_FILE: stage-docker-compose.yaml
+  COMPOSE_FILE: alpha-docker-compose.yaml
   SWAN_IMAGE: swan-alpha
   SWAN_IMAGE_WITH_URL: ${{ secrets.REGISTRY_URL }}/swan-alpha
 
@@ -41,6 +37,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
     - name: Set up Python 3.7
       uses: actions/setup-python@v1
       with:
@@ -97,9 +95,12 @@ jobs:
         docker-compose -f ${{ env.COMPOSE_FILE }} build
     - name: Push image
       run: |
+        export DOCKER_ALPHA_TAG=${{ github.base_ref }}
         docker login ${{ secrets.REGISTRY_URL }} --username "${{ secrets.REGISTRY_USERNAME }}" --password "${{ secrets.REGISTRY_PASSWORD }}"
-        docker tag ${{ env.SWAN_IMAGE }} ${{ env.SWAN_IMAGE_WITH_URL }}:${{ github.base_ref }}
-        docker push ${{ env.SWAN_IMAGE_WITH_URL }}:${{ github.base_ref }}
+        docker tag ${{ env.SWAN_IMAGE }} ${{ env.SWAN_IMAGE_WITH_URL }}:$DOCKER_ALPHA_TAG
+        docker push ${{ env.SWAN_IMAGE_WITH_URL }}:$DOCKER_ALPHA_TAG
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
         
 
   deploy:
@@ -115,8 +116,11 @@ jobs:
           echo "REGISTRY_PASSWORD=${{ secrets.REGISTRY_PASSWORD }}" >> server.env
           echo "REGISTRY_URL=${{ secrets.REGISTRY_URL }}" >> server.env
           echo "SWAN_IMAGE=${{ env.SWAN_IMAGE }}" >> server.env
-          echo "SWAN_IMAGE_WITH_URL=${{ env.SWAN_IMAGE_WITH_URL }}:${{ github.base_ref }}" >> server.env
+          echo "SWAN_IMAGE_WITH_URL=${{ env.SWAN_IMAGE_WITH_URL }}" >> server.env
           echo "COMPOSE_FILE=${{ env.COMPOSE_FILE }}" >> server.env
+          echo "DOCKER_ALPHA_TAG=${{ github.base_ref }}" >> server.env
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
 
       - name: add swan service env
         run: |
@@ -152,12 +156,13 @@ jobs:
         run: |
           scp  -o StrictHostKeyChecking=no -r ./server.env ./swan.env ./pg.env ./pgadmin.env ./${{ env.COMPOSE_FILE }} ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/swan-alpha
           ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'ENDSSH'
-            cd ~/swan
+            cd ~/swan-alpha
             source server.env
             docker login $REGISTRY_URL --username $REGISTRY_USERNAME --password $REGISTRY_PASSWORD
-            docker pull $SWAN_IMAGE_WITH_URL
-            export SWAN_IMAGE=$SWAN_IMAGE_WITH_URL
+            docker pull $SWAN_IMAGE_WITH_URL:$DOCKER_ALPHA_TAG
+            export SWAN_IMAGE=$SWAN_IMAGE_WITH_URL:$DOCKER_ALPHA_TAG
             docker-compose -f $COMPOSE_FILE up -d
+            rm -rf server.env
           ENDSSH
 
 
