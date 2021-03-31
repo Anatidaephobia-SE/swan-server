@@ -112,7 +112,7 @@ jobs:
           echo "REGISTRY_URL=${{ secrets.REGISTRY_URL }}" >> server.env
           echo "SWAN_IMAGE=${{ env.SWAN_IMAGE }}" >> server.env
           echo "SWAN_IMAGE_WITH_URL=${{ env.SWAN_IMAGE_WITH_URL }}:$GITHUB_SHA" >> server.env
-          echo "COMPOSE_FILE=${{ env.COMPOSE_FILE }}:$GITHUB_SHA" >> server.env
+          echo "COMPOSE_FILE=${{ env.COMPOSE_FILE }}" >> server.env
 
       - name: add swan service env
         run: |
