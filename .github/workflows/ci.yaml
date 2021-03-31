@@ -152,7 +152,7 @@ jobs:
             source server.env
             docker login $REGISTRY_URL --username $REGISTRY_USERNAME --password $REGISTRY_PASSWORD
             docker pull $SWAN_IMAGE_WITH_URL
-            export SWAN_IMAGE=$SWAN_IMAGE
+            export SWAN_IMAGE=$SWAN_IMAGE_WITH_URL
             docker-compose -f stage-docker-compose.yaml up -d
           ENDSSH
 
