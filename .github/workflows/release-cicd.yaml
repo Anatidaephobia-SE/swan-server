@@ -98,8 +98,8 @@ jobs:
     - name: Push image
       run: |
         docker login ${{ secrets.REGISTRY_URL }} --username "${{ secrets.REGISTRY_USERNAME }}" --password "${{ secrets.REGISTRY_PASSWORD }}"
-        docker tag ${{ env.SWAN_IMAGE }} ${{ env.SWAN_IMAGE_WITH_URL }}:${GITHUB_REF##*/}
-        docker push ${{ env.SWAN_IMAGE_WITH_URL }}:${GITHUB_REF##*/}
+        docker tag ${{ env.SWAN_IMAGE }} ${{ env.SWAN_IMAGE_WITH_URL }}:${{ github.base_ref }}
+        docker push ${{ env.SWAN_IMAGE_WITH_URL }}:${{ github.base_ref }}
         
 
   deploy:
@@ -115,7 +115,7 @@ jobs:
           echo "REGISTRY_PASSWORD=${{ secrets.REGISTRY_PASSWORD }}" >> server.env
           echo "REGISTRY_URL=${{ secrets.REGISTRY_URL }}" >> server.env
           echo "SWAN_IMAGE=${{ env.SWAN_IMAGE }}" >> server.env
-          echo "SWAN_IMAGE_WITH_URL=${{ env.SWAN_IMAGE_WITH_URL }}:${GITHUB_REF##*/}" >> server.env
+          echo "SWAN_IMAGE_WITH_URL=${{ env.SWAN_IMAGE_WITH_URL }}:${{ github.base_ref }}" >> server.env
           echo "COMPOSE_FILE=${{ env.COMPOSE_FILE }}" >> server.env
 
       - name: add swan service env
