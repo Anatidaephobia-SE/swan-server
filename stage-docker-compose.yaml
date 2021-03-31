@@ -12,24 +12,25 @@ services:
     env_file:
       - pg.env
     networks: 
-      - swan
+      - swan-stage
 
   pg-admin:
     image: dpage/pgadmin4
     container_name: swan-stage_pgadmin
     hostname: pgadmin4
     ports:
-      - "9090:80"
+      - "10333:80"
     env_file: 
       - pgadmin.env
     depends_on:
       - postgres
     networks: 
-      - swan
+      - swan-stage
 
   swan:
     image: "${SWAN_IMAGE}"
     build: .
+    hostname: swan
     command: python manage.py runserver 0.0.0.0:8080
     volumes:
       - .:/code
@@ -41,7 +42,25 @@ services:
     depends_on:
       - postgres
     networks: 
-      - swan
+      - swan-stage
+
+  prometheus:
+    image: prom/prometheus:v2.25.0
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - 10334:9090
+    networks: 
+      - swan-stage
+
+  grafana:
+    image: grafana/grafana:7.5.2
+    ports:
+      - 10335:3000
+    networks: 
+      - swan-stage
 
 networks: 
-  swan:
+  swan-stage:
