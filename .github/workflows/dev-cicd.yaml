@@ -93,12 +93,10 @@ jobs:
         docker-compose -f ${{ env.COMPOSE_FILE }} build
     - name: Push image
       run: |
-        export DOCKER_DEV_TAG=${{ github.event.after }}
+        export DOCKER_DEV_TAG=$(git rev-parse HEAD)
         docker login ${{ secrets.REGISTRY_URL }} --username "${{ secrets.REGISTRY_USERNAME }}" --password "${{ secrets.REGISTRY_PASSWORD }}"
         docker tag ${{ env.SWAN_IMAGE }} ${{ env.SWAN_IMAGE_WITH_URL }}:$DOCKER_DEV_TAG
         docker push ${{ env.SWAN_IMAGE_WITH_URL }}:$DOCKER_DEV_TAG
-      env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
         
 
   deploy:
@@ -116,7 +114,7 @@ jobs:
           echo "SWAN_IMAGE=${{ env.SWAN_IMAGE }}" >> server.env
           echo "SWAN_IMAGE_WITH_URL=${{ env.SWAN_IMAGE_WITH_URL }}" >> server.env
           echo "COMPOSE_FILE=${{ env.COMPOSE_FILE }}" >> server.env
-          echo "DOCKER_DEV_TAG=$("$GITHUB_CONTEXT" | jq '.event.commits[].id' | tail -2 | head -1 |sed 's/\"//g')" >> server.env
+          echo "DOCKER_DEV_TAG=$(\"$GITHUB_CONTEXT\"| jq '.event.commits[].id' | tail -2 | head -1 |sed 's/\"//g')" >> server.env
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
 
