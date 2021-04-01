@@ -30,7 +30,6 @@ DEBUG = True
 
 
 #ALLOWED_HOSTS = []
-
 import os
 from dotenv import load_dotenv
 
@@ -59,7 +58,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'users',
     'corsheaders',
-    'post',
+    'post'
 ]
 CORS_ORIGIN_ALLOW_ALL = True
 MIDDLEWARE = [
@@ -104,8 +103,8 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
-        'PORT': os.getenv('POSTGRES_PORT', 5432),
+        'HOST': 'postgres',
+        'PORT': 5432,
     }
 }
 
