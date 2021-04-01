@@ -6,4 +6,5 @@ urlpatterns = [
     path('update_post/<int:pk>/',views.UpdatePostView.as_view()),
     path('single_post/<int:pk>/',views.SinglePostView.as_view()),
     path('all_post/',views.AllPostView.as_view()),
+    path('create_comment/<int:pk>/',views.CreateCommentView.as_view()),
 ]

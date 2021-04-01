@@ -2,6 +2,12 @@ from rest_framework import serializers
 from . import models
 from users.models import User
 
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Comment
+        fields = ('context', 'author','created_at', 'post')
+    
 class PostMediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Media
@@ -9,9 +15,8 @@ class PostMediaSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     multimedia = PostMediaSerializer(many=True, read_only=True, required=False)
+    comments = CommentSerializer(many=True, read_only=True)
     class Meta:
         model = models.Post
-        fields = ('name', 'caption', 'status', 'owner', 'created_at', 'multimedia')
-
-
+        fields = ('name', 'caption', 'status', 'owner', 'created_at', 'multimedia','comments')
 

@@ -3,7 +3,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from . import serializers as post_serializer
-from .models import Post, Media
+from .models import Post, Media, Comment
 from users.models import User
 
 
@@ -90,3 +90,21 @@ class AllPostView(generics.RetrieveAPIView):
         postsList = Post.objects.all()
         serializer = post_serializer.PostSerializer(postsList, many=True)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class CreateCommentView(generics.RetrieveUpdateDestroyAPIView):
+
+    queryset = Comment.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = post_serializer.CommentSerializer
+    def put(self, request, pk=None):
+        user = request.user
+        data = request.data
+        data['author'] = user.email
+        data['post'] = pk
+        serializer = self.get_serializer(data=data)
+        if not serializer.is_valid(True):
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return Response("comment created!", status=status.HTTP_202_ACCEPTED)
+
+    
