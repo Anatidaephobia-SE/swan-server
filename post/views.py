@@ -10,7 +10,7 @@ from users.models import User
 class CreatePostView(generics.CreateAPIView):
     queryset = Post.objects.all()
     permission_classes = (IsAuthenticated,)
-    serializer_class = post_serializer.post_serializer
+    serializer_class = post_serializer.PostSerializer
 
     def post(self, request, *args, **kwargs):
         user = request.user
