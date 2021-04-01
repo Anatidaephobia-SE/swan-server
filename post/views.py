@@ -15,12 +15,13 @@ class CreatePostView(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         user = request.user
         data = request.data
-        data['owner'] = user.id
+        data['owner'] = user.email
         serializer = self.get_serializer(data=data)
         if not serializer.is_valid(True):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         post = serializer.save()
         for m in data['multimedia']:
+            profile_picture = request.data.get('profile_picture', None)
             i = Media.objects.create(media=m['media'])
             post.multimedia.add(i)
         return Response("OK", status=status.HTTP_202_ACCEPTED)

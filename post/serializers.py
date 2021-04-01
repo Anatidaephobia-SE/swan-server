@@ -14,10 +14,10 @@ class PostMediaSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     owner = PostOwnerSerializer
-    gallery = PostMediaSerializer(many=True, read_only=True, required=False)
+    multimedia = PostMediaSerializer(many=True, read_only=True, required=False)
     class Meta:
         model = models.Post
         fields = ('name', 'caption', 'status', 'owner', 'created_at', 'multimedia')
-        read_only_fields = ('games', )
+
 
 
