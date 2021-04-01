@@ -17,11 +17,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import url
 import users.urls as users_urls
+import post.urls as post_urls
 from . import settings
 from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^api/users/', include(users_urls))
+    path('api/post/', include(post_urls))
 ]
 
 if(settings.DEBUG):
