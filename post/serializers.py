@@ -5,7 +5,7 @@ from users.models import User
 class PostOwnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', )
+        fields = ('Post_owner', )
 
 class PostMediaSerializer(serializers.ModelSerializer):
     class Meta:
