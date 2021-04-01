@@ -21,7 +21,8 @@ from . import settings
 from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url(r'^api/users/', include(users_urls))
+    url(r'^api/users/', include(users_urls)),
+    path('api/socialmedia/', include('socialmedia.urls')),
 ]
 
 if(settings.DEBUG):
