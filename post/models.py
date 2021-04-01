@@ -16,3 +16,9 @@ class Post(models.Model):
     created_at = models.TimeField(auto_now_add=True)
     multimedia = models.ManyToManyField(Media, related_name='Post', blank=True)
 
+class Comment(models.Model):
+    context = models.CharField(blank=True, max_length=280) 
+    author = models.ForeignKey(User, related_name='comment_author', null=True, on_delete=models.CASCADE)
+    created_at = models.TimeField(auto_now_add=True)
+    post = models.ForeignKey(Post, related_name='post', null=True, on_delete=models.CASCADE)
+
