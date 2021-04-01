@@ -30,6 +30,7 @@ def create_team(request):
 
     new_team = Team(name=name, url=url, logo=logo, head=user)
     new_team.save()
+    new_team.members.add(user)
 
     return Response({'team': TeamSerializer(new_team).data})
 
@@ -62,7 +63,8 @@ def invite_user(request):
 
     team.pending_users.add(user)
 
-    return Response({'message': 'User invited successfuly'})
+    serializer = UserSerializer(user)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])

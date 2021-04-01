@@ -44,7 +44,10 @@ def update_profile(request):
         return Response({"error": "First name not submitted."}, status=status.HTTP_400_BAD_REQUEST)
     if last_name is None:
         return Response({"error": "Last name not submitted."}, status=status.HTTP_400_BAD_REQUEST)
-    user.profile_picture = profile_picture
+
+    if profile_picture:
+        user.profile_picture = profile_picture
+
     user.first_name = first_name
     user.last_name = last_name
     user.save()
