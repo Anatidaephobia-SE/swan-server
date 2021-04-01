@@ -70,3 +70,13 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
             i.delete()
         post_info.delete()
         return Response("OK", status=status.HTTP_202_ACCEPTED)
+
+class SinglePostView(generics.RetrieveAPIView):
+    queryset = Post.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = post_serializer.PostSerializer
+
+    def get(self, request, pk=None):
+        post_Info = Post.objects.all().get(pk=pk)
+        serializer = post_serializer.PostSerializer(post_Info)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
