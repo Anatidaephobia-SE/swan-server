@@ -98,21 +98,20 @@ jobs:
     - name: Create event tag
       if: ${{ contains(github.ref, 'refs/heads/test-release') }}
       run: |
-        export DOCKER_ALPHA_TAG=${GITHUB_REF#refs/heads/}
-        echo $DOCKER_ALPHA_TAG >> $GITHUB_ENV
+        echo "DOCKER_ALPHA_TAG=${GITHUB_REF#refs/heads/}" >> tag.env
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
     
     - name: Pull request event tag
       if: ${{ github.event_name == 'pull_request' }}
       run: |
-        export DOCKER_ALPHA_TAG=${{ github.base_ref }}
-        echo $DOCKER_ALPHA_TAG >> $GITHUB_ENV
+        echo "DOCKER_ALPHA_TAG=${{ github.base_ref }}" >> tag.env
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
 
     - name: Push image
       run: |
+        source tag.env
         docker login ${{ secrets.PRODEUCTION_REGISTRY_URL }} --username "${{ secrets.PRODEUCTION_REGISTRY_USERNAME }}" --password "${{ secrets.PRODEUCTION_REGISTRY_PASSWORD }}"
         docker tag ${{ env.SWAN_IMAGE }} ${{ env.SWAN_IMAGE_WITH_URL }}:$DOCKER_ALPHA_TAG
         docker push ${{ env.SWAN_IMAGE_WITH_URL }}:$DOCKER_ALPHA_TAG
