@@ -4,23 +4,23 @@ on:
 
   pull_request:
     branches:
-      - develop
+      - develop-test
 
   push:
     branches:
-      - develop
+      - develop-test
 
 env:
   COMPOSE_FILE: stage-docker-compose.yaml
   SWAN_IMAGE: swan-stage
-  SWAN_IMAGE_WITH_URL: ${{ secrets.REGISTRY_URL }}/swan-stage
+  SWAN_IMAGE_WITH_URL: ${{ secrets.REGISTRY_URL }}/develop/swan-stage
 
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/develop' #for pull request only
+    if: github.ref != 'refs/heads/develop-test' #for pull request only
 
     services:
       postgres:
@@ -105,7 +105,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop' #for push only
+    if: github.ref == 'refs/heads/develop-test' #for push only
 
     steps:
       - name: Checkout
@@ -130,6 +130,7 @@ jobs:
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> swan.env
           echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> swan.env
           echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}" >> swan.env
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> swan.env
 
       - name: add postgres service env
         run: |
