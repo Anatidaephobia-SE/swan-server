@@ -26,7 +26,7 @@ jobs:
           echo "PRODEUCTION_REGISTRY_PASSWORD=${{ secrets.PRODEUCTION_REGISTRY_PASSWORD }}" >> server.env
           echo "PRODEUCTION_REGISTRY_URL=${{ secrets.PRODEUCTION_REGISTRY_URL }}" >> server.env
           echo "SWAN_IMAGE=${{ env.SWAN_IMAGE }}" >> server.env
-          echo "SWAN_IMAGE_WITH_URL=${{ env.SWAN_IMAGE_WITH_URL }}:$GITHUB_SHA" >> server.env
+          echo "SWAN_IMAGE_WITH_URL=${{ env.SWAN_IMAGE_WITH_URL }}" >> server.env
           echo "COMPOSE_FILE=${{ env.COMPOSE_FILE }}" >> server.env
           echo "DOCKER_PRODUCTION_TAG=${{ github.head_ref }}" >> server.env
         env:
