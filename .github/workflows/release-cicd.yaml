@@ -99,6 +99,7 @@ jobs:
       if: ${{ contains(github.ref, 'refs/heads/test-release') }}
       run: |
         export DOCKER_ALPHA_TAG=${GITHUB_REF#refs/heads/}
+        echo $DOCKER_ALPHA_TAG >> $GITHUB_ENV
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
     
@@ -106,6 +107,7 @@ jobs:
       if: ${{ github.event_name == 'pull_request' }}
       run: |
         export DOCKER_ALPHA_TAG=${{ github.base_ref }}
+        echo $DOCKER_ALPHA_TAG >> $GITHUB_ENV
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
 
