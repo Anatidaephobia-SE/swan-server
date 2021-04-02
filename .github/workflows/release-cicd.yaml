@@ -3,7 +3,7 @@ name: Swan Release CI/CD
 on:
   pull_request:
     branches:
-      - test-release-**
+      - release-**
 
 env:
   COMPOSE_FILE: alpha-docker-compose.yaml
@@ -15,7 +15,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/test-release-**' #for pull request and create
+    if: github.ref != 'refs/heads/release-**' #for pull request and create
 
     services:
       postgres:

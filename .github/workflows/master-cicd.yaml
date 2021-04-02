@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [closed]
     branches:
-      - test-master
+      - master
 
 env:
   COMPOSE_FILE: prod-docker-compose.yaml
