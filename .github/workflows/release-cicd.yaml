@@ -96,7 +96,7 @@ jobs:
         docker-compose -f ${{ env.COMPOSE_FILE }} build
     
     - name: Create event tag
-      if: ${{ github.ref == 'refs/heads/test-release-**' }}
+      if: ${{ contains(github.ref, 'refs/heads/test-release') }}
       run: |
         export DOCKER_ALPHA_TAG=${GITHUB_REF#refs/heads/}
       env:
