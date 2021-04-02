@@ -58,6 +58,7 @@ jobs:
         POSTGRES_HOST_AUTH_METHOD: trust
         POSTGRES_HOST: localhost
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
+        SECRET_KEY: ${{ secrets.PRODEUCTION_SECRET_KEY }}
     - name: Run tests
       run: python manage.py test
       env: 
@@ -67,6 +68,7 @@ jobs:
         POSTGRES_HOST_AUTH_METHOD: trust
         POSTGRES_HOST: localhost
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
+        SECRET_KEY: ${{ secrets.PRODEUCTION_SECRET_KEY }}
 
     - name: add swan service env
       run: |
