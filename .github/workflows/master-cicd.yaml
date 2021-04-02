@@ -3,7 +3,7 @@ name: Swan application
 on:
   push:
     branches:
-      - master
+      - test-master
 
 env:
   COMPOSE_FILE: prod-docker-compose.yaml
@@ -14,7 +14,7 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master' #for push only
+    if: github.ref == 'refs/heads/test-master' #for push only
 
     steps:
       - name: Checkout
