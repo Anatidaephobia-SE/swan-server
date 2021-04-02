@@ -68,7 +68,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'ENDSSH'
             cd ~/swan-prod
             source server.env
-            docker login $REGISTRY_URL_PRODEUCTION --username $PRODEUCTION_REGISTRY_USERNAME --password $PRODEUCTION_REGISTRY_PASSWORD
+            docker login $PRODEUCTION_REGISTRY_URL --username $PRODEUCTION_REGISTRY_USERNAME --password $PRODEUCTION_REGISTRY_PASSWORD
             docker pull $SWAN_IMAGE_WITH_URL:$DOCKER_PRODUCTION_TAG
             export SWAN_IMAGE=$SWAN_IMAGE_WITH_URL:$DOCKER_PRODUCTION_TAG
             docker-compose -f $COMPOSE_FILE up -d
