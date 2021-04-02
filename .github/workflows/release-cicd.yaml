@@ -1,9 +1,6 @@
 name: Swan Release CI/CD
 
 on:
-
-  create:
-
   pull_request:
     branches:
       - test-release-**
