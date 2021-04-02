@@ -15,7 +15,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/test-release-**' || contains(github.ref, 'refs/heads/test-release') #for pull request and create
+    if: github.ref != 'refs/heads/test-release-**' #for pull request and create
 
     services:
       postgres:
@@ -91,13 +91,6 @@ jobs:
     - name: Build image
       run: |
         docker-compose -f ${{ env.COMPOSE_FILE }} build
-    
-    - name: Create event tag
-      if: ${{ contains(github.ref, 'refs/heads/test-release') }}
-      run: |
-        echo "DOCKER_ALPHA_TAG=${GITHUB_REF#refs/heads/}" >> tag.env
-      env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
     
     - name: Pull request event tag
       if: ${{ github.event_name == 'pull_request' }}
