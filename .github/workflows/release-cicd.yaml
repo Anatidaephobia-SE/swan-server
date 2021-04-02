@@ -18,7 +18,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    if: ${{ github.ref != 'refs/heads/test-release-**' || contains(github.ref, 'refs/heads/test-release') }} #for pull request and create
+    if: github.ref != 'refs/heads/test-release-**' || contains(github.ref, 'refs/heads/test-release') #for pull request and create
 
     services:
       postgres:
