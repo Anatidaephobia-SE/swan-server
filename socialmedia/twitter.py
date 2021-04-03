@@ -6,10 +6,11 @@ import requests
 from requests_oauthlib import OAuth1
 import os
 
-def Authorize_Address():
+def Authorize_Address(team_url):
     consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
     consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
-    auth = OAuth1(client_key=consumer_key, client_secret=consumer_secret)
+    auth = OAuth1(client_key=consumer_key, client_secret=consumer_secret, callback_uri=f"http://localhost:8080?team_url={team_url}")
+    
     print(consumer_key)
     response = requests.post(url=REQUEST_TOKEN_ADDRESS, auth=auth, params={'lang': 'en'})
     if(response.status_code == 200):
