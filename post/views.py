@@ -2,6 +2,7 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
 from . import serializers as post_serializer
 from .models import Post, Media, Comment
 from users.models import User
@@ -106,11 +107,11 @@ class CreateCommentView(generics.RetrieveUpdateDestroyAPIView):
         serializer.save()
         return Response("comment created.", status=status.HTTP_202_ACCEPTED)
     
-class AllCommentsView(generics.RetrieveAPIView):
-    queryset = Post.objects.all()
+class AllCommentsView(generics.ListAPIView):
+    queryset = Comment.objects.all()
     permission_classes = (IsAuthenticated,)
-    serializer_class = post_serializer.PostSerializer
-
+    serializer_class = post_serializer.CommentSerializer
+    pagination_class = PageNumberPagination
     def get(self, request, pk=None):
         commentsList = Comment.objects.all().filter(post=pk)
         serializer = post_serializer.CommentSerializer(commentsList, many=True)
