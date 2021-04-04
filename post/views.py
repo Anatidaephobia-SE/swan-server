@@ -36,7 +36,7 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
         post_info = Post.objects.all().get(pk=pk)
         posts_query = user.Post_owner.all()
         if not posts_query.filter(pk=pk).exists():
-            return Response("This post does not exist!", status=status.HTTP_400_BAD_REQUEST)
+            return Response("You did not create this post!", status=status.HTTP_400_BAD_REQUEST)
         serializer = post_serializer.PostSerializer(post_info)
         serializer.data['owner'] = User.objects.get(email=serializer.data['owner'])
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -47,7 +47,7 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
         post_info = Post.objects.all().get(pk=pk)
         posts_query = user.Post_owner.all()
         if not posts_query.filter(pk=pk).exists():
-            return Response("This post does not exist!", status=status.HTTP_400_BAD_REQUEST)
+            return Response("You did not create this post!", status=status.HTTP_400_BAD_REQUEST)
         serializer = self.get_serializer(instance=post_info, data=data)
         if serializer.is_valid(True):
             post = serializer.update(instance=post_info, validated_data=serializer.validated_data)    
@@ -63,7 +63,7 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
         post_info = Post.objects.all().get(pk=pk)
         posts_query = user.Post_owner.all()
         if not posts_query.filter(pk=pk).exists():
-            return Response("This post does not exist!", status=status.HTTP_400_BAD_REQUEST)
+            return Response("You did not create this post!", status=status.HTTP_400_BAD_REQUEST)
         multimedia_info = post_info.multimedia.all()
         for i in multimedia_info:
             i.delete()
