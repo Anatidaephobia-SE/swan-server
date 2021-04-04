@@ -50,16 +50,11 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
             return Response("This post does not exist!", status=status.HTTP_400_BAD_REQUEST)
         serializer = self.get_serializer(instance=post_info, data=data)
         if serializer.is_valid(True):
-            post = serializer.update(instance=post_info, validated_data=serializer.validated_data)
-                
+            post = serializer.update(instance=post_info, validated_data=serializer.validated_data)    
             post.multimedia.clear()
             for m in data['multimedia']:
                 i = Media.objects.create(media=m['media'])
                 post.multimedia.add(i)
-            # post.comments.clear()
-            # for c in data['comments']:
-            #     c = Comment.objects.create(context=c['context'])
-            #     post.comments.add(c)
             return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
         return Response("Not OK", status=status.HTTP_400_BAD_REQUEST)
 
@@ -121,3 +116,17 @@ class AllCommentsView(generics.RetrieveAPIView):
         serializer = post_serializer.CommentSerializer(commentsList, many=True)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
+class DeleteCommentView(generics.RetrieveUpdateDestroyAPIView):
+
+    queryset = Comment.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = post_serializer.CommentSerializer
+    def delete(self, request, pk=None):
+        user = request.user
+        comment_info = Comment.objects.all().get(pk=pk)
+        comments_query = user.comment_author.all()
+        print("**********************",comments_query)
+        if not comments_query.filter(pk=pk).exists():
+            return Response("You did not write this comment!", status=status.HTTP_400_BAD_REQUEST)
+        comment_info.delete()
+        return Response("OK", status=status.HTTP_202_ACCEPTED)
