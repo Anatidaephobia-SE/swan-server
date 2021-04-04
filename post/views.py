@@ -56,19 +56,19 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
                 i = Media.objects.create(media=m['media'])
                 post.multimedia.add(i)
             return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
-        return Response("Not OK", status=status.HTTP_400_BAD_REQUEST)
+        return Response("Bad request.", status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk=None):
         user = request.user
         post_info = Post.objects.all().get(pk=pk)
         posts_query = user.Post_owner.all()
         if not posts_query.filter(pk=pk).exists():
-            return Response("You did not create this post!", status=status.HTTP_400_BAD_REQUEST)
+            return Response("You did not create this post.", status=status.HTTP_400_BAD_REQUEST)
         multimedia_info = post_info.multimedia.all()
         for i in multimedia_info:
             i.delete()
         post_info.delete()
-        return Response("OK", status=status.HTTP_202_ACCEPTED)
+        return Response("Post deleted.", status=status.HTTP_202_ACCEPTED)
 
 class SinglePostView(generics.RetrieveAPIView):
     queryset = Post.objects.all()
@@ -104,7 +104,7 @@ class CreateCommentView(generics.RetrieveUpdateDestroyAPIView):
         if not serializer.is_valid(True):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
-        return Response("comment created!", status=status.HTTP_202_ACCEPTED)
+        return Response("comment created.", status=status.HTTP_202_ACCEPTED)
     
 class AllCommentsView(generics.RetrieveAPIView):
     queryset = Post.objects.all()
@@ -125,8 +125,7 @@ class DeleteCommentView(generics.RetrieveUpdateDestroyAPIView):
         user = request.user
         comment_info = Comment.objects.all().get(pk=pk)
         comments_query = user.comment_author.all()
-        print("**********************",comments_query)
         if not comments_query.filter(pk=pk).exists():
-            return Response("You did not write this comment!", status=status.HTTP_400_BAD_REQUEST)
+            return Response("You did not write this comment.", status=status.HTTP_400_BAD_REQUEST)
         comment_info.delete()
-        return Response("OK", status=status.HTTP_202_ACCEPTED)
+        return Response("Comment deleted.", status=status.HTTP_202_ACCEPTED)
