@@ -36,18 +36,15 @@ SECRET_KEY = '!)vy8ut^x=*j@8l+hm20ceq98dyv!wfs1@a5@k9802&z!_j*+_'
 DEBUG = True
 
 
-
 #ALLOWED_HOSTS = []
 
-import os
-from dotenv import load_dotenv
 
 load_dotenv()
 
 ALLOWED_HOSTS = ['anatidaephobia.pythonanywhere.com', 'localhost']
 allowed_hosts_string = os.getenv("ALLOWED_HOSTS")
 
-if  allowed_hosts_string != None and len(allowed_hosts_string) != 0:
+if allowed_hosts_string != None and len(allowed_hosts_string) != 0:
     allowed_host_list = allowed_hosts_string.split(", ")
 
     for allowed_host in allowed_host_list:
@@ -106,16 +103,14 @@ WSGI_APPLICATION = 'swan.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.getenv('POSTGRES_DBNAME', 'postgres'),
-        'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
-        'PORT': os.getenv('POSTGRES_PORT', 5432),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
