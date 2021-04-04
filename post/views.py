@@ -56,6 +56,10 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
             for m in data['multimedia']:
                 i = Media.objects.create(media=m['media'])
                 post.multimedia.add(i)
+            # post.comments.clear()
+            # for c in data['comments']:
+            #     c = Comment.objects.create(context=c['context'])
+            #     post.comments.add(c)
             return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
         return Response("Not OK", status=status.HTTP_400_BAD_REQUEST)
 
@@ -106,5 +110,14 @@ class CreateCommentView(generics.RetrieveUpdateDestroyAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
         return Response("comment created!", status=status.HTTP_202_ACCEPTED)
+    
+class AllCommentsView(generics.RetrieveAPIView):
+    queryset = Post.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = post_serializer.PostSerializer
 
+    def get(self, request, pk=None):
+        commentsList = Comment.objects.all().filter(post=pk)
+        serializer = post_serializer.CommentSerializer(commentsList, many=True)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
     
