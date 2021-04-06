@@ -9,7 +9,8 @@ from team.models import Team
 from request_checker.functions import *
 # Create your views here.
 
-@api_view(['GET'])
+
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def twitter_request_authorize(request):
     req_check = have_parameters(request, 'team_url')
@@ -31,8 +32,9 @@ def twitter_request_authorize(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def twitter_access(request):    
-    req_check = have_parameters(request, 'oauth_token', 'oauth_verifier', 'team_url')
+def twitter_access(request):
+    req_check = have_parameters(
+        request, 'oauth_token', 'oauth_verifier', 'team_url')
     if not req_check.have_all:
         return Response({'error': req_check.error_message}, status=status.HTTP_400_BAD_REQUEST)
 
