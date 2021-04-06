@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes, api_view
-from .twitter import Authorize_Address, Get_Access_Token
+from .twitter import Authorize_Address, Get_Access_Token, Queue_Tweet, Tweet
 from rest_framework.response import Response
 from rest_framework import status
 from .models import SocialMedia
@@ -60,4 +60,31 @@ def twitter_access(request):
     social_media.twitter_user_id = twitter_data['user_id']
     social_media.twitter_name = twitter_data['screen_name']
     social_media.save()
+    return Response(data={"message": "Successful."}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def tweet(request):
+    user = request.user
+    req_check = have_parameters(request, 'post_id', 'team_url')
+    if not req_check.have_all:
+        return Response({'error': req_check.error_message}, status=status.HTTP_400_BAD_REQUEST)
+    team_url = request.data.get("team_url")
+    post_id = request.data.get("post_id")
+    text = "Hola!"
+    try:
+        team = Team.objects.get(url=team_url)
+        social_media = SocialMedia.objects.get(team=team)
+    except Team.DoesNotExist:
+        return Response(data={"error": "Team not found"}, status=status.HTTP_404_NOT_FOUND)
+    try:
+        social_media = SocialMedia.objects.get(team=team)
+    except SocialMedia.DoesNotExist:
+        return Response(data={"error": "Social media accounts not found"}, status=status.HTTP_404_NOT_FOUND)
+    try:
+        #TODO find post
+        pass
+    except:
+        pass
+    Tweet(text, social_media) #TODO Queue_Tweet(post, ...)
     return Response(data={"message": "Successful."}, status=status.HTTP_200_OK)

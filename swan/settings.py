@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_crontab',
     'rest_framework',
     'users',
     'team',
@@ -169,3 +170,9 @@ REST_FRAMEWORK = {
         'users.authenticators.JWTAuthenticator',
     )
 }
+
+#CRON JOBS
+# CRONJOBS = [
+#     ('* * * * *', 'socialmedia.twitter.Pop_Tweets')
+# ]
+# CRONTAB_COMMAND_SUFFIX = '2>&1'
