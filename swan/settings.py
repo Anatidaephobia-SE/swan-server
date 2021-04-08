@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'team',
     'request_checker',
     'corsheaders',
+    'post',
 ]
 CORS_ORIGIN_ALLOW_ALL = True
 MIDDLEWARE = [
@@ -163,5 +164,8 @@ REFRESH_TOKEN_EXPIRE_TIME = timedelta(days=2, hours=0, minutes=0)
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'users.authenticators.JWTAuthenticator',
-    )
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
 }
+
