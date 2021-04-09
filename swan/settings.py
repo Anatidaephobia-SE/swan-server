@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_crontab',
     'rest_framework',
     'users',
     'team',
@@ -106,8 +107,12 @@ WSGI_APPLICATION = 'swan.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'postgres',
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
+        'PORT': os.getenv('POSTGRES_PORT', 5432),
     }
 }
 
@@ -164,3 +169,9 @@ REST_FRAMEWORK = {
         'users.authenticators.JWTAuthenticator',
     )
 }
+
+#CRON JOBS
+# CRONJOBS = [
+#     ('* * * * *', 'socialmedia.twitter.Pop_Tweets')
+# ]
+# CRONTAB_COMMAND_SUFFIX = '2>&1'
