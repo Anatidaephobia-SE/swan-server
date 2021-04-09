@@ -10,7 +10,7 @@ REQUEST_TOKEN_ADDRESS = "https://api.twitter.com/oauth/request_token"
 AUTHORIZE_ADDRESS = "https://api.twitter.com/oauth/authorize"
 ACCESS_TOKEN = "https://api.twitter.com/oauth/access_token"
 UPDATE_STATUS = "https://api.twitter.com/1.1/statuses/update.json"
-
+USERS_LOOKUP = "https://api.twitter.com/1.1/users/lookup.json"
 def Authorize_Address(team_url):
     consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
     consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
@@ -47,7 +47,6 @@ def Queue_Tweet(post, social_media: SocialMedia):
     return "Successfully queued for tweeting.", 200
 
 def Pop_Tweets():
-    print("pop")
     try:
         post, social_media = tweets_queue.get(False)
         sync_to_async(Tweet, thread_sensitive=False)(post, social_media)
@@ -74,3 +73,12 @@ def Tweet(post, social_media):
     response = requests.post(url=UPDATE_STATUS, params=params, auth=auth)
     print(f"posted tweet with response: {response.status_code}")
     #TODO Change post status based on the response
+    return response
+
+def Get_Twitter_User(user_id):
+    consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
+    consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
+    params = {"user_id": user_id}
+    auth = OAuth1(client_key=consumer_key, client_secret=consumer_secret)
+    response = requests.get(USERS_LOOKUP, params=params, auth=auth)
+    return response

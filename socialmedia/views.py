@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes, api_view
-from .twitter import Authorize_Address, Get_Access_Token, Queue_Tweet, Tweet
+from .twitter import Authorize_Address, Get_Access_Token, Queue_Tweet, Tweet, Get_Twitter_User
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, generics
 from .models import SocialMedia
 from team.models import Team
 from request_checker.functions import *
@@ -76,7 +76,6 @@ def tweet(request):
     text = "Hola!"
     try:
         team = Team.objects.get(url=team_url)
-        social_media = SocialMedia.objects.get(team=team)
     except Team.DoesNotExist:
         return Response(data={"error": "Team not found"}, status=status.HTTP_404_NOT_FOUND)
     try:
@@ -90,3 +89,32 @@ def tweet(request):
         pass
     Tweet(text, social_media) #TODO Queue_Tweet(post, ...)
     return Response(data={"message": "Successful."}, status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+def get_user(request):
+    user = request.user
+    req_check = have_queryparams(request, 'team_url')
+    if not req_check.have_all:
+        return Response({'error': req_check.error_message}, status=status.HTTP_400_BAD_REQUEST)
+    team_url = request.query_params.get("team_url")
+
+    try:
+        team = Team.objects.get(url=team_url)
+    except Team.DoesNotExist:
+        return Response(data={"error": "Team not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    try:
+        social_media = SocialMedia.objects.get(team=team)
+    except SocialMedia.DoesNotExist:
+        return Response(data={"error": "Social media accounts for this team not found"}, status=status.HTTP_404_NOT_FOUND)
+    response = Get_Twitter_User(social_media.twitter_user_id)
+    if(response.status_code != 200):
+        return Response(data=response.json(), status=response.status_code)
+    json = response.json()[0]
+    data = {
+        "name": json["name"], 
+        "profile_image": json["profile_image_url"], 
+        "secreen_name" : json['screen_name'],
+        "default_profile_image" : json["default_profile_image"]
+    }
+    return Response(data=data, status=response.status_code)
