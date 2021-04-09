@@ -227,6 +227,7 @@ def update_team_info(request):
     
     new_logo = request.data.get('logo', None)
     new_name = request.data.get('name', None)
+    new_url = request.data.get('url', None)
 
     if new_logo != None:
         team.logo = new_logo
@@ -234,32 +235,11 @@ def update_team_info(request):
     if new_name != None:
         team.name = new_name
         team.save(update_fields = ['name'])
+    if new_url != None:
+        if Team.objects.filter(url = new_url).exists():
+            return Response({'error' : 'Team with this url already exists'})
+    
+        team.url = new_url
+        team.save(update_fields = ['url'])
     
     return Response({'message' : 'All fields updated'})
-
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def update_team_url(request):
-    head = request.user
-
-    req_check = have_parameters(request, 'team_url', 'new_url')
-    if not req_check.have_all: return Response({'error' : req_check.error_message}, status = status.HTTP_400_BAD_REQUEST)
-
-    team_url = request.data.get('team_url')
-
-    team = Team.objects.filter(url = team_url).first()
-    if team is None:
-        return Response({'error' : 'Team with this url does not exist'}, status = status.HTTP_404_NOT_FOUND)
-    
-    if team.head != head:
-        return Response({'error' : 'This user is not head of team'}, status = status.HTTP_403_FORBIDDEN)
-
-    new_url = request.data.get('new_url')
-    
-    if Team.objects.filter(url = new_url).exists():
-        return Response({'error' : 'Team with this url already exists'})
-    
-    team.url = new_url
-    team.save(update_fields = ['url'])
-
-    return Response({'message' : 'Team url updated'})

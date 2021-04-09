@@ -13,5 +13,4 @@ urlpatterns = [
     path('get_members', get_members),
     path('get_user_teams', get_user_teams),
     path('update_team_info', update_team_info),
-    path('update_team_url', update_team_url),
 ]
