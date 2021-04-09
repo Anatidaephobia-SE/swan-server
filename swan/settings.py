@@ -18,6 +18,9 @@ from pathlib import Path
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
@@ -33,18 +36,15 @@ SECRET_KEY = '!)vy8ut^x=*j@8l+hm20ceq98dyv!wfs1@a5@k9802&z!_j*+_'
 DEBUG = True
 
 
-
 #ALLOWED_HOSTS = []
 
-import os
-from dotenv import load_dotenv
 
 load_dotenv()
 
 ALLOWED_HOSTS = ['anatidaephobia.pythonanywhere.com', 'localhost']
 allowed_hosts_string = os.getenv("ALLOWED_HOSTS")
 
-if  allowed_hosts_string != None and len(allowed_hosts_string) != 0:
+if allowed_hosts_string != None and len(allowed_hosts_string) != 0:
     allowed_host_list = allowed_hosts_string.split(", ")
 
     for allowed_host in allowed_host_list:
@@ -61,11 +61,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_crontab',
     'rest_framework',
     'users',
     'team',
     'request_checker',
     'corsheaders',
+    'socialmedia'
 ]
 CORS_ORIGIN_ALLOW_ALL = True
 MIDDLEWARE = [
@@ -102,6 +104,7 @@ WSGI_APPLICATION = 'swan.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -112,6 +115,7 @@ DATABASES = {
         'PORT': os.getenv('POSTGRES_PORT', 5432),
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -165,3 +169,9 @@ REST_FRAMEWORK = {
         'users.authenticators.JWTAuthenticator',
     )
 }
+
+#CRON JOBS
+# CRONJOBS = [
+#     ('* * * * *', 'socialmedia.twitter.Pop_Tweets')
+# ]
+# CRONTAB_COMMAND_SUFFIX = '2>&1'
