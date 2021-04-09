@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'request_checker',
     'corsheaders',
     'socialmedia'
+    'post',
 ]
 CORS_ORIGIN_ALLOW_ALL = True
 MIDDLEWARE = [
@@ -167,11 +168,8 @@ REFRESH_TOKEN_EXPIRE_TIME = timedelta(days=2, hours=0, minutes=0)
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'users.authenticators.JWTAuthenticator',
-    )
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
 }
 
-#CRON JOBS
-# CRONJOBS = [
-#     ('* * * * *', 'socialmedia.twitter.Pop_Tweets')
-# ]
-# CRONTAB_COMMAND_SUFFIX = '2>&1'
