@@ -8,7 +8,7 @@ def get_teamlogo_directory(instance, filename):
 
 class Team(models.Model):
     name = models.CharField(max_length=100)
-    url = models.CharField(primary_key=True, max_length=100)
+    url = models.CharField(unique=True, max_length=100)
     logo = models.ImageField(upload_to=get_teamlogo_directory, null=True)
     members = models.ManyToManyField(User, related_name='members', blank=True)
     pending_users = models.ManyToManyField(
