@@ -24,7 +24,7 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/socialmedia/', include('socialmedia.urls')),
+    path('api/v1.0.0/socialmedia/', include('socialmedia.urls')),
     path('api/users/', include(users_urls)),
     path('api/team/', include(team_urls))
 ]
