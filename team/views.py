@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from request_checker.functions import *
-from .serializers import TeamSerializer
+from .serializers import TeamSerializer, MemberSerializer
 from users.serializers import UserSerializer
 from django.db.models import Q
 from rest_framework.response import Response
@@ -55,7 +55,7 @@ def invite_user(request):
     if user is None:
         return Response({'error': 'User with this username does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
-    if Team.objects.filter(Q(pk=team_url, pending_users__pk=user.id) | Q(pk=team_url, members__pk=user.id)).exists():
+    if Team.objects.filter(Q(url=team_url, pending_users__id=user.id) | Q(url=team_url, members__id=user.id)).exists():
         return Response({'error': 'User already invited or joined to team'}, status=status.HTTP_400_BAD_REQUEST)
 
     if team.head != head:
@@ -82,7 +82,7 @@ def accept_invite(request):
     if team is None:
         return Response({'error': 'Team with url does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
-    if not Team.objects.filter(pk=team_url, pending_users__pk=user.id).exists():
+    if not Team.objects.filter(url=team_url, pending_users__pk=user.id).exists():
         return Response({'error': 'User is not invited to team'}, status=status.HTTP_403_FORBIDDEN)
 
     team.pending_users.remove(user)
@@ -100,7 +100,7 @@ def reject_invite(request, team_url):
     if team is None:
         return Response({'error': 'Team with url does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
-    if not Team.objects.filter(pk=team_url, pending_users__pk=user.id).exists():
+    if not Team.objects.filter(url=team_url, pending_users__pk=user.id).exists():
         return Response({'error': 'User is not invited to team'}, status=status.HTTP_403_FORBIDDEN)
 
     team.pending_users.remove(user)
@@ -119,6 +119,7 @@ def remove_user(request, team_url):
 
     username = request.query_params.get('username')
 
+    print(team_url)
     team = Team.objects.filter(url=team_url).first()
     if team is None:
         return Response({'error': 'Team with this url does not exist'}, status=status.HTTP_404_NOT_FOUND)
@@ -193,8 +194,8 @@ def get_members(request):
     members = team.members.all()
     serialized = []
     for member in members:
-        serialized.append(UserSerializer(member, context = {'is_head' : team.head.id == member.id}))
-    return Response({'members': serialized.data})
+        serialized.append(MemberSerializer(member, context = {'is_head' : team.head.id == member.id}).data)
+    return Response({'members': serialized})
 
 
 @api_view(['GET'])
@@ -213,16 +214,16 @@ def update_team_info(request):
     head = request.user
 
     req_check = have_parameters(request, 'team_url')
-    if not req_check.have_all: return JsonResponse({'error' : req_check.error_message}, status = status.HTTP_400_BAD_REQUEST)
+    if not req_check.have_all: return Response({'error' : req_check.error_message}, status = status.HTTP_400_BAD_REQUEST)
 
     team_url = request.data.get('team_url')
 
     team = Team.objects.filter(url = team_url).first()
     if team is None:
-        return JsonResponse({'error' : 'Team with this url does not exist'}, status = status.HTTP_404_NOT_FOUND)
+        return Response({'error' : 'Team with this url does not exist'}, status = status.HTTP_404_NOT_FOUND)
     
     if team.head != head:
-        return JsonResponse({'error' : 'This user is not head of team'}, status = status.HTTP_403_FORBIDDEN)
+        return Response({'error' : 'This user is not head of team'}, status = status.HTTP_403_FORBIDDEN)
     
     new_logo = request.data.get('logo', None)
     new_name = request.data.get('name', None)
@@ -234,7 +235,7 @@ def update_team_info(request):
         team.name = new_name
         team.save(update_fields = ['name'])
     
-    return JsonResponse({'message' : 'All fields updated'})
+    return Response({'message' : 'All fields updated'})
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -242,23 +243,23 @@ def update_team_url(request):
     head = request.user
 
     req_check = have_parameters(request, 'team_url', 'new_url')
-    if not req_check.have_all: return JsonResponse({'error' : req_check.error_message}, status = status.HTTP_400_BAD_REQUEST)
+    if not req_check.have_all: return Response({'error' : req_check.error_message}, status = status.HTTP_400_BAD_REQUEST)
 
     team_url = request.data.get('team_url')
 
     team = Team.objects.filter(url = team_url).first()
     if team is None:
-        return JsonResponse({'error' : 'Team with this url does not exist'}, status = status.HTTP_404_NOT_FOUND)
+        return Response({'error' : 'Team with this url does not exist'}, status = status.HTTP_404_NOT_FOUND)
     
     if team.head != head:
-        return JsonResponse({'error' : 'This user is not head of team'}, status = status.HTTP_403_FORBIDDEN)
+        return Response({'error' : 'This user is not head of team'}, status = status.HTTP_403_FORBIDDEN)
 
     new_url = request.data.get('new_url')
     
     if Team.objects.filter(url = new_url).exists():
-        return JsonResponse({'error' : 'Team with this url already exists'})
+        return Response({'error' : 'Team with this url already exists'})
     
     team.url = new_url
     team.save(update_fields = ['url'])
 
-    return JsonResponse({'message' : 'Team url updated'})
+    return Response({'message' : 'Team url updated'})
