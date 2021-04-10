@@ -24,11 +24,11 @@ class PostSerializer(serializers.ModelSerializer):
     multimedia = PostMediaSerializer(many=True, read_only=True, required=False)
     class Meta:
         model = models.Post
-        fields = ('name', 'caption', 'status', 'owner', 'created_at', 'multimedia','team')
+        fields = ('id','name', 'caption', 'status', 'owner', 'created_at', 'multimedia','team')
     read_only_fields = ('owner')
 
 class UpdatePostSerializer(serializers.ModelSerializer):
     multimedia = PostMediaSerializer(many=True, read_only=True, required=False)
     class Meta:
         model = models.Post
-        fields = ('name', 'caption', 'status', 'multimedia','team')
+        fields = ('id','name', 'caption', 'status', 'multimedia','team')

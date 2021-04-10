@@ -30,7 +30,7 @@ class CreatePostView(generics.CreateAPIView):
         for m in data['multimedia']:
             i = Media.objects.create(media=m['media'])
             post.multimedia.add(i)
-        return Response("Post created!", status=status.HTTP_202_ACCEPTED)
+        return Response(post_serializer.PostSerializer(post).data, status=status.HTTP_201_CREATED)
 
 class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
 
