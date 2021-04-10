@@ -33,7 +33,7 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = Post.objects.all()
     permission_classes = (IsAuthenticated,)
-    serializer_class = post_serializer.PostSerializer
+    serializer_class = post_serializer.UpdatePostSerializer
 
     def get(self, request, pk=None):
         user = request.user
@@ -41,8 +41,8 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
         posts_query = user.owner.all()
         if not posts_query.filter(pk=pk).exists():
             return Response("You did not create this post!", status=status.HTTP_400_BAD_REQUEST)
-        serializer = post_serializer.PostSerializer(post_info)
-        serializer.data['owner'] = User.objects.get(id=serializer.data['owner'])
+        serializer = post_serializer.UpdatePostSerializer(post_info)
+        serializer.data['owner'] = user.id
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def put(self, request, pk=None):
@@ -64,7 +64,6 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
             if post.status == 'Published':
                 socialmedia=SocialMedia.objects.all().get(team=post.team)
                 twitter_response = Tweet(post,socialmedia)
-                print("****************",twitter_response)
                 if twitter_response.status_code != 200 :
                     post.status == 'Error'
             return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
@@ -110,7 +109,7 @@ class CreateCommentView(generics.RetrieveUpdateDestroyAPIView):
     def put(self, request, pk=None):
         user = request.user
         data = request.data
-        data['author'] = user.email
+        data['author'] = user.id
         data['post'] = pk
         serializer = self.get_serializer(data=data)
         if not serializer.is_valid(True):
