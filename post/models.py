@@ -10,9 +10,13 @@ class Media(models.Model):
     media = models.FileField(upload_to=get_user_directory, null=True)
 
 class Post(models.Model):
+    CHOICES = (
+        ('Dr','Drafts'),
+        ('Pu','Published')
+    )
     name = models.CharField(null = True, max_length=60)
     caption = models.CharField(blank = True, max_length=280)
-    status = models.CharField(null = True, default='Draft',max_length=20)
+    status = models.CharField(null = True, default='Draft',max_length=20,choices = CHOICES)
     owner = models.ForeignKey(User, related_name = 'owner', null=True, on_delete = models.CASCADE)
     created_at = models.TimeField(auto_now_add = True)
     multimedia = models.ManyToManyField(Media, related_name = 'Post', blank=True)
