@@ -6,7 +6,9 @@ from rest_framework.pagination import PageNumberPagination
 from . import serializers as post_serializer
 from .models import Post, Media, Comment
 from users.models import User
-
+from team.models import Team
+from socialmedia.models import SocialMedia
+from socialmedia.twitter import Tweet
 
 class CreatePostView(generics.CreateAPIView):
     queryset = Post.objects.all()
@@ -16,7 +18,7 @@ class CreatePostView(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         user = request.user
         data = request.data
-        data['owner'] = user.email
+        data['owner'] = user.id
         serializer = self.get_serializer(data=data)
         if not serializer.is_valid(True):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -24,6 +26,7 @@ class CreatePostView(generics.CreateAPIView):
         for m in data['multimedia']:
             i = Media.objects.create(media=m['media'])
             post.multimedia.add(i)
+        post.team = Team.objects.get(url=data['team'])
         return Response("Post created!", status=status.HTTP_202_ACCEPTED)
 
 class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
@@ -35,34 +38,42 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
     def get(self, request, pk=None):
         user = request.user
         post_info = Post.objects.all().get(pk=pk)
-        posts_query = user.Post_owner.all()
+        posts_query = user.owner.all()
         if not posts_query.filter(pk=pk).exists():
             return Response("You did not create this post!", status=status.HTTP_400_BAD_REQUEST)
         serializer = post_serializer.PostSerializer(post_info)
-        serializer.data['owner'] = User.objects.get(email=serializer.data['owner'])
+        serializer.data['owner'] = User.objects.get(id=serializer.data['owner'])
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def put(self, request, pk=None):
         user = request.user
         data = request.data
         post_info = Post.objects.all().get(pk=pk)
-        posts_query = user.Post_owner.all()
+        posts_query = user.owner.all()
+        teams_query = Team.objects.all()
         if not posts_query.filter(pk=pk).exists():
             return Response("You did not create this post!", status=status.HTTP_400_BAD_REQUEST)
         serializer = self.get_serializer(instance=post_info, data=data)
+
         if serializer.is_valid(True):
             post = serializer.update(instance=post_info, validated_data=serializer.validated_data)    
             post.multimedia.clear()
             for m in data['multimedia']:
                 i = Media.objects.create(media=m['media'])
                 post.multimedia.add(i)
+            if post.status == 'Published':
+                socialmedia=SocialMedia.objects.all().get(team=post.team)
+                twitter_response = Tweet(post,socialmedia)
+                print("****************",twitter_response)
+                if twitter_response.status_code != 200 :
+                    post.status == 'Error'
             return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
         return Response("Bad request.", status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk=None):
         user = request.user
         post_info = Post.objects.all().get(pk=pk)
-        posts_query = user.Post_owner.all()
+        posts_query = user.owner.all()
         if not posts_query.filter(pk=pk).exists():
             return Response("You did not create this post.", status=status.HTTP_400_BAD_REQUEST)
         multimedia_info = post_info.multimedia.all()

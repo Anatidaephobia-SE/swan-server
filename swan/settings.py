@@ -67,7 +67,7 @@ INSTALLED_APPS = [
     'team',
     'request_checker',
     'corsheaders',
-    'socialmedia'
+    'socialmedia',
     'post',
 ]
 CORS_ORIGIN_ALLOW_ALL = True
