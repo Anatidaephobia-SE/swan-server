@@ -18,15 +18,18 @@ class CreatePostView(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         user = request.user
         data = request.data
-        data['owner'] = user.id
         serializer = self.get_serializer(data=data)
         if not serializer.is_valid(True):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        post = serializer.save()
+        post_team=Team.objects.get(url=data['team'])
+        post_name=data['name']
+        post_caption=data['caption']
+        post_status=data['status']
+        post = Post(team=post_team,name=post_name,caption=post_caption,status=post_status,owner=user)
+        post.save()
         for m in data['multimedia']:
             i = Media.objects.create(media=m['media'])
             post.multimedia.add(i)
-        post.team = Team.objects.get(url=data['team'])
         return Response("Post created!", status=status.HTTP_202_ACCEPTED)
 
 class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
@@ -109,12 +112,13 @@ class CreateCommentView(generics.RetrieveUpdateDestroyAPIView):
     def put(self, request, pk=None):
         user = request.user
         data = request.data
-        data['author'] = user.id
-        data['post'] = pk
         serializer = self.get_serializer(data=data)
         if not serializer.is_valid(True):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        serializer.save()
+        comment_context=data['context']
+        comment_post=Post.objects.get(pk=pk)
+        comment = Comment(author=user,context=comment_context,post=comment_post)
+        comment.save()
         return Response("comment created.", status=status.HTTP_202_ACCEPTED)
     
 class AllCommentsView(generics.ListAPIView):
