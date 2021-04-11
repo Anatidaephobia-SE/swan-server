@@ -13,7 +13,7 @@ on:
 env:
   COMPOSE_FILE: stage-docker-compose.yaml
   SWAN_IMAGE: swan-stage
-  SWAN_IMAGE_WITH_URL: ${{ secrets.REGISTRY_URL }}/swan-stage
+  SWAN_IMAGE_WITH_URL: ${{ secrets.REGISTRY_URL }}/develop/swan-stage
 
 
 jobs:
@@ -60,6 +60,7 @@ jobs:
         POSTGRES_HOST_AUTH_METHOD: trust
         POSTGRES_HOST: localhost
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
     - name: Run tests
       run: python manage.py test
       env: 
@@ -69,6 +70,7 @@ jobs:
         POSTGRES_HOST_AUTH_METHOD: trust
         POSTGRES_HOST: localhost
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
     - name: add swan service env
       run: |
@@ -76,6 +78,7 @@ jobs:
         echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> swan.env
         echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> swan.env
         echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}" >> swan.env
+        echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> swan.env
 
     - name: add postgres service env
       run: |
@@ -130,6 +133,7 @@ jobs:
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> swan.env
           echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> swan.env
           echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}" >> swan.env
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> swan.env
 
       - name: add postgres service env
         run: |
