@@ -11,13 +11,17 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 
+import os
+from datetime import timedelta
+from pathlib import Path
+
+
 from pathlib import Path
 import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -27,6 +31,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
 
 
 #ALLOWED_HOSTS = []
@@ -59,6 +64,8 @@ INSTALLED_APPS = [
     "django_prometheus",
     'rest_framework',
     'users',
+    'team',
+    'request_checker',
     'corsheaders',
 ]
 CORS_ORIGIN_ALLOW_ALL = True
@@ -66,6 +73,7 @@ MIDDLEWARE = [
     'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -74,7 +82,6 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django_prometheus.middleware.PrometheusAfterMiddleware'
-]
 
 ROOT_URLCONF = 'swan.urls'
 
@@ -96,7 +103,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'swan.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
@@ -110,7 +116,6 @@ DATABASES = {
         'PORT': os.getenv('POSTGRES_PORT', 5432),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -130,7 +135,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
@@ -144,20 +148,22 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
+HOST = "http://localhost:8000/"
 STATIC_URL = '/static/'
+STATIC_ROOT = '/static/',
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 EMAIL_ADDRESS = 'swan.team2021@gmail.com'
 EMAIL_PASSWORD = 'Sw@n2021'
-#user models
-AUTH_USER_MODEL='users.User'
-import datetime
-ACCESS_TOKEN_EXPIRE_TIME = datetime.timedelta(days = 0, hours=5, minutes=0)
-REFRESH_TOKEN_EXPIRE_TIME = datetime.timedelta(days = 2, hours=0, minutes=0)
-#REST framework 
+# user models
+AUTH_USER_MODEL = 'users.User'
+ACCESS_TOKEN_EXPIRE_TIME = timedelta(days=0, hours=5, minutes=0)
+REFRESH_TOKEN_EXPIRE_TIME = timedelta(days=2, hours=0, minutes=0)
+# REST framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'users.authenticators.JWTAuthenticator',
