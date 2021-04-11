@@ -25,7 +25,7 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", include("django_prometheus.urls"), name="django-prometheus"),
-    url(r'^api/users/', include(users_urls))
+    path('api/users/', include(users_urls)),
     path('api/users/', include(users_urls)),
     path('api/team/', include(team_urls))
 ]
