@@ -46,7 +46,7 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
             return Response("You did not create this post!", status=status.HTTP_400_BAD_REQUEST)
         serializer = post_serializer.UpdatePostSerializer(post_info)
         serializer.data['owner'] = user.id
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.status.HTTP_200_OK)
 
     def put(self, request, pk=None):
         user = request.user
@@ -69,7 +69,7 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
                 twitter_response = Tweet(post,socialmedia)
                 if twitter_response.status_code != 200 :
                     post.status == 'Error'
-            return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
+            return Response(serializer.data,status=status.status.HTTP_200_OK)
         return Response("Bad request.", status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk=None):
@@ -82,7 +82,7 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
         for i in multimedia_info:
             i.delete()
         post_info.delete()
-        return Response("Post deleted.", status=status.HTTP_202_ACCEPTED)
+        return Response("Post deleted.", status=status.status.HTTP_200_OK)
 
 class SinglePostView(generics.RetrieveAPIView):
     queryset = Post.objects.all()
@@ -92,7 +92,7 @@ class SinglePostView(generics.RetrieveAPIView):
     def get(self, request, pk=None):
         post_Info = Post.objects.all().get(pk=pk)
         serializer = post_serializer.PostSerializer(post_Info)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.status.HTTP_200_OK)
 
 class AllPostView(generics.RetrieveAPIView):
     queryset = Post.objects.all()
@@ -102,7 +102,7 @@ class AllPostView(generics.RetrieveAPIView):
     def get(self, request):
         postsList = Post.objects.all()
         serializer = post_serializer.PostSerializer(postsList, many=True)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.status.HTTP_200_OK)
 
 class CreateCommentView(generics.RetrieveUpdateDestroyAPIView):
 
@@ -119,7 +119,7 @@ class CreateCommentView(generics.RetrieveUpdateDestroyAPIView):
         comment_post=Post.objects.get(pk=pk)
         comment = Comment(author=user,context=comment_context,post=comment_post)
         comment.save()
-        return Response("comment created.", status=status.HTTP_202_ACCEPTED)
+        return Response(post_serializer.CommentSerializer(comment).data, status=status.HTTP_201_CREATED)
     
 class AllCommentsView(generics.ListAPIView):
     queryset = Comment.objects.all()
@@ -129,7 +129,7 @@ class AllCommentsView(generics.ListAPIView):
     def get(self, request, pk=None):
         commentsList = Comment.objects.all().filter(post=pk)
         serializer = post_serializer.CommentSerializer(commentsList, many=True)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.status.HTTP_200_OK)
     
 class DeleteCommentView(generics.RetrieveUpdateDestroyAPIView):
 
@@ -143,4 +143,4 @@ class DeleteCommentView(generics.RetrieveUpdateDestroyAPIView):
         if not comments_query.filter(pk=pk).exists():
             return Response("You did not write this comment.", status=status.HTTP_400_BAD_REQUEST)
         comment_info.delete()
-        return Response("Comment deleted.", status=status.HTTP_202_ACCEPTED)
+        return Response("Comment deleted.", status=status.HTTP_200_OK)
