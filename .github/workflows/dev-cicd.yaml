@@ -70,6 +70,8 @@ jobs:
         POSTGRES_HOST_AUTH_METHOD: trust
         POSTGRES_HOST: localhost
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
+        TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+        TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
     - name: add swan service env
