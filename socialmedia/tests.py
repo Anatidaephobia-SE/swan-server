@@ -55,7 +55,7 @@ class TwitterRequestAuthorizeTest(APITestCase):
     def test_request_authorize(self):
         client = APIClient()
         response = client.post(
-            "http://localhost:8000/api/v1.0.0/socialmedia/twitter/authorize/request", 
+            "/api/v1.0.0/socialmedia/twitter/authorize/request", 
             data={"team_url" : "team11"}, 
             **{'HTTP_Authorization' : 'bear ' + self.token}
         )
@@ -63,7 +63,7 @@ class TwitterRequestAuthorizeTest(APITestCase):
     def test_request_authorize_failure(self):
         client = APIClient()
         response = client.post(
-            "http://localhost:8000/api/v1.0.0/socialmedia/twitter/authorize/request", 
+            "/api/v1.0.0/socialmedia/twitter/authorize/request", 
             data={"team_url" : "team134"}, 
             **{'HTTP_Authorization' : 'bear ' + self.token}
         )
@@ -71,7 +71,7 @@ class TwitterRequestAuthorizeTest(APITestCase):
     def test_request_authorize_permission_denied(self):
         client = APIClient()
         response = client.post(
-            "http://localhost:8000/api/v1.0.0/socialmedia/twitter/authorize/request", 
+            "/api/v1.0.0/socialmedia/twitter/authorize/request", 
             data={"team_url" : "team12"}, 
             **{'HTTP_Authorization' : 'bear ' + self.token}
         )
@@ -90,7 +90,7 @@ class TwitterGetUserTest(APITestCase):
     def test_get_user(self):
         client = APIClient()
         response = client.get(
-            "http://localhost:8000/api/v1.0.0/socialmedia/twitter/accounts", 
+            "/api/v1.0.0/socialmedia/twitter/accounts", 
             data={"team_url" : "team11"}, 
             **{'HTTP_Authorization' : 'bear ' + self.token}
         )
@@ -99,7 +99,7 @@ class TwitterGetUserTest(APITestCase):
     def test_request_authorize_failure(self):
         client = APIClient()
         response = client.get(
-            "http://localhost:8000/api/v1.0.0/socialmedia/twitter/accounts", 
+            "/api/v1.0.0/socialmedia/twitter/accounts", 
             data={"team_url" : "team134"}, 
             **{'HTTP_Authorization' : 'bear ' + self.token}
         )
@@ -107,7 +107,7 @@ class TwitterGetUserTest(APITestCase):
     def test_request_authorize_team_without_social_media(self):
         client = APIClient()
         response = client.get(
-            "http://localhost:8000/api/v1.0.0/socialmedia/twitter/accounts", 
+            "/api/v1.0.0/socialmedia/twitter/accounts", 
             data={"team_url" : "team22"}, 
             **{'HTTP_Authorization' : 'bear ' + self.token}
         )
@@ -115,7 +115,7 @@ class TwitterGetUserTest(APITestCase):
     def test_request_authorize_team_without_twitter(self):
         client = APIClient()
         response = client.get(
-            "http://localhost:8000/api/v1.0.0/socialmedia/twitter/accounts", 
+            "/api/v1.0.0/socialmedia/twitter/accounts", 
             data={"team_url" : "team33"}, 
             **{'HTTP_Authorization' : 'bear ' + self.token}
         )
