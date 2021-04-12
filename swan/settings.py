@@ -11,13 +11,20 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 
+import os
+from datetime import timedelta
+from pathlib import Path
+
+
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -31,15 +38,13 @@ DEBUG = True
 
 #ALLOWED_HOSTS = []
 
-import os
-from dotenv import load_dotenv
 
 load_dotenv()
 
 ALLOWED_HOSTS = ['anatidaephobia.pythonanywhere.com', 'localhost']
 allowed_hosts_string = os.getenv("ALLOWED_HOSTS")
 
-if  allowed_hosts_string != None and len(allowed_hosts_string) != 0:
+if allowed_hosts_string != None and len(allowed_hosts_string) != 0:
     allowed_host_list = allowed_hosts_string.split(", ")
 
     for allowed_host in allowed_host_list:
@@ -56,22 +61,25 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_crontab',
     'rest_framework',
     'users',
+    'team',
+    'request_checker',
     'corsheaders',
+    'socialmedia',
     'post',
 ]
 CORS_ORIGIN_ALLOW_ALL = True
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'swan.urls'
@@ -94,9 +102,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'swan.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
+
 
 DATABASES = {
     'default': {
@@ -128,7 +136,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
@@ -142,20 +149,22 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
+HOST = "http://localhost:8000/"
 STATIC_URL = '/static/'
+STATIC_ROOT = '/static/',
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 EMAIL_ADDRESS = 'swan.team2021@gmail.com'
 EMAIL_PASSWORD = 'Sw@n2021'
-#user models
-AUTH_USER_MODEL='users.User'
-import datetime
-ACCESS_TOKEN_EXPIRE_TIME = datetime.timedelta(days = 0, hours=5, minutes=0)
-REFRESH_TOKEN_EXPIRE_TIME = datetime.timedelta(days = 2, hours=0, minutes=0)
-#REST framework 
+# user models
+AUTH_USER_MODEL = 'users.User'
+ACCESS_TOKEN_EXPIRE_TIME = timedelta(days=0, hours=5, minutes=0)
+REFRESH_TOKEN_EXPIRE_TIME = timedelta(days=2, hours=0, minutes=0)
+# REST framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'users.authenticators.JWTAuthenticator',
@@ -163,3 +172,4 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
 }
+
