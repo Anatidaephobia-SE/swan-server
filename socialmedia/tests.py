@@ -92,31 +92,31 @@ class TwitterGetUserTest(APITestCase):
         response = client.get(
             "/api/v1.0.0/socialmedia/twitter/accounts", 
             data={"team_url" : "team11"}, 
-            **{'HTTP_Authorization' : 'bear ' + self.token}
+            **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['screen_name'], "Dev23080567")
-    def test_request_authorize_failure(self):
+    def test_request_get_user_failure(self):
         client = APIClient()
         response = client.get(
             "/api/v1.0.0/socialmedia/twitter/accounts", 
             data={"team_url" : "team134"}, 
-            **{'HTTP_Authorization' : 'bear ' + self.token}
+            **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
         self.assertEqual(response.status_code, 404)
-    def test_request_authorize_team_without_social_media(self):
+    def test_request_get_user_without_social_media(self):
         client = APIClient()
         response = client.get(
             "/api/v1.0.0/socialmedia/twitter/accounts", 
             data={"team_url" : "team22"}, 
-            **{'HTTP_Authorization' : 'bear ' + self.token}
+            **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
         self.assertEqual(response.status_code, 404)
-    def test_request_authorize_team_without_twitter(self):
+    def test_request_get_user_without_twitter(self):
         client = APIClient()
         response = client.get(
             "/api/v1.0.0/socialmedia/twitter/accounts", 
             data={"team_url" : "team33"}, 
-            **{'HTTP_Authorization' : 'bear ' + self.token}
+            **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
         self.assertEqual(response.status_code, 403)
