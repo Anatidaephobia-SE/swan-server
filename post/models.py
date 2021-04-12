@@ -3,16 +3,17 @@ from users.models import User
 from team.models import Team
 
 def get_user_directory(instance, filename):
-    return f'uploads/'
+    return f'postfiles/{instance.post_id}/{filename}'
 
 class Media(models.Model):
     id = models.AutoField(primary_key=True)
     media = models.FileField(upload_to=get_user_directory, null=True)
+    post_id = models.PositiveIntegerField(null = True)
 
 class Post(models.Model):
     CHOICES = (
-        ('Dr','Drafts'),
-        ('Pu','Published')
+        ('Drafts','Drafts'),
+        ('Published','Published')
     )
     name = models.CharField(null = True, max_length=60)
     caption = models.CharField(blank = True, max_length=280)

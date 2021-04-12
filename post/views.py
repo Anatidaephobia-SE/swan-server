@@ -27,9 +27,10 @@ class CreatePostView(generics.CreateAPIView):
         post_status=data['status']
         post = Post(team=post_team,name=post_name,caption=post_caption,status=post_status,owner=user)
         post.save()
-        for m in data['multimedia']:
-            i = Media.objects.create(media=m['media'])
-            post.multimedia.add(i)
+        post_files=request.FILES.getlist('multimedia[]')
+        for media_file in post_files:
+            media = Media.objects.create(media=media_file, post_id = post.id)
+            post.multimedia.add(media)
         return Response(post_serializer.PostSerializer(post).data, status=status.HTTP_201_CREATED)
 
 class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
@@ -45,8 +46,7 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
         if not posts_query.filter(pk=pk).exists():
             return Response("You did not create this post!", status=status.HTTP_400_BAD_REQUEST)
         serializer = post_serializer.UpdatePostSerializer(post_info)
-        serializer.data['owner'] = user.id
-        return Response(serializer.data, status=status.status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk=None):
         user = request.user
@@ -61,15 +61,17 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
         if serializer.is_valid(True):
             post = serializer.update(instance=post_info, validated_data=serializer.validated_data)    
             post.multimedia.clear()
-            for m in data['multimedia']:
-                i = Media.objects.create(media=m['media'])
-                post.multimedia.add(i)
+            post_files=request.FILES.getlist('multimedia[]')
+            for media_file in post_files:
+                media = Media.objects.create(media=media_file, post_id = post.id)
+                post.multimedia.add(media)
+                
             if post.status == 'Published':
                 socialmedia=SocialMedia.objects.all().get(team=post.team)
                 twitter_response = Tweet(post,socialmedia)
                 if twitter_response.status_code != 200 :
                     post.status == 'Error'
-            return Response(serializer.data,status=status.status.HTTP_200_OK)
+            return Response(serializer.data,status=status.HTTP_200_OK)
         return Response("Bad request.", status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk=None):
@@ -82,7 +84,7 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
         for i in multimedia_info:
             i.delete()
         post_info.delete()
-        return Response("Post deleted.", status=status.status.HTTP_200_OK)
+        return Response("Post deleted.", status=status.HTTP_200_OK)
 
 class SinglePostView(generics.RetrieveAPIView):
     queryset = Post.objects.all()
@@ -92,7 +94,7 @@ class SinglePostView(generics.RetrieveAPIView):
     def get(self, request, pk=None):
         post_Info = Post.objects.all().get(pk=pk)
         serializer = post_serializer.PostSerializer(post_Info)
-        return Response(serializer.data, status=status.status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class AllPostView(generics.RetrieveAPIView):
     queryset = Post.objects.all()
@@ -102,7 +104,7 @@ class AllPostView(generics.RetrieveAPIView):
     def get(self, request):
         postsList = Post.objects.all()
         serializer = post_serializer.PostSerializer(postsList, many=True)
-        return Response(serializer.data, status=status.status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class CreateCommentView(generics.RetrieveUpdateDestroyAPIView):
 
@@ -129,7 +131,7 @@ class AllCommentsView(generics.ListAPIView):
     def get(self, request, pk=None):
         commentsList = Comment.objects.all().filter(post=pk)
         serializer = post_serializer.CommentSerializer(commentsList, many=True)
-        return Response(serializer.data, status=status.status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 class DeleteCommentView(generics.RetrieveUpdateDestroyAPIView):
 
