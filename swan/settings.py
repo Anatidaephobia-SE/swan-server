@@ -67,7 +67,7 @@ INSTALLED_APPS = [
     'team',
     'request_checker',
     'corsheaders',
-    'socialmedia'
+    'socialmedia',
     'post',
 ]
 CORS_ORIGIN_ALLOW_ALL = True
@@ -109,7 +109,7 @@ WSGI_APPLICATION = 'swan.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
+        'NAME': os.getenv('POSTGRES_DBNAME', 'postgress'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'HOST': os.getenv('POSTGRES_HOST', 'localhost'),

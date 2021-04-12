@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status, generics
 from .models import SocialMedia
 from team.models import Team
+from post.models import Post
 from request_checker.functions import *
 # Create your views here.
 
@@ -77,17 +78,16 @@ def tweet(request):
     try:
         team = Team.objects.get(url=team_url)
     except Team.DoesNotExist:
-        return Response(data={"error": "Team not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(data={"error": "Team not found."}, status=status.HTTP_404_NOT_FOUND)
     try:
         social_media = SocialMedia.objects.get(team=team)
     except SocialMedia.DoesNotExist:
-        return Response(data={"error": "Social media accounts not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(data={"error": "Social media accounts not found."}, status=status.HTTP_404_NOT_FOUND)
     try:
-        #TODO find post
-        pass
-    except:
-        pass
-    Tweet(text, social_media) #TODO Queue_Tweet(post, ...)
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        return Response(data={"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
+    Tweet(text, social_media)
     return Response(data={"message": "Successful."}, status=status.HTTP_200_OK)
 
 @api_view(["GET"])
