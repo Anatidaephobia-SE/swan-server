@@ -31,7 +31,7 @@ services:
     image: "${SWAN_IMAGE}"
     build: .
     hostname: swan
-    command: python manage.py runserver 127.0.0.1:9090
+    command: python manage.py runserver 0.0.0.0:9090
     volumes:
       - .:/code
     restart: on-failure
