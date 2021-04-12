@@ -27,7 +27,7 @@ urlpatterns = [
     path('api/v1.0.0/socialmedia/', include('socialmedia.urls')),
     path('api/users/', include(users_urls)),
     path('api/team/', include(team_urls)),
-    path('api/post/', include(post_urls))
+    path('api/v1.0.0/post/', include(post_urls))
 ]
 
 if(settings.DEBUG):
