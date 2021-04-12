@@ -60,7 +60,7 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
 
         if serializer.is_valid(True):
             post = serializer.update(instance=post_info, validated_data=serializer.validated_data)    
-            post.multimedia.clear()
+            # post.multimedia.clear()
             post_files=request.FILES.getlist('multimedia[]')
             for media_file in post_files:
                 media = Media.objects.create(media=media_file, post_id = post.id)
