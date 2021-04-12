@@ -79,6 +79,8 @@ jobs:
         echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> swan.env
         echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}" >> swan.env
         echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> swan.env
+        echo "TWITTER_CONSUMER_KEY=${{ secrets.TWITTER_CONSUMER_KEY }}" >> swan.env
+        echo "TWITTER_CONSUMER_SECRET=${{ secrets.TWITTER_CONSUMER_SECRET }}" >> swan.env
 
     - name: add postgres service env
       run: |
@@ -134,6 +136,8 @@ jobs:
           echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> swan.env
           echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}" >> swan.env
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> swan.env
+          echo "TWITTER_CONSUMER_KEY=${{ secrets.TWITTER_CONSUMER_KEY }}" >> swan.env
+          echo "TWITTER_CONSUMER_SECRET=${{ secrets.TWITTER_CONSUMER_SECRET }}" >> swan.env
 
       - name: add postgres service env
         run: |
