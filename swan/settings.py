@@ -67,7 +67,8 @@ INSTALLED_APPS = [
     'team',
     'request_checker',
     'corsheaders',
-    'socialmedia'
+    'socialmedia',
+    'post',
 ]
 CORS_ORIGIN_ALLOW_ALL = True
 MIDDLEWARE = [
@@ -108,7 +109,7 @@ WSGI_APPLICATION = 'swan.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
+        'NAME': os.getenv('POSTGRES_DBNAME', 'postgress'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
@@ -167,11 +168,8 @@ REFRESH_TOKEN_EXPIRE_TIME = timedelta(days=2, hours=0, minutes=0)
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'users.authenticators.JWTAuthenticator',
-    )
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
 }
 
-#CRON JOBS
-# CRONJOBS = [
-#     ('* * * * *', 'socialmedia.twitter.Pop_Tweets')
-# ]
-# CRONTAB_COMMAND_SUFFIX = '2>&1'
