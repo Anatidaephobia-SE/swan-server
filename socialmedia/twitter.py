@@ -14,11 +14,11 @@ UPDATE_STATUS = "https://api.twitter.com/1.1/statuses/update.json"
 USERS_LOOKUP = "https://api.twitter.com/1.1/users/lookup.json"
 UPLOAD_MEDIA = "https://upload.twitter.com/1.1/media/upload.json"
 
-def Authorize_Address(team_url):
+def Authorize_Address(team_url, modified):
     consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
     consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
     auth = OAuth1(client_key=consumer_key, client_secret=consumer_secret,
-                  callback_uri=f"http://localhost:8080/workspaces?team_url={team_url}")
+                  callback_uri=f"http://localhost:8080/dispatch?team_url={team_url}&modify={modified}")
 
     response = requests.post(url=REQUEST_TOKEN_ADDRESS,
                              auth=auth, params={'lang': 'en'})

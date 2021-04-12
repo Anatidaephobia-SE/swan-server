@@ -18,6 +18,7 @@ def twitter_request_authorize(request):
     if not req_check.have_all:
         return Response({'error': req_check.error_message}, status=status.HTTP_400_BAD_REQUEST)
     team_url = request.data.get("team_url")
+    modify = request.data.get("modify", 0)
     try:
         team = Team.objects.get(url=team_url)
     except Team.DoesNotExist:
@@ -25,7 +26,7 @@ def twitter_request_authorize(request):
     user = request.user
     if(user.email != team.head.email):
         return Response(data={"error": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
-    message, status_code = Authorize_Address(team_url)
+    message, status_code = Authorize_Address(team_url, modify)
     if(status_code != 200):
         return Response(data={"error": message}, status=status_code)
     return Response(data={"address": message}, status=status.HTTP_200_OK)
@@ -65,31 +66,6 @@ def twitter_access(request):
     social_media.save()
     return Response(data={"message": "Successful."}, status=status.HTTP_200_OK)
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def tweet(request):
-    user = request.user
-    req_check = have_parameters(request, 'post_id', 'team_url')
-    if not req_check.have_all:
-        return Response({'error': req_check.error_message}, status=status.HTTP_400_BAD_REQUEST)
-    team_url = request.data.get("team_url")
-    post_id = request.data.get("post_id")
-    text = "Hola!"
-    try:
-        team = Team.objects.get(url=team_url)
-    except Team.DoesNotExist:
-        return Response(data={"error": "Team not found."}, status=status.HTTP_404_NOT_FOUND)
-    try:
-        social_media = SocialMedia.objects.get(team=team)
-    except SocialMedia.DoesNotExist:
-        return Response(data={"error": "Social media accounts not found."}, status=status.HTTP_404_NOT_FOUND)
-    try:
-        post = Post.objects.get(id=post_id)
-    except Post.DoesNotExist:
-        return Response(data={"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
-    Tweet(text, social_media)
-    return Response(data={"message": "Successful."}, status=status.HTTP_200_OK)
-
 @api_view(["GET"])
 def get_user(request):
     user = request.user
@@ -107,6 +83,8 @@ def get_user(request):
         social_media = SocialMedia.objects.get(team=team)
     except SocialMedia.DoesNotExist:
         return Response(data={"error": "Social media accounts for this team not found"}, status=status.HTTP_404_NOT_FOUND)
+    if(social_media.twitter_user_id is None):
+        return Response(data={"error": "Team don't have twitter."}, status=status.HTTP_403_FORBIDDEN)
     response = Get_Twitter_User(social_media.twitter_user_id)
     if(response.status_code != 200):
         return Response(data=response.json(), status=response.status_code)
@@ -114,7 +92,7 @@ def get_user(request):
     data = {
         "name": json["name"], 
         "profile_image": json["profile_image_url"], 
-        "secreen_name" : json['screen_name'],
+        "screen_name" : json['screen_name'],
         "default_profile_image" : json["default_profile_image"]
     }
     return Response(data=data, status=response.status_code)
