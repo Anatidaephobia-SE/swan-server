@@ -21,7 +21,7 @@ class CreatePostView(generics.CreateAPIView):
         serializer = self.get_serializer(data=data)
         if not serializer.is_valid(True):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        post_team=Team.objects.get(url=data['team'])
+        post_team=Team.objects.get(pk=data['team'])
         post_name=data['name']
         post_caption=data['caption']
         post_status=data['status']
