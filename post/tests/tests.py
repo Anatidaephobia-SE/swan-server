@@ -27,26 +27,27 @@ class PostViewTest(APITestCase):
         def test_create_post(self):
             client = APIClient()
             files=[]
-            abs_path = path.abspath(__file__) # full path of your script
-            dir_path = path.dirname(abs_path) # full path of the directory of your script
-            media_file_path = path.join(dir_path,'test_file.jpg') # absolute zip file path
+            abs_path = path.abspath(__file__) 
+            dir_path = path.dirname(abs_path) 
+            media_file_path = path.join(dir_path,'test_file.jpg')
             with open(media_file_path, 'rb') as fp:
                 files.append(fp)
+                pk_team = self.test_team.pk
                 data = {"name":"big opportunities",
                         "caption":"Over the past decade, the availability and demand for data science skills and data-decision decision making has skyrocketed.",
                         "status":"Drafts",
                         "multimedia[]":files,
-                        "team":"myteam"
+                        "team": pk_team
                         }
                 self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
                 response = self.client.post('/api/v1.0.0/post/create_post/', data)
+                print(response.__dict__)
                 self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
                 data = {"name":"big opportunities",
-                        "caption":"Over the past decade, the availability and demand for data science skills and data-decision decision making has skyrocketed.",
-                        "status":"Drafts",
+                        "caption":"aking has skyrocketed.",
                         "multimedia[]":files,
-                        "team":"It_is_not_a_team_url"
+                        "team":pk_team
                         }
                 response = self.client.post('/api/v1.0.0/post/create_post/', data)
                 self.assertNotEqual(response.status_code, status.HTTP_201_CREATED)
@@ -54,7 +55,7 @@ class PostViewTest(APITestCase):
                 data = {"caption":"Over the past decade, the availability and demand for data science skills and data-decision decision making has skyrocketed.",
                         "status":"Drafts",
                         "multimedia[]":files,
-                        "team":"It_is_not_a_team_url"
+                        "team":pk_team
                         }
                 response = self.client.post('/api/v1.0.0/post/create_post/', data)
                 self.assertNotEqual(response.status_code, status.HTTP_201_CREATED)
@@ -79,11 +80,12 @@ class PostViewTest(APITestCase):
             client = APIClient()
             files=[]
             self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
+            pk_team = self.test_team.pk
             data = {"name":"First Post",
                     "caption":"Over the past decade, the availability and demand for data science skills and data-decision decision making has skyrocketed.",
                     "status":"Drafts",
                     "multimedia[]":files,
-                    "team":"team11"
+                    "team":pk_team
                     }
             post_id=self.test_post.pk
             response = self.client.put(f'/api/v1.0.0/post/update_post/{post_id}/',data)
