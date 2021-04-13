@@ -44,14 +44,6 @@ class PostViewTest(APITestCase):
                 print(response.__dict__)
                 self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-                data = {"name":"big opportunities",
-                        "caption":"aking has skyrocketed.",
-                        "multimedia[]":files,
-                        "team":pk_team
-                        }
-                response = self.client.post('/api/v1.0.0/post/create_post/', data)
-                self.assertNotEqual(response.status_code, status.HTTP_201_CREATED)
-
                 data = {"caption":"Over the past decade, the availability and demand for data science skills and data-decision decision making has skyrocketed.",
                         "status":"Drafts",
                         "multimedia[]":files,
