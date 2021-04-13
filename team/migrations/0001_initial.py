@@ -18,8 +18,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Team',
             fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100)),
-                ('url', models.CharField(max_length=100, primary_key=True, serialize=False)),
+                ('url', models.CharField(max_length=100, unique=True)),
                 ('logo', models.ImageField(null=True, upload_to=team.models.get_teamlogo_directory)),
                 ('created_at', models.DateField(auto_now_add=True)),
                 ('head', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='head', to=settings.AUTH_USER_MODEL)),

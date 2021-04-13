@@ -1,0 +1,55 @@
+version: "3"
+   
+services:
+  postgres:
+    image: postgres
+    container_name: swan-prod_postgares
+    hostname: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    expose: 
+      - "5432"
+    env_file:
+      - pg.env
+    networks: 
+      - swan-production
+
+  swan:
+    image: "${SWAN_IMAGE}"
+    build: .
+    hostname: swan-prod
+    command: python manage.py runserver 0.0.0.0:8080
+    volumes:
+      - .:/code
+    restart: on-failure
+    env_file: 
+      - swan.env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks: 
+      - swan-production
+
+  prometheus:
+    image: prom/prometheus:v2.25.0
+    hostname: swan-prod_prometheus
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - 12334:9090
+    networks: 
+      - swan-production
+
+  grafana:
+    image: grafana/grafana:7.5.2
+    hostname: swan-prod_grafana
+    ports:
+      - 12335:3000
+    networks: 
+      - swan-production
+
+networks: 
+  swan-production:

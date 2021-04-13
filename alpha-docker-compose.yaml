@@ -3,7 +3,7 @@ version: "3"
 services:
   postgres:
     image: postgres
-    container_name: swan-stage_postgares
+    container_name: swan-alpha_postgares
     hostname: postgres
     volumes:
       - ./data/db:/var/lib/postgresql/data
@@ -12,37 +12,24 @@ services:
     env_file:
       - pg.env
     networks: 
-      - swan-stage
-
-  pg-admin:
-    image: dpage/pgadmin4
-    container_name: swan-stage_pgadmin
-    hostname: pgadmin4
-    ports:
-      - "10333:80"
-    env_file: 
-      - pgadmin.env
-    depends_on:
-      - postgres
-    networks: 
-      - swan-stage
+      - swan-release
 
   swan:
     image: "${SWAN_IMAGE}"
     build: .
     hostname: swan
-    command: python manage.py runserver 0.0.0.0:9090
+    command: python manage.py runserver 0.0.0.0:8080
     volumes:
       - .:/code
     restart: on-failure
     env_file: 
       - swan.env
     ports:
-      - "9090:9090"
+      - "8080:8080"
     depends_on:
       - postgres
     networks: 
-      - swan-stage
+      - swan-release
 
 networks: 
-  swan-stage:
+  swan-release:
