@@ -21,7 +21,7 @@ class CreatePostView(generics.CreateAPIView):
         serializer = self.get_serializer(data=data)
         if not serializer.is_valid(True):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        post_team=Team.objects.get(url=data['team'])
+        post_team=Team.objects.get(pk=data['team'])
         post_name=data['name']
         post_caption=data['caption']
         post_status=data['status']
@@ -60,7 +60,8 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
 
         if serializer.is_valid(True):
             post = serializer.update(instance=post_info, validated_data=serializer.validated_data)    
-            # post.multimedia.clear()
+            if post.multimedia.count !=0:
+                post.multimedia.clear()
             post_files=request.FILES.getlist('multimedia[]')
             for media_file in post_files:
                 media = Media.objects.create(media=media_file, post_id = post.id)

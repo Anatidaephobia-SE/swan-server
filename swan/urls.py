@@ -27,8 +27,8 @@ urlpatterns = [
     path('api/v1.0.0/socialmedia/', include('socialmedia.urls')),
     path("", include("django_prometheus.urls"), name="django-prometheus"),
     path('api/users/', include(users_urls)),
+    path('api/v1.0.0/post/', include(post_urls)),
     path('api/v1.0.0/team/', include(team_urls)),
-    path('api/post/', include(post_urls))
 ]
 
 if(settings.DEBUG):
