@@ -97,13 +97,13 @@ class SinglePostView(generics.RetrieveAPIView):
         serializer = post_serializer.PostSerializer(post_Info)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class AllPostView(generics.RetrieveAPIView):
+class AllPostView(generics.ListAPIView):
     queryset = Post.objects.all()
     permission_classes = (IsAuthenticated,)
     serializer_class = post_serializer.PostSerializer
 
-    def get(self, request):
-        postsList = Post.objects.all()
+    def get(self, request, pk=None):
+        postsList = Post.objects.all().filter(team=pk)
         serializer = post_serializer.PostSerializer(postsList, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
