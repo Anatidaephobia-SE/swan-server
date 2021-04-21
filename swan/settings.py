@@ -178,3 +178,8 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
+#Crons
+CRONJOBS = [
+    ('* * * * *', 'scheduler.cron.Queue_jobs'),
+    ('* * * * *', 'scheduler.cron.Dequeue_Jobs')
+]
