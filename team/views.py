@@ -40,25 +40,25 @@ def create_team(request):
 def invite_user(request):
     head = request.user
 
-    req_check = have_parameters(request, 'team_url', 'username')
+    req_check = have_parameters(request, 'team_id', 'username')
     if not req_check.have_all:
         return Response({'error': req_check.error_message}, status=status.HTTP_400_BAD_REQUEST)
 
-    team_url = request.data.get('team_url')
+    team_id = request.data.get('team_id')
     username = request.data.get('username')
 
-    team = Team.objects.filter(url=team_url).first()
+    team = Team.objects.filter(id=team_id).first()
     if team is None:
-        return Response({'error': 'Team with this url does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': 'Team with this id does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
     user = User.objects.filter(username=username).first()
     if user is None:
         return Response({'error': 'User with this username does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
-    if Team.objects.filter(Q(url=team_url, pending_users__id=user.id) | Q(url=team_url, members__id=user.id)).exists():
+    if Team.objects.filter(Q(id=team_id, pending_users__id=user.id) | Q(id=team_id, members__id=user.id)).exists():
         return Response({'error': 'User already invited or joined to team'}, status=status.HTTP_400_BAD_REQUEST)
 
-    if team.head != head:
+    if team.head != head or not Team.objects.filter(members__id = head.id).exists():
         return Response({'error': 'This user is not head of team'}, status=status.HTTP_403_FORBIDDEN)
 
     team.pending_users.add(user)
@@ -72,17 +72,17 @@ def invite_user(request):
 def accept_invite(request):
     user = request.user
 
-    req_check = have_parameters(request, 'team_url')
+    req_check = have_parameters(request, 'team_id')
     if not req_check.have_all:
         return Response({'error': req_check.error_message}, status=status.HTTP_400_BAD_REQUEST)
 
-    team_url = request.data.get('team_url')
+    team_id = request.data.get('team_id')
 
-    team = Team.objects.filter(url=team_url).first()
+    team = Team.objects.filter(id=team_id).first()
     if team is None:
-        return Response({'error': 'Team with url does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': 'Team with this id does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
-    if not Team.objects.filter(url=team_url, pending_users__pk=user.id).exists():
+    if not Team.objects.filter(id=team_id, pending_users__pk=user.id).exists():
         return Response({'error': 'User is not invited to team'}, status=status.HTTP_403_FORBIDDEN)
 
     team.pending_users.remove(user)
@@ -93,14 +93,14 @@ def accept_invite(request):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-def reject_invite(request, team_url):
+def reject_invite(request, team_id):
     user = request.user
 
-    team = Team.objects.filter(url=team_url).first()
+    team = Team.objects.filter(id=team_id).first()
     if team is None:
-        return Response({'error': 'Team with url does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': 'Team with this id does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
-    if not Team.objects.filter(url=team_url, pending_users__pk=user.id).exists():
+    if not Team.objects.filter(id=team_id, pending_users__pk=user.id).exists():
         return Response({'error': 'User is not invited to team'}, status=status.HTTP_403_FORBIDDEN)
 
     team.pending_users.remove(user)
@@ -110,7 +110,7 @@ def reject_invite(request, team_url):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-def remove_user(request, team_url):
+def remove_user(request, team_id):
     head = request.user
 
     req_check = have_queryparams(request, 'username')
@@ -119,10 +119,9 @@ def remove_user(request, team_url):
 
     username = request.query_params.get('username')
 
-    print(team_url)
-    team = Team.objects.filter(url=team_url).first()
+    team = Team.objects.filter(id=team_id).first()
     if team is None:
-        return Response({'error': 'Team with this url does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': 'Team with this id does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
     user = User.objects.filter(username=username).first()
     if user is None:
@@ -131,6 +130,9 @@ def remove_user(request, team_url):
     if team.head != head:
         return Response({'error': 'This user is not head of team'}, status=status.HTTP_403_FORBIDDEN)
 
+    if team.head == user:
+        return Response({'error' : 'Head of team can not be removed'}, status = status.HTTP_403_FORBIDDEN)
+
     team.members.remove(user)
 
     return Response({'message': 'User removed successfuly'})
@@ -138,12 +140,15 @@ def remove_user(request, team_url):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-def leave_team(request, team_url):
+def leave_team(request, team_id):
     user = request.user
 
-    team = Team.objects.filter(url=team_url).first()
+    team = Team.objects.filter(id=team_id).first()
     if team is None:
-        return Response({'error': 'Team with this url does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': 'Team with this id does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    if team.head == user:
+        return Response({'error' : 'Head of team can not leave the team'}, status = status.HTTP_403_FORBIDDEN)
 
     team.members.remove(user)
 
@@ -161,35 +166,43 @@ def get_invites(request):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def get_team_info(request):
+    user = request.user
 
-    req_check = have_queryparams(request, 'team_url')
+    req_check = have_queryparams(request, 'team_id')
     if not req_check.have_all:
         return Response({'error': req_check.error_message}, status=status.HTTP_400_BAD_REQUEST)
 
-    team_url = request.query_params.get('team_url')
+    team_id = request.query_params.get('team_id')
 
-    team = Team.objects.filter(url=team_url).first()
+    team = Team.objects.filter(id=team_id).first()
     if team is None:
-        return Response({'error': 'Team with this url does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': 'Team with this id does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    if not Team.objects.filter(members__id = user.id).exists():
+        return Response({'error' : 'This user is not member of team'}, status = status.HTTP_403_FORBIDDEN)
 
     return Response({'team': TeamSerializer(team).data})
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def get_members(request):
+    user = request.user
 
-    req_check = have_queryparams(request, 'team_url')
+    req_check = have_queryparams(request, 'team_id')
     if not req_check.have_all:
         return Response({'error': req_check.error_message}, status=status.HTTP_400_BAD_REQUEST)
 
-    team_url = request.query_params.get('team_url')
+    team_id = request.query_params.get('team_id')
 
-    team = Team.objects.filter(url=team_url).first()
+    team = Team.objects.filter(id=team_id).first()
     if team is None:
-        return Response({'error': 'Team with this url does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': 'Team with this id does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    if not Team.objects.filter(members__id = user.id).exists():
+        return Response({'error' : 'This user is not member of team'}, status = status.HTTP_403_FORBIDDEN)
 
     members = team.members.all()
     serialized = []
@@ -213,14 +226,14 @@ def get_user_teams(request):
 def update_team_info(request):
     head = request.user
 
-    req_check = have_parameters(request, 'team_url')
+    req_check = have_parameters(request, 'team_id')
     if not req_check.have_all: return Response({'error' : req_check.error_message}, status = status.HTTP_400_BAD_REQUEST)
 
-    team_url = request.data.get('team_url')
+    team_id = request.data.get('team_id')
 
-    team = Team.objects.filter(url = team_url).first()
+    team = Team.objects.filter(id=team_id).first()
     if team is None:
-        return Response({'error' : 'Team with this url does not exist'}, status = status.HTTP_404_NOT_FOUND)
+        return Response({'error' : 'Team with this id does not exist'}, status = status.HTTP_404_NOT_FOUND)
     
     if team.head != head:
         return Response({'error' : 'This user is not head of team'}, status = status.HTTP_403_FORBIDDEN)
