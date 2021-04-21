@@ -8,4 +8,4 @@ class SocialMediaSatisfier(serializers.ModelSerializer):
         return intsance.twitter_user_id is not None
     class Meta:
         model = SocialMedia
-        fields = ['has_twitter']
+        fields = ['id', 'has_twitter']
