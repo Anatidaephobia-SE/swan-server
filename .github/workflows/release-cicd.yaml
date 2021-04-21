@@ -1,26 +1,21 @@
 name: Swan Release CI/CD
 
 on:
-
   pull_request:
-    branches:
-      - release-**
-
-  push:
     branches:
       - release-**
 
 env:
   COMPOSE_FILE: alpha-docker-compose.yaml
-  SWAN_IMAGE: swan-alpha
-  SWAN_IMAGE_WITH_URL: ${{ secrets.REGISTRY_URL }}/swan-alpha
+  SWAN_IMAGE: swan-prod
+  SWAN_IMAGE_WITH_URL: ${{ secrets.PRODEUCTION_REGISTRY_URL }}/release/swan-prod
 
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/release-**' #for pull request only
+    if: github.ref != 'refs/heads/release-**' #for pull request and create
 
     services:
       postgres:
@@ -60,6 +55,7 @@ jobs:
         POSTGRES_HOST_AUTH_METHOD: trust
         POSTGRES_HOST: localhost
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
+        SECRET_KEY: ${{ secrets.PRODEUCTION_SECRET_KEY }}
     - name: Run tests
       run: python manage.py test
       env: 
@@ -69,6 +65,7 @@ jobs:
         POSTGRES_HOST_AUTH_METHOD: trust
         POSTGRES_HOST: localhost
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
+        SECRET_KEY: ${{ secrets.PRODEUCTION_SECRET_KEY }}
 
     - name: add swan service env
       run: |
@@ -76,6 +73,7 @@ jobs:
         echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> swan.env
         echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> swan.env
         echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}" >> swan.env
+        echo "SECRET_KEY=${{ secrets.PRODEUCTION_SECRET_KEY }}" >> swan.env
 
     - name: add postgres service env
       run: |
@@ -93,76 +91,18 @@ jobs:
     - name: Build image
       run: |
         docker-compose -f ${{ env.COMPOSE_FILE }} build
-    - name: Push image
+    
+    - name: Pull request event tag
+      if: ${{ github.event_name == 'pull_request' }}
       run: |
-        export DOCKER_ALPHA_TAG=${{ github.base_ref }}
-        docker login ${{ secrets.REGISTRY_URL }} --username "${{ secrets.REGISTRY_USERNAME }}" --password "${{ secrets.REGISTRY_PASSWORD }}"
-        docker tag ${{ env.SWAN_IMAGE }} ${{ env.SWAN_IMAGE_WITH_URL }}:$DOCKER_ALPHA_TAG
-        docker push ${{ env.SWAN_IMAGE_WITH_URL }}:$DOCKER_ALPHA_TAG
+        echo "DOCKER_ALPHA_TAG=${{ github.base_ref }}" >> tag.env
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
+
+    - name: Push image
+      run: |
+        source tag.env
+        docker login ${{ secrets.PRODEUCTION_REGISTRY_URL }} --username "${{ secrets.PRODEUCTION_REGISTRY_USERNAME }}" --password "${{ secrets.PRODEUCTION_REGISTRY_PASSWORD }}"
+        docker tag ${{ env.SWAN_IMAGE }} ${{ env.SWAN_IMAGE_WITH_URL }}:$DOCKER_ALPHA_TAG
+        docker push ${{ env.SWAN_IMAGE_WITH_URL }}:$DOCKER_ALPHA_TAG
         
-
-  deploy:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/release-**' #for push only
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-      - name: add server utils env
-        run: |
-          echo "REGISTRY_USERNAME=${{ secrets.REGISTRY_USERNAME }}" >> server.env
-          echo "REGISTRY_PASSWORD=${{ secrets.REGISTRY_PASSWORD }}" >> server.env
-          echo "REGISTRY_URL=${{ secrets.REGISTRY_URL }}" >> server.env
-          echo "SWAN_IMAGE=${{ env.SWAN_IMAGE }}" >> server.env
-          echo "SWAN_IMAGE_WITH_URL=${{ env.SWAN_IMAGE_WITH_URL }}" >> server.env
-          echo "COMPOSE_FILE=${{ env.COMPOSE_FILE }}" >> server.env
-          echo "DOCKER_ALPHA_TAG=${{ github.base_ref }}" >> server.env
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-
-      - name: add swan service env
-        run: |
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> swan.env
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> swan.env
-          echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> swan.env
-          echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}" >> swan.env
-
-      - name: add postgres service env
-        run: |
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> pg.env
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> pg.env
-          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> pg.env
-
-      - name: add pgadmin service env
-        run: |
-          echo "PGADMIN_DEFAULT_EMAIL=${{ secrets.PGADMIN_DEFAULT_EMAIL }}" >> pgadmin.env
-          echo "PGADMIN_DEFAULT_PASSWORD=${{ secrets.PGADMIN_DEFAULT_PASSWORD }}" >> pgadmin.env
-          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> pgadmin.env
-
-      - name: Add the private SSH key to the ssh-agent
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-          mkdir -p ~/.ssh
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-          ssh-add - <<< "${{ secrets.DEPLOY_KEY }}"
-      
-      - name: Deploy images on Server
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-          scp  -o StrictHostKeyChecking=no -r ./server.env ./swan.env ./pg.env ./pgadmin.env ./${{ env.COMPOSE_FILE }} ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/swan-alpha
-          ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'ENDSSH'
-            cd ~/swan-alpha
-            source server.env
-            docker login $REGISTRY_URL --username $REGISTRY_USERNAME --password $REGISTRY_PASSWORD
-            docker pull $SWAN_IMAGE_WITH_URL:$DOCKER_ALPHA_TAG
-            export SWAN_IMAGE=$SWAN_IMAGE_WITH_URL:$DOCKER_ALPHA_TAG
-            docker-compose -f $COMPOSE_FILE up -d
-            rm -rf server.env
-          ENDSSH
-
-

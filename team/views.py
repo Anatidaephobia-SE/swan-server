@@ -26,11 +26,12 @@ def create_team(request):
     logo = request.data.get('logo', None)
 
     if Team.objects.filter(url=url).exists():
-        return Response({'error': 'Team with same url exists'})
+        return Response({'error': 'Team with same url exists'}, status=status.HTTP_409_CONFLICT)
 
     new_team = Team(name=name, url=url, logo=logo, head=user)
     new_team.save()
     new_team.members.add(user)
+    new_team.save()
 
     return Response({'team': TeamSerializer(new_team).data})
 

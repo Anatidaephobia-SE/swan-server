@@ -8,7 +8,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('email', 'first_name', 'last_name', 'profile_picture')
 
 class CommentSerializer(serializers.ModelSerializer):
-    author=UserSerializer(read_only=True)
+    author = UserSerializer(required=False)
     class Meta:
         model = models.Comment
         fields = ('id','context', 'author','created_at', 'post')
@@ -20,8 +20,15 @@ class PostMediaSerializer(serializers.ModelSerializer):
         fields = ('id','media')
 
 class PostSerializer(serializers.ModelSerializer):
+    owner = UserSerializer(required=False)
     multimedia = PostMediaSerializer(many=True, read_only=True, required=False)
     class Meta:
         model = models.Post
-        fields = ('name', 'caption', 'status', 'owner', 'created_at', 'multimedia')
+        fields = ('id','name', 'caption', 'status', 'owner', 'created_at', 'multimedia','team')
+    read_only_fields = ('owner')
 
+class UpdatePostSerializer(serializers.ModelSerializer):
+    multimedia = PostMediaSerializer(many=True, read_only=True, required=False)
+    class Meta:
+        model = models.Post
+        fields = ('id','name', 'caption', 'status', 'multimedia','team')
