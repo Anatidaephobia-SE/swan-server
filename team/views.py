@@ -184,7 +184,7 @@ def get_team_info(request):
     if not Team.objects.filter(members__id = user.id).exists():
         return Response({'error' : 'This user is not member of team'}, status = status.HTTP_403_FORBIDDEN)
 
-    return Response({'team': TeamSerializer(team).data})
+    return Response({'team': TeamSerializer(team).data, 'can_edit': user == team.head})
 
 
 @api_view(['GET'])
@@ -209,7 +209,7 @@ def get_members(request):
     serialized = []
     for member in members:
         serialized.append(MemberSerializer(member, context = {'is_head' : team.head.id == member.id}).data)
-    return Response({'members': serialized})
+    return Response({'members': serialized, 'can_edit' : user == team.head})
 
 
 @api_view(['GET'])
