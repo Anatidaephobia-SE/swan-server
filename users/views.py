@@ -12,7 +12,7 @@ from .serializers import UserSerializer
 
 
 @api_view(['POST'])
-@permission_classes([])
+# @permission_classes([])
 def signup_view(request):
     email = request.data.get('email', None)
     password = request.data.get('password', None)
@@ -73,7 +73,7 @@ def get_profile(request, user_email=None):
 
 
 @api_view(['POST'])
-@permission_classes([])
+# @permission_classes([])
 def login_view(request):
     email = request.data.get('email', None)
     password = request.data.get("password", None)
