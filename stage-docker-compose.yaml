@@ -44,5 +44,15 @@ services:
     networks: 
       - swan-stage
 
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: "swagger-ui"
+    ports:
+      - "10334:8080"
+    volumes:
+      - ./docs/swan-doc/swagger.json:/swagger.json
+    environment:
+      SWAGGER_JSON: /swagger.json
+
 networks: 
   swan-stage:
