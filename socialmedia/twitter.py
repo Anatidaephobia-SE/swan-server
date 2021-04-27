@@ -15,10 +15,11 @@ USERS_LOOKUP = "https://api.twitter.com/1.1/users/lookup.json"
 UPLOAD_MEDIA = "https://upload.twitter.com/1.1/media/upload.json"
 GET_AVAILABLE_LOCATIONS = "https://api.twitter.com/1.1/trends/available.json"
 GET_TRENDS_HASHTAGS = "https://api.twitter.com/1.1/trends/place.json"
+TWEET_LOOKUP = "https://api.twitter.com/2/tweets"
 
 def Authorize_Address(team_id, modified):
-    consumer_key = "RF4M2xLDmWmnTTyQbH0qDpkls"#os.getenv("TWITTER_CONSUMER_KEY")
-    consumer_secret = "Lv862uggz1TDq0jMWfvrP1pxqXoFazQcrTcamSSOcqzf4Razoi"#os.getenv("TWITTER_CONSUMER_SECRET")
+    consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
+    consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
     auth = OAuth1(client_key=consumer_key, client_secret=consumer_secret,
                   callback_uri=f"http://localhost:8080/dispatch?team_id={team_id}&modify={modified}")
 
@@ -59,8 +60,8 @@ def Pop_Tweets():
         return
     
 def Tweet(post, social_media):
-    consumer_key = "RF4M2xLDmWmnTTyQbH0qDpkls"#os.getenv("TWITTER_CONSUMER_KEY")
-    consumer_secret = "Lv862uggz1TDq0jMWfvrP1pxqXoFazQcrTcamSSOcqzf4Razoi"#os.getenv("TWITTER_CONSUMER_SECRET")
+    consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
+    consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
     auth = OAuth1(
         client_key=consumer_key, 
         client_secret=consumer_secret, 
@@ -137,3 +138,18 @@ def Get_WOEID(location_name):
     if woeid == -1:
         return None
     return woeid
+
+def Get_Tweet(tweet_id, social_media):
+    consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
+    consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
+    ACCESS_TOKEN = os.getenv("TWITTER_ACCESS_TOKEN")
+    ACCESS_TOKEN_SECRET = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
+    params = {"ids": f'{tweet_id}', 'tweet.fields': 'public_metrics'}
+    auth = OAuth1(
+        client_key=consumer_key, 
+        client_secret=consumer_secret, 
+        resource_owner_key=ACCESS_TOKEN, 
+        resource_owner_secret=ACCESS_TOKEN_SECRET)
+    response = requests.get(TWEET_LOOKUP, params=params, auth=auth)
+    return response
+

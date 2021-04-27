@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import permission_classes, api_view
-from .twitter import Authorize_Address, Get_Access_Token, Queue_Tweet, Tweet, Get_Twitter_User, Get_WOEID, Get_Trend_Hashtags
+from .twitter import Authorize_Address, Get_Access_Token, Queue_Tweet, Tweet, Get_Twitter_User, Get_WOEID, Get_Trend_Hashtags, Get_Tweet
 from rest_framework.response import Response
 from rest_framework import status, generics
 from .models import SocialMedia
@@ -114,3 +114,24 @@ def get_trends(request):
     trends = Get_Trend_Hashtags(woeid)
 
     return Response({'trends' : trends})
+
+@api_view(["GET"])
+def get_tweet_info(request, pk):
+    user = request.user
+    mypost= Post.objects.get(pk=pk)
+    tweet_id=mypost.published_id
+    myteam = mypost.team
+    mysocialmedia=SocialMedia.objects.get(team=myteam)
+    response = Get_Tweet(tweet_id, mysocialmedia)
+    if(response.status_code != 200):
+        return Response(data=response.json(), status=response.status_code)
+    data = response.json()
+    print("****************",data)
+    metrics = data["data"][0]["public_metrics"]
+    data = {
+        "reply_count": metrics["reply_count"], 
+        "retweet_count": metrics["retweet_count"], 
+        "quote_count" :metrics["quote_count"],
+        "like_count" : metrics["like_count"],
+    }
+    return Response(data=data, status=response.status_code)
