@@ -119,14 +119,21 @@ def get_trends(request):
 def get_tweet_info(request, pk):
     user = request.user
     mypost= Post.objects.get(pk=pk)
+    if mypost.status!='Published':
+        return Response({'error': "This post has not been published yet."}, status=status.HTTP_400_BAD_REQUEST)
+
     tweet_id=mypost.published_id
     myteam = mypost.team
-    mysocialmedia=SocialMedia.objects.get(team=myteam)
+    
+    try:
+        mysocialmedia = SocialMedia.objects.get(team=myteam)
+    except SocialMedia.DoesNotExist:
+        return Response(data={"error": "Social media accounts for this team not found"}, status=status.HTTP_404_NOT_FOUND)
+
     response = Get_Tweet(tweet_id, mysocialmedia)
     if(response.status_code != 200):
         return Response(data=response.json(), status=response.status_code)
     data = response.json()
-    print("****************",data)
     metrics = data["data"][0]["public_metrics"]
     data = {
         "reply_count": metrics["reply_count"], 
