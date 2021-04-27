@@ -17,8 +17,8 @@ GET_AVAILABLE_LOCATIONS = "https://api.twitter.com/1.1/trends/available.json"
 GET_TRENDS_HASHTAGS = "https://api.twitter.com/1.1/trends/place.json"
 
 def Authorize_Address(team_id, modified):
-    consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
-    consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
+    consumer_key = "RF4M2xLDmWmnTTyQbH0qDpkls"#os.getenv("TWITTER_CONSUMER_KEY")
+    consumer_secret = "Lv862uggz1TDq0jMWfvrP1pxqXoFazQcrTcamSSOcqzf4Razoi"#os.getenv("TWITTER_CONSUMER_SECRET")
     auth = OAuth1(client_key=consumer_key, client_secret=consumer_secret,
                   callback_uri=f"http://localhost:8080/dispatch?team_id={team_id}&modify={modified}")
 
@@ -59,8 +59,8 @@ def Pop_Tweets():
         return
     
 def Tweet(post, social_media):
-    consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
-    consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
+    consumer_key = "RF4M2xLDmWmnTTyQbH0qDpkls"#os.getenv("TWITTER_CONSUMER_KEY")
+    consumer_secret = "Lv862uggz1TDq0jMWfvrP1pxqXoFazQcrTcamSSOcqzf4Razoi"#os.getenv("TWITTER_CONSUMER_SECRET")
     auth = OAuth1(
         client_key=consumer_key, 
         client_secret=consumer_secret, 
@@ -82,8 +82,9 @@ def Tweet(post, social_media):
     }
     
     response = requests.post(url=UPDATE_STATUS, params=params, auth=auth)
+    published_id = response.json()["id"]
     print(f"posted tweet with response: {response.status_code} {response.text}")
-    return response
+    return response, published_id
 
 def Get_Twitter_User(user_id):
     consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
