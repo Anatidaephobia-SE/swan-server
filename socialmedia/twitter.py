@@ -13,6 +13,8 @@ ACCESS_TOKEN = "https://api.twitter.com/oauth/access_token"
 UPDATE_STATUS = "https://api.twitter.com/1.1/statuses/update.json"
 USERS_LOOKUP = "https://api.twitter.com/1.1/users/lookup.json"
 UPLOAD_MEDIA = "https://upload.twitter.com/1.1/media/upload.json"
+GET_AVAILABLE_LOCATIONS = "https://api.twitter.com/1.1/trends/available.json"
+GET_TRENDS_HASHTAGS = "https://api.twitter.com/1.1/trends/place.json"
 
 def Authorize_Address(team_id, modified):
     consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
@@ -98,3 +100,39 @@ def upload_media(media, auth):
         return response
     raise FileNotFoundError(f"Cannot open media file {media}")
 
+
+def Get_Trend_Hashtags(woeid):
+    consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
+    consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
+    
+    auth = OAuth1(client_key=consumer_key,
+                    client_secret=consumer_secret)
+    
+    params = {'id' : woeid,
+                'lang' : 'en'}
+
+    response = requests.get(url = GET_TRENDS_HASHTAGS, params = params, auth = auth)
+    
+    trends = []
+    for trend in response.json()[0]['trends']:
+        trends.append(trend['name'])
+    
+    return trends
+
+def Get_WOEID(location_name):
+    consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
+    consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
+    
+    auth = OAuth1(client_key=consumer_key,
+                    client_secret=consumer_secret)
+    
+    response = requests.get(url = GET_AVAILABLE_LOCATIONS, auth = auth)
+
+    woeid = -1
+    for location in response.json():
+        if location['name'].lower() == location_name.lower():
+            woeid = location['woeid']
+    
+    if woeid == -1:
+        return None
+    return woeid

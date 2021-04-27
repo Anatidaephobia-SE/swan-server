@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import permission_classes, api_view
-from .twitter import Authorize_Address, Get_Access_Token, Queue_Tweet, Tweet, Get_Twitter_User
+from .twitter import Authorize_Address, Get_Access_Token, Queue_Tweet, Tweet, Get_Twitter_User, Get_WOEID, Get_Trend_Hashtags
 from rest_framework.response import Response
 from rest_framework import status, generics
 from .models import SocialMedia
@@ -96,3 +96,21 @@ def get_user(request):
         "default_profile_image" : json["default_profile_image"]
     }
     return Response(data=data, status=response.status_code)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_trends(request):
+    
+    req_check = have_queryparams(request, 'location')
+    if not req_check.have_all:
+        return Response({'error' : req_check.error_message}, status = status.HTTP_400_BAD_REQUEST)
+    
+    location = request.query_params.get('location')
+
+    woeid = Get_WOEID(location)
+    if woeid == None:
+        return Response({'error' : 'trends for this location are not available'}, status = status.HTTP_400_BAD_REQUEST)
+
+    trends = Get_Trend_Hashtags(woeid)
+
+    return Response({'trends' : trends})
