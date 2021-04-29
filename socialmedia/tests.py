@@ -5,6 +5,7 @@ from team.models import Team
 from users.models import User
 from .views import twitter_request_authorize
 from users.authenticators import generate_access_token
+from django.urls import reverse
 # Create your tests here.
 class SocialMediaModelTest(TestCase):
     @classmethod
@@ -47,33 +48,37 @@ class TwitterRequestAuthorizeTest(APITestCase):
         self.team1 = Team.objects.create(url="team11", name="hahaha", head=user)
         self.team2 = Team.objects.create(url="team12", name="hahaha", head=user2)
         client = APIClient()
-        client.post('/api/users/signup/', data = {'email' : 'hadi@gmail.com', 'password' : '123456', 'confirm_password' : '123456'})
+        signup_url = reverse("users-url:signup")
+        client.post(signup_url, data = {'email' : 'hadi@gmail.com', 'password' : '123456', 'confirm_password' : '123456'})
         user = User.objects.get(email = 'hadi@gmail.com')
         user.verified = True
         user.save(update_fields = ['verified'])
         self.token = generate_access_token(user)
     def test_request_authorize(self):
         client = APIClient()
+        url = reverse("socialmedia-urls:requestAuthorizeTwitter")
         response = client.post(
-            "/api/v1.0.0/socialmedia/twitter/authorize/request", 
+            url, 
             data={"team_id" : self.team1.id}, 
-            **{'HTTP_Authorization' : 'bear ' + self.token}
+            **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
         self.assertEqual(response.status_code, 200)
     def test_request_authorize_failure(self):
         client = APIClient()
+        url = reverse("socialmedia-urls:requestAuthorizeTwitter")
         response = client.post(
-            "/api/v1.0.0/socialmedia/twitter/authorize/request", 
+            url, 
             data={"team_id" : 45126}, 
-            **{'HTTP_Authorization' : 'bear ' + self.token}
+            **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
         self.assertEqual(response.status_code, 404)
     def test_request_authorize_permission_denied(self):
         client = APIClient()
+        url = reverse("socialmedia-urls:requestAuthorizeTwitter")
         response = client.post(
-            "/api/v1.0.0/socialmedia/twitter/authorize/request", 
+            url, 
             data={"team_id" : self.team2.id}, 
-            **{'HTTP_Authorization' : 'bear ' + self.token}
+            **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
         self.assertEqual(response.status_code, 403)
 
@@ -89,8 +94,9 @@ class TwitterGetUserTest(APITestCase):
         self.token = generate_access_token(user)
     def test_get_user(self):
         client = APIClient()
+        url = reverse("socialmedia-urls:accountsTwitter")
         response = client.get(
-            "/api/v1.0.0/socialmedia/twitter/accounts", 
+            url, 
             data={"team_id" : self.team.id}, 
             **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
@@ -98,24 +104,27 @@ class TwitterGetUserTest(APITestCase):
         self.assertEqual(response.data['screen_name'], "Dev23080567")
     def test_request_get_user_failure(self):
         client = APIClient()
+        url = reverse("socialmedia-urls:accountsTwitter")
         response = client.get(
-            "/api/v1.0.0/socialmedia/twitter/accounts", 
+            url, 
             data={"team_id" : 567}, 
             **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
         self.assertEqual(response.status_code, 404)
     def test_request_get_user_without_social_media(self):
         client = APIClient()
+        url = reverse("socialmedia-urls:accountsTwitter")
         response = client.get(
-            "/api/v1.0.0/socialmedia/twitter/accounts", 
+            url, 
             data={"team_id" : self.team2.id}, 
             **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
         self.assertEqual(response.status_code, 404)
     def test_request_get_user_without_twitter(self):
         client = APIClient()
+        url = reverse("socialmedia-urls:accountsTwitter")
         response = client.get(
-            "/api/v1.0.0/socialmedia/twitter/accounts", 
+            url, 
             data={"team_id" : self.team3.id}, 
             **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
