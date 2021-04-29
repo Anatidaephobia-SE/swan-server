@@ -44,8 +44,8 @@ class TwitterRequestAuthorizeTest(APITestCase):
     def setUp(self):
         user = User.objects.create(email="hadi@gmail.com")
         user2 = User.objects.create(email="had234i@gmail.com")
-        Team.objects.create(url="team11", name="hahaha", head=user)
-        Team.objects.create(url="team12", name="hahaha", head=user2)
+        self.team1 = Team.objects.create(url="team11", name="hahaha", head=user)
+        self.team2 = Team.objects.create(url="team12", name="hahaha", head=user2)
         client = APIClient()
         client.post('/api/users/signup/', data = {'email' : 'hadi@gmail.com', 'password' : '123456', 'confirm_password' : '123456'})
         user = User.objects.get(email = 'hadi@gmail.com')
@@ -56,7 +56,7 @@ class TwitterRequestAuthorizeTest(APITestCase):
         client = APIClient()
         response = client.post(
             "/api/v1.0.0/socialmedia/twitter/authorize/request", 
-            data={"team_url" : "team11"}, 
+            data={"team_id" : self.team1.id}, 
             **{'HTTP_Authorization' : 'bear ' + self.token}
         )
         self.assertEqual(response.status_code, 200)
@@ -64,7 +64,7 @@ class TwitterRequestAuthorizeTest(APITestCase):
         client = APIClient()
         response = client.post(
             "/api/v1.0.0/socialmedia/twitter/authorize/request", 
-            data={"team_url" : "team134"}, 
+            data={"team_id" : 45126}, 
             **{'HTTP_Authorization' : 'bear ' + self.token}
         )
         self.assertEqual(response.status_code, 404)
@@ -72,7 +72,7 @@ class TwitterRequestAuthorizeTest(APITestCase):
         client = APIClient()
         response = client.post(
             "/api/v1.0.0/socialmedia/twitter/authorize/request", 
-            data={"team_url" : "team12"}, 
+            data={"team_id" : self.team2.id}, 
             **{'HTTP_Authorization' : 'bear ' + self.token}
         )
         self.assertEqual(response.status_code, 403)
@@ -81,17 +81,17 @@ class TwitterGetUserTest(APITestCase):
     @classmethod
     def setUp(self):
         user = User.objects.create(email="hadi@gmail.com")
-        team = Team.objects.create(url="team11", name="hahaha", head=user)
-        team2 = Team.objects.create(url="team22", name="hahaha", head=user)
-        team3 = Team.objects.create(url="team33", name="hahaha", head=user)
-        SocialMedia.objects.create(team=team, twitter_oauth_token="token1", twitter_oauth_token_secret="token1-secret", twitter_name="account_name", twitter_user_id="1371442090245304321")
-        SocialMedia.objects.create(team=team3)
+        self.team = Team.objects.create(url="team11", name="hahaha", head=user)
+        self.team2 = Team.objects.create(url="team22", name="hahaha", head=user)
+        self.team3 = Team.objects.create(url="team33", name="hahaha", head=user)
+        SocialMedia.objects.create(team=self.team, twitter_oauth_token="token1", twitter_oauth_token_secret="token1-secret", twitter_name="account_name", twitter_user_id="1371442090245304321")
+        SocialMedia.objects.create(team=self.team3)
         self.token = generate_access_token(user)
     def test_get_user(self):
         client = APIClient()
         response = client.get(
             "/api/v1.0.0/socialmedia/twitter/accounts", 
-            data={"team_url" : "team11"}, 
+            data={"team_id" : self.team.id}, 
             **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
         self.assertEqual(response.status_code, 200)
@@ -100,7 +100,7 @@ class TwitterGetUserTest(APITestCase):
         client = APIClient()
         response = client.get(
             "/api/v1.0.0/socialmedia/twitter/accounts", 
-            data={"team_url" : "team134"}, 
+            data={"team_id" : 567}, 
             **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
         self.assertEqual(response.status_code, 404)
@@ -108,7 +108,7 @@ class TwitterGetUserTest(APITestCase):
         client = APIClient()
         response = client.get(
             "/api/v1.0.0/socialmedia/twitter/accounts", 
-            data={"team_url" : "team22"}, 
+            data={"team_id" : self.team2.id}, 
             **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
         self.assertEqual(response.status_code, 404)
@@ -116,7 +116,7 @@ class TwitterGetUserTest(APITestCase):
         client = APIClient()
         response = client.get(
             "/api/v1.0.0/socialmedia/twitter/accounts", 
-            data={"team_url" : "team33"}, 
+            data={"team_id" : self.team3.id}, 
             **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
         self.assertEqual(response.status_code, 403)
