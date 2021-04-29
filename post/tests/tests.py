@@ -37,11 +37,11 @@ class PostViewTest(APITestCase):
                         "caption":"Over the past decade, the availability and demand for data science skills and data-decision decision making has skyrocketed.",
                         "status":"Drafts",
                         "multimedia[]":files,
-                        "team": pk_team
+                        "team": pk_team,
+                        "tag" : "Quote"
                         }
                 self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
                 response = self.client.post('/api/v1.0.0/post/create_post/', data)
-                print(response.__dict__)
                 self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         def test_get_post(self):
