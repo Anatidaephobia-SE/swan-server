@@ -7,12 +7,14 @@ class TestViews(TestCase):
 
     def setUp(self):
         self.client = Client()
-        self.client.post('/api/users/signup/', data = {'email' : 'amir.j1881@gmail.com', 'password' : '123456', 'confirm_password' : '123456'})
+        signup_url = reverse("users-url:signup")
+        login_url = reverse("users-url:login")
+        self.client.post(signup_url, data = {'email' : 'amir.j1881@gmail.com', 'password' : '123456', 'confirm_password' : '123456'})
         user = User.objects.get(email = 'amir.j1881@gmail.com')
         user.verified = True
         user.save(update_fields = ['verified'])
         
-        login_resp = self.client.post('/api/users/login/', data = {'email' : 'amir.j1881@gmail.com', 'password' : '123456'})
+        login_resp = self.client.post(login_url, data = {'email' : 'amir.j1881@gmail.com', 'password' : '123456'})
         self.token = login_resp.data.get('token')
 
 
@@ -41,8 +43,8 @@ class TestViews(TestCase):
         self.assertEqual(unauth_resp.status_code, 403)
 
         self.setUp()
-
-        self.client.post('/api/users/signup/', data = {'email' : 'amir.j1882@gmail.com', 'password' : '123456', 'confirm_password' : '123456'})
+        signup_url = reverse("users-url:signup")
+        self.client.post(signup_url, data = {'email' : 'amir.j1882@gmail.com', 'password' : '123456', 'confirm_password' : '123456'})
         user = User.objects.get(email = 'amir.j1882@gmail.com')
         user.verified = True
         user.save(update_fields = ['verified'])
