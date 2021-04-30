@@ -116,9 +116,12 @@ def get_trends(request):
     return Response({'trends' : trends})
 
 @api_view(["GET"])
-def get_tweet_info(request, pk):
-    user = request.user
-    mypost= Post.objects.get(pk=pk)
+def get_tweet_info(request):
+    req_check = have_queryparams(request, "post_id")
+    if not req_check.have_all:
+        return Response({'error': req_check.error_message}, status=status.HTTP_400_BAD_REQUEST)
+    post_id = request.query_params.get("post_id")
+    mypost= Post.objects.get(pk=post_id)
     if mypost.status!='Published':
         return Response({'error': "This post has not been published yet."}, status=status.HTTP_400_BAD_REQUEST)
 

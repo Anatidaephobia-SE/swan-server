@@ -6,7 +6,8 @@ from users.models import User
 from post.models import Post
 from .views import twitter_request_authorize
 from users.authenticators import generate_access_token
-# Create your tests here.
+from django.urls import reverse
+Create your tests here.
 class SocialMediaModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -135,8 +136,10 @@ class TwitterGetTweetTest(APITestCase):
         self.token = generate_access_token(user)
     def test_get_tweet(self):
         client = APIClient()
+        url = reverse("TweetDetail")
         response = client.get(
-            f"/api/v1.0.0/socialmedia/twitter/tweet/1/", 
+            url, 
+            data={"post_id" : 1}, 
             **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
         self.assertEqual(response.status_code, 200)
@@ -147,17 +150,20 @@ class TwitterGetTweetTest(APITestCase):
     
     def test_not_published(self):
         client = APIClient()
+        url = reverse("TweetDetail")        
         response = client.get(
-            f"/api/v1.0.0/socialmedia/twitter/tweet/2/", 
+            url, 
+            data={"post_id" : 2}, 
             **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
         self.assertEqual(response.status_code, 400)
 
     def test_request_get_tweet_without_social_media(self):
         client = APIClient()
+        url = reverse("TweetDetail")
         response = client.get(
-            "/api/v1.0.0/socialmedia/twitter/tweet/3/", 
-            data={"team_id" : 2}, 
+            url, 
+            data={"post_id" : 3}, 
             **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
         self.assertEqual(response.status_code, 404)

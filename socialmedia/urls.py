@@ -8,5 +8,5 @@ urlpatterns = [
     path('twitter/authorize/access', twitter_access),
     path('twitter/accounts', get_user),
     path('twitter/get_trends', get_trends),
-    path('twitter/tweet/<int:pk>/',get_tweet_info)
+    path('twitter/tweet/',get_tweet_info, name="TweetDetail")
 ]
