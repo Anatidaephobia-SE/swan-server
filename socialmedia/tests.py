@@ -3,10 +3,13 @@ from rest_framework.test import APIClient, APITestCase
 from .models import SocialMedia
 from team.models import Team
 from users.models import User
+from post.models import Post
 from .views import twitter_request_authorize
 from users.authenticators import generate_access_token
 from django.urls import reverse
+
 # Create your tests here.
+
 class SocialMediaModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -129,3 +132,52 @@ class TwitterGetUserTest(APITestCase):
             **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
         self.assertEqual(response.status_code, 403)
+
+class TwitterGetTweetTest(APITestCase):
+    @classmethod
+    def setUp(self):
+        user = User.objects.create(email="hadi@gmail.com")
+        team = Team.objects.create(url="team11", name="hahaha", head=user)
+        team2 = Team.objects.create(url="team22", name="hahaha", head=user)
+        post = Post.objects.create(name='test',caption="test caption",status="Published",team=team,owner=user,published_id=1387130734431948804)
+        post2 = Post.objects.create(name='test',caption="test caption",status="Drafts",team=team,owner=user)
+        post3 = Post.objects.create(name='test',caption="test caption",status="Published",team=team2,owner=user)
+        SocialMedia.objects.create(team=team, twitter_oauth_token="token1", twitter_oauth_token_secret="token1-secret", twitter_name="account_name", twitter_user_id="1371442090245304321")
+        self.token = generate_access_token(user)
+    def test_get_tweet(self):
+        client = APIClient()
+        url = reverse("TweetDetail")
+        response = client.get(
+            url, 
+            data={"post_id" : 1}, 
+            **{'HTTP_Authorization' : 'bearer ' + self.token}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['reply_count'], 0)
+        self.assertEqual(response.data['retweet_count'], 0)
+        self.assertEqual(response.data['quote_count'], 0)
+        self.assertEqual(response.data['like_count'], 0)
+    
+    def test_not_published(self):
+        client = APIClient()
+        url = reverse("TweetDetail")        
+        response = client.get(
+            url, 
+            data={"post_id" : 2}, 
+            **{'HTTP_Authorization' : 'bearer ' + self.token}
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_request_get_tweet_without_social_media(self):
+        client = APIClient()
+        url = reverse("TweetDetail")
+        response = client.get(
+            url, 
+            data={"post_id" : 3}, 
+            **{'HTTP_Authorization' : 'bearer ' + self.token}
+        )
+        self.assertEqual(response.status_code, 404)
+
+
+
+  
