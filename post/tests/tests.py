@@ -6,13 +6,15 @@ from team.models import Team
 from rest_framework import status
 from users.authenticators import generate_access_token
 from os import path
+from django.urls import reverse
 
 
 class PostViewTest(APITestCase):
 
         def setUp(self):
             client = APIClient()
-            client.post('/api/users/signup/', data = {'email' : 'zahra_hosseini99@yahoo.com', 'password' : '123456', 'confirm_password' : '123456'})
+            signup_url = reverse("users-url:signup")
+            client.post(signup_url, data = {'email' : 'zahra_hosseini99@yahoo.com', 'password' : '123456', 'confirm_password' : '123456'})
             self.user = User.objects.get(email = 'zahra_hosseini99@yahoo.com')
             self.user.verified = True
             self.user.save(update_fields = ['verified'])
@@ -49,8 +51,8 @@ class PostViewTest(APITestCase):
             post_id=self.test_post.pk
             response = self.client.get(f'/api/v1.0.0/post/update_post/{post_id}/')
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-            client.post('/api/users/signup/', data = {'email' : 'hosseini99_zahra@yahoo.com', 'password' : '123456', 'confirm_password' : '123456'})
+            signup_url = reverse("users-url:signup")
+            client.post(signup_url, data = {'email' : 'hosseini99_zahra@yahoo.com', 'password' : '123456', 'confirm_password' : '123456'})
             user_test = User.objects.get(email = 'hosseini99_zahra@yahoo.com')
             user_test.verified = True
             user_test.save(update_fields = ['verified'])
@@ -73,8 +75,8 @@ class PostViewTest(APITestCase):
             post_id=self.test_post.pk
             response = self.client.put(f'/api/v1.0.0/post/update_post/{post_id}/',data)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-            client.post('/api/users/signup/', data = {'email' : 'hosseini99_zahra@yahoo.com', 'password' : '123456', 'confirm_password' : '123456'})
+            signup_url = reverse("users-url:signup")
+            client.post(signup_url, data = {'email' : 'hosseini99_zahra@yahoo.com', 'password' : '123456', 'confirm_password' : '123456'})
             user_test = User.objects.get(email = 'hosseini99_zahra@yahoo.com')
             user_test.verified = True
             user_test.save(update_fields = ['verified'])
@@ -122,7 +124,8 @@ class PostViewTest(APITestCase):
             
             
             second_comment_id=self.second_test_comment.pk
-            client.post('/api/users/signup/', data = {'email' : 'hosseini99_zahra@yahoo.com', 'password' : '123456', 'confirm_password' : '123456'})
+            signup_url = reverse("users-url:signup")
+            client.post(signup_url, data = {'email' : 'hosseini99_zahra@yahoo.com', 'password' : '123456', 'confirm_password' : '123456'})
             user_test = User.objects.get(email = 'hosseini99_zahra@yahoo.com')
             user_test.verified = True
             user_test.save(update_fields = ['verified'])
@@ -140,7 +143,8 @@ class PostViewTest(APITestCase):
 
             
             post_id=self.second_test_post.pk
-            client.post('/api/users/signup/', data = {'email' : 'hosseini99_zahra@yahoo.com', 'password' : '123456', 'confirm_password' : '123456'})
+            signup_url = reverse("users-url:signup")
+            client.post(signup_url, data = {'email' : 'hosseini99_zahra@yahoo.com', 'password' : '123456', 'confirm_password' : '123456'})
             user_test = User.objects.get(email = 'hosseini99_zahra@yahoo.com')
             user_test.verified = True
             user_test.save(update_fields = ['verified'])

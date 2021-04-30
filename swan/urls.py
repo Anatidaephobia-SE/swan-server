@@ -16,7 +16,6 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import url
-import users.urls as users_urls
 import team.urls as team_urls
 import post.urls as post_urls
 from django.conf.urls.static import static
@@ -24,9 +23,9 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1.0.0/socialmedia/', include('socialmedia.urls')),
+    path('api/v1.1.0/socialmedia/', include(('socialmedia.urls', "socialmedia"), namespace="socialmedia-urls")),
     path("", include("django_prometheus.urls"), name="django-prometheus"),
-    path('api/users/', include(users_urls)),
+    path('api/v1.1.0/users/', include(("users.urls", "users"), namespace="users-url")),
     path('api/v1.0.0/post/', include(post_urls)),
     path('api/v1.0.0/team/', include(team_urls)),
 ]
