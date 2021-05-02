@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -12,7 +12,7 @@ from .serializers import UserSerializer
 
 
 @api_view(['POST'])
-@permission_classes([])
+@authentication_classes([])
 def signup_view(request):
     email = request.data.get('email', None)
     password = request.data.get('password', None)
@@ -45,7 +45,9 @@ def update_profile(request):
     if last_name is None:
         return Response({"error": "Last name not submitted."}, status=status.HTTP_400_BAD_REQUEST)
 
-    if profile_picture:
+    if profile_picture or profile_picture == "":
+        if(profile_picture == ""):
+            profile_picture = None
         user.profile_picture = profile_picture
 
     user.first_name = first_name
@@ -71,7 +73,7 @@ def get_profile(request, user_email=None):
 
 
 @api_view(['POST'])
-@permission_classes([])
+@authentication_classes([])
 def login_view(request):
     email = request.data.get('email', None)
     password = request.data.get("password", None)
