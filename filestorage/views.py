@@ -33,7 +33,14 @@ class SingleFileView(generics.RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = MediaStorage_serializer.FileSerializer
 
-    def get(self, request, pk=None):
-        file_Info = FileStorage.objects.all().get(pk=pk)
+    def get(self, request):
+        
+        req_check = have_queryparams(request, 'media_pk')
+
+        if not req_check.have_all:
+            return Response({'error': req_check.error_message}, status=status.HTTP_400_BAD_REQUEST)
+        media_pk = request.query_params.get("media_pk")
+
+        file_Info = FileStorage.objects.all().get(pk=media_pk)
         serializer = MediaStorage_serializer.FileSerializer(file_Info)
         return Response(serializer.data, status=status.HTTP_200_OK)
