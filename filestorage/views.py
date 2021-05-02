@@ -3,15 +3,17 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
 from .models import MediaStorage
 from users.models import User
 from team.models import Team
-from . import serializers as MediaStorage_serializer
+from . import serializers as FileStorage_serializer
+from request_checker.functions import *
 
 class UploadFileView(generics.CreateAPIView):
-    queryset = FileStorage.objects.all()
+    queryset = MediaStorage.objects.all()
     permission_classes = (IsAuthenticated,)
-    serializer_class = MediaStorage_serializer.FileSerializer
+    serializer_class = FileStorage_serializer.FileSerializer
 
     def post(self, request, *args, **kwargs):
         user = request.user
@@ -21,17 +23,18 @@ class UploadFileView(generics.CreateAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         file_titile=data['title']
         file_media=data['media']
-        f = FileStorage(title=file_titile)
+        file_team=Team.objects.get(pk=data['team'])
+        f = MediaStorage(title=file_titile,team=file_team,owner=user)
         f.save()
         f.media = file_media
         f.save()
-        return Response(MediaStorage_serializer.FileSerializer(f).data, status=status.HTTP_201_CREATED)
+        return Response(FileStorage_serializer.FileSerializer(f).data, status=status.HTTP_201_CREATED)
 
 
 class SingleFileView(generics.RetrieveAPIView):
-    queryset = FileStorage.objects.all()
+    queryset = MediaStorage.objects.all()
     permission_classes = (IsAuthenticated,)
-    serializer_class = MediaStorage_serializer.FileSerializer
+    serializer_class = FileStorage_serializer.FileSerializer
 
     def get(self, request):
         
@@ -41,6 +44,52 @@ class SingleFileView(generics.RetrieveAPIView):
             return Response({'error': req_check.error_message}, status=status.HTTP_400_BAD_REQUEST)
         media_pk = request.query_params.get("media_pk")
 
-        file_Info = FileStorage.objects.all().get(pk=media_pk)
-        serializer = MediaStorage_serializer.FileSerializer(file_Info)
+        file_Info = MediaStorage.objects.all().get(pk=media_pk)
+        serializer = FileStorage_serializer.FileSerializer(file_Info)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class AllMediaView(generics.ListAPIView):
+    queryset = MediaStorage.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = FileStorage_serializer.FileSerializer
+
+    def get(self, request):
+
+        req_check = have_queryparams(request, 'team_id')
+
+        if not req_check.have_all:
+            return Response({'error': req_check.error_message}, status=status.HTTP_400_BAD_REQUEST)
+        team_id = request.query_params.get("team_id")
+
+        mediaList = MediaStorage.objects.all().filter(team=team_id)
+        serializer = FileStorage_serializer.FileSerializer(mediaList, many=True)
+        print(serializer)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class DeleteMediaView(generics.DestroyAPIView):
+
+    queryset = MediaStorage.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = FileStorage_serializer.FileSerializer
+
+    def delete(self, request):
+
+        req_check = have_queryparams(request, 'media_pk')
+
+        if not req_check.have_all:
+            return Response({'error': req_check.error_message}, status=status.HTTP_400_BAD_REQUEST)
+        media_pk = request.query_params.get("media_pk")
+
+        user = request.user
+        media_info = MediaStorage.objects.get(pk=media_pk)
+        medias_query = user.media_owner.all()
+
+        if user==media_info.team.head: #head of team can delete the uploaded media
+             media_info.delete()
+             return Response("File deleted.", status=status.HTTP_200_OK)
+
+        if not medias_query.filter(pk=media_pk).exists():
+            return Response("You did not upload this file.", status=status.HTTP_400_BAD_REQUEST)
+
+        media_info.delete()
+        return Response("File deleted.", status=status.HTTP_200_OK)
