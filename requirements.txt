@@ -22,3 +22,4 @@ psycopg2-binary>=2.8
 python_dotenv==0.16
 django_prometheus==2.1.0
 prometheus_client==0.9.0
+django-minio-backend==2.6.0
