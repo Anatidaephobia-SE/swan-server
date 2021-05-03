@@ -60,6 +60,10 @@ jobs:
         POSTGRES_HOST_AUTH_METHOD: trust
         POSTGRES_HOST: localhost
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
+        MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+        MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
+        MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+        BASE_URL_FOR_MINIO: ${{ secrets.BASE_URL_FOR_MINIO }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
     - name: Run tests
       run: python manage.py test
@@ -194,7 +198,7 @@ jobs:
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          scp  -o StrictHostKeyChecking=no -r ./minio.env ./server.env ./swan.env ./pg.env ./pgadmin.env ./${{ env.COMPOSE_FILE }} ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/swan-stage
+          scp  -o StrictHostKeyChecking=no -r ./nginx.conf ./minio.env ./server.env ./swan.env ./pg.env ./pgadmin.env ./${{ env.COMPOSE_FILE }} ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/swan-stage
           ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'ENDSSH'
             cd ~/swan-stage
             source server.env
