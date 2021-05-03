@@ -152,7 +152,6 @@ class TwitterGetTweetTest(APITestCase):
             data={"post_id" : self.post.id }, 
             **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
-        print(response.data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['reply_count'], 0)
         self.assertEqual(response.data['retweet_count'], 0)
