@@ -21,10 +21,9 @@ class UploadFileView(generics.CreateAPIView):
         serializer = self.get_serializer(data=data)
         if not serializer.is_valid(True):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        file_titile=data['title']
         file_media=data['media']
         file_team=Team.objects.get(pk=data['team'])
-        f = MediaStorage(title=file_titile,team=file_team,owner=user)
+        f = MediaStorage(team=file_team,owner=user)
         f.save()
         f.media = file_media
         f.save()
