@@ -12,6 +12,8 @@ from socialmedia.twitter import Tweet
 from scheduler.scheduler import Scheduler
 from scheduler.models import TaskType
 from datetime import datetime
+
+from filestorage.models import MediaStorage
 class CreatePostView(generics.CreateAPIView):
     queryset = Post.objects.all()
     permission_classes = (IsAuthenticated,)
@@ -31,6 +33,10 @@ class CreatePostView(generics.CreateAPIView):
         post.save()
         post_files=request.FILES.getlist('multimedia[]')
         for media_file in post_files:
+            file_team=post_team
+            f = MediaStorage.objects.create(team=file_team,owner=user)
+            f.media=media_file
+            f.save()
             media = Media.objects.create(media=media_file, post_id = post.id)
             post.multimedia.add(media)
         return Response(post_serializer.PostSerializer(post).data, status=status.HTTP_201_CREATED)
@@ -71,10 +77,14 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
                 
             if post.status == 'Published':
                 socialmedia=SocialMedia.objects.all().get(team=post.team)
-                twitter_response = Tweet(post,socialmedia)
                 # sc = Scheduler()
                 # sc.schedule(post, socialmedia, TaskType.Twitter, datetime.now())
                 # return Response(data={"message": "added to tyhe queue"},status=status.HTTP_200_OK)
+                twitter_response, published_id = Tweet(post,socialmedia)
+                print("*************************",published_id)
+                post.published_id=published_id
+                post.save()
+                print("*************************",post.published_id)
                 if twitter_response.status_code != 200 :
                     post.status == 'Error'
             return Response(serializer.data,status=status.HTTP_200_OK)

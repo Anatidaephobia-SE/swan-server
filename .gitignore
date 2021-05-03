@@ -263,3 +263,6 @@ uploads/*
 #database
 data*
 .sqlite3
+
+#minio database
+minio-data

@@ -44,5 +44,38 @@ services:
     networks: 
       - swan-stage
 
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: "swagger-ui"
+    ports:
+      - "10334:8080"
+    volumes:
+      - ./docs/swan-doc/swagger.json:/swagger.json
+    environment:
+      SWAGGER_JSON: /swagger.json
+
+  minio:
+    image: minio/minio
+    container_name: "stage-minio"
+    hostname: stage-minio
+    command: server /data
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./minio-data:/data
+    env_file: 
+      - minio.env
+    networks: 
+      - swan-stage
+
+  nginx:
+    image: nginx:stable-alpine
+    volumes: 
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "15033:80"
+    networks: 
+      - swan-stage
+
 networks: 
   swan-stage:
