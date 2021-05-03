@@ -1,3 +1,4 @@
+# <<<<<<< feature/v1.1.0/team
 # from django.test import TestCase, Client
 # from django.urls import reverse
 # from .models import Team
@@ -14,6 +15,26 @@
         
 #         login_resp = self.client.post('/api/users/login/', data = {'email' : 'amir.j1881@gmail.com', 'password' : '123456'})
 #         self.token = login_resp.data.get('token')
+# =======
+# from django.test import TestCase, Client
+# from django.urls import reverse
+# from .models import Team
+# from users.models import User
+
+# class TestViews(TestCase):
+
+#     def setUp(self):
+#         self.client = Client()
+#         signup_url = reverse("users-url:signup")
+#         login_url = reverse("users-url:login")
+#         self.client.post(signup_url, data = {'email' : 'amir.j1881@gmail.com', 'password' : '123456', 'confirm_password' : '123456'})
+#         user = User.objects.get(email = 'amir.j1881@gmail.com')
+#         user.verified = True
+#         user.save(update_fields = ['verified'])
+        
+#         login_resp = self.client.post(login_url, data = {'email' : 'amir.j1881@gmail.com', 'password' : '123456'})
+#         self.token = login_resp.data.get('token')
+# >>>>>>> develop
 
 
 #     def test_create_team(self):
@@ -40,12 +61,21 @@
 #         unauth_resp = client_unauth.post('/api/v1.1.0/team/invite_user', data = {'username' : 'amir.j1883@gmail.com'})
 #         self.assertEqual(unauth_resp.status_code, 403)
 
-#         self.setUp()
+# <<<<<<< feature/v1.1.0/team
+# #         self.setUp()
 
-#         self.client.post('/api/users/signup/', data = {'email' : 'amir.j1882@gmail.com', 'password' : '123456', 'confirm_password' : '123456'})
+# #         self.client.post('/api/users/signup/', data = {'email' : 'amir.j1882@gmail.com', 'password' : '123456', 'confirm_password' : '123456'})
+# #         user = User.objects.get(email = 'amir.j1882@gmail.com')
+# #         user.verified = True
+# #         user.save(update_fields = ['verified'])
+# =======
+#         self.setUp()
+#         signup_url = reverse("users-url:signup")
+#         self.client.post(signup_url, data = {'email' : 'amir.j1882@gmail.com', 'password' : '123456', 'confirm_password' : '123456'})
 #         user = User.objects.get(email = 'amir.j1882@gmail.com')
 #         user.verified = True
 #         user.save(update_fields = ['verified'])
+# >>>>>>> develop
 
 #         invite_resp = self.client.post('/api/v1.1.0/team/invite_user', data = {'team_url' : 'test_url', 'username' : 'amir.j1882@gmail.com'}, **{'HTTP_Authorization' : 'bear ' + self.token})
 #         assert invite_resp.status_code == 404

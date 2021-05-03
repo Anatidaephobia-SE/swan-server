@@ -1,0 +1,12 @@
+swagger: "2.0"
+info:
+  description: "This is doc for swan app"
+  version: "1.0.0"
+  title: "Swan Docs"
+host: "api.stage.swan-app.ir"
+tags:
+- name: "swan"
+schemes:
+- "https"
+- "http"
+paths:

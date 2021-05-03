@@ -64,14 +64,35 @@ INSTALLED_APPS = [
     'django_crontab',
     "django_prometheus",
     'rest_framework',
+    'django_minio_backend',
     'users',
     'team',
     'request_checker',
     'corsheaders',
     'socialmedia',
     'post',
+    'scheduler',
+    'filestorage',
 ]
 CORS_ORIGIN_ALLOW_ALL = True
+
+MINIO_CONSISTENCY_CHECK_ON_START = True
+
+MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT")
+MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY")
+MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY")
+MINIO_USE_HTTPS = False
+MINIO_URL_EXPIRY_HOURS = timedelta(days=1)
+MINIO_CONSISTENCY_CHECK_ON_START = True
+MINIO_PRIVATE_BUCKETS = [
+    'django-backend-dev-private',
+]
+
+MINIO_PUBLIC_BUCKETS = [
+    'django-backend-dev-public',
+]
+
+
 MIDDLEWARE = [
     'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -178,3 +199,8 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
+#Crons
+CRONJOBS = [
+    ('* * * * *', 'scheduler.cron.Queue_jobs', '>>'+os.path.join(BASE_DIR,'scheduler/logs/queue_jobs.log')),
+    ('* * * * *', 'scheduler.cron.Dequeue_Jobs', '>>'+os.path.join(BASE_DIR,'scheduler/logs/dequeue_jobs.log'))
+]

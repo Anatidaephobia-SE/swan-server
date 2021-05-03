@@ -9,7 +9,11 @@ from users.models import User
 from team.models import Team
 from socialmedia.models import SocialMedia
 from socialmedia.twitter import Tweet
+from scheduler.scheduler import Scheduler
+from scheduler.models import TaskType
+from datetime import datetime
 
+from filestorage.models import MediaStorage
 class CreatePostView(generics.CreateAPIView):
     queryset = Post.objects.all()
     permission_classes = (IsAuthenticated,)
@@ -25,10 +29,15 @@ class CreatePostView(generics.CreateAPIView):
         post_name=data['name']
         post_caption=data['caption']
         post_status=data['status']
-        post = Post(team=post_team,name=post_name,caption=post_caption,status=post_status,owner=user)
+        post_tag = data['tag']
+        post = Post(team=post_team,name=post_name,caption=post_caption,status=post_status,owner=user,tag=post_tag)
         post.save()
         post_files=request.FILES.getlist('multimedia[]')
         for media_file in post_files:
+            file_team=post_team
+            f = MediaStorage.objects.create(team=file_team,owner=user)
+            f.media=media_file
+            f.save()
             media = Media.objects.create(media=media_file, post_id = post.id)
             post.multimedia.add(media)
         return Response(post_serializer.PostSerializer(post).data, status=status.HTTP_201_CREATED)
@@ -60,16 +69,23 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
 
         if serializer.is_valid(True):
             post = serializer.update(instance=post_info, validated_data=serializer.validated_data)    
-            if post.multimedia.count !=0:
-                post.multimedia.clear()
             post_files=request.FILES.getlist('multimedia[]')
+            if len(post_files) != 0:
+                post.multimedia.clear()
             for media_file in post_files:
                 media = Media.objects.create(media=media_file, post_id = post.id)
                 post.multimedia.add(media)
                 
             if post.status == 'Published':
                 socialmedia=SocialMedia.objects.all().get(team=post.team)
-                twitter_response = Tweet(post,socialmedia)
+                # sc = Scheduler()
+                # sc.schedule(post, socialmedia, TaskType.Twitter, datetime.now())
+                # return Response(data={"message": "added to tyhe queue"},status=status.HTTP_200_OK)
+                twitter_response, published_id = Tweet(post,socialmedia)
+                print("*************************",published_id)
+                post.published_id=published_id
+                post.save()
+                print("*************************",post.published_id)
                 if twitter_response.status_code != 200 :
                     post.status == 'Error'
             return Response(serializer.data,status=status.HTTP_200_OK)
