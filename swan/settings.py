@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'socialmedia',
     'post',
+    'scheduler',
     'filestorage',
 ]
 CORS_ORIGIN_ALLOW_ALL = True
@@ -198,3 +199,8 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
+#Crons
+CRONJOBS = [
+    ('* * * * *', 'scheduler.cron.Queue_jobs', '>>'+os.path.join(BASE_DIR,'scheduler/logs/queue_jobs.log')),
+    ('* * * * *', 'scheduler.cron.Dequeue_Jobs', '>>'+os.path.join(BASE_DIR,'scheduler/logs/dequeue_jobs.log'))
+]
