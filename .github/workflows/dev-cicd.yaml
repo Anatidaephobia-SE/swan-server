@@ -72,6 +72,8 @@ jobs:
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
         TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
         TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+        TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+        TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
     - name: add swan service env
@@ -83,6 +85,8 @@ jobs:
         echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> swan.env
         echo "TWITTER_CONSUMER_KEY=${{ secrets.TWITTER_CONSUMER_KEY }}" >> swan.env
         echo "TWITTER_CONSUMER_SECRET=${{ secrets.TWITTER_CONSUMER_SECRET }}" >> swan.env
+        echo "TWITTER_ACCESS_TOKEN=${{ secrets.TWITTER_ACCESS_TOKEN }}" >> swan.env
+        echo "TWITTER_ACCESS_TOKEN_SECRET=${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}" >> swan.env
 
     - name: add postgres service env
       run: |
@@ -140,6 +144,8 @@ jobs:
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> swan.env
           echo "TWITTER_CONSUMER_KEY=${{ secrets.TWITTER_CONSUMER_KEY }}" >> swan.env
           echo "TWITTER_CONSUMER_SECRET=${{ secrets.TWITTER_CONSUMER_SECRET }}" >> swan.env
+          echo "TWITTER_ACCESS_TOKEN=${{ secrets.TWITTER_ACCESS_TOKEN }}" >> swan.env
+          echo "TWITTER_ACCESS_TOKEN_SECRET=${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}" >> swan.env
 
       - name: add postgres service env
         run: |
