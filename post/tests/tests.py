@@ -25,7 +25,6 @@ from django.urls import reverse
 #             self.test_comment = Comment.objects.create(context="testing",author=self.user,post=self.test_post)
 #             self.second_test_post = Post.objects.create(name='test',caption="test caption",status="Drafts",team=self.test_team,owner=self.user)
 #             self.second_test_comment = Comment.objects.create(context="testing",author=self.user,post=self.test_post)
-
 #         def test_create_post(self):
 #             client = APIClient()
 #             files=[]
@@ -44,7 +43,6 @@ from django.urls import reverse
 #                 self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
 #                 response = self.client.post('/api/v1.0.0/post/create_post/', data)
 #                 self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
 #         def test_get_post(self):
 #             client = APIClient()
 #             self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)

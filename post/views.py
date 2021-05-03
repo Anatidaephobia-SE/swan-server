@@ -29,7 +29,8 @@ class CreatePostView(generics.CreateAPIView):
         post_name=data['name']
         post_caption=data['caption']
         post_status=data['status']
-        post = Post(team=post_team,name=post_name,caption=post_caption,status=post_status,owner=user)
+        post_tag = data['tag']
+        post = Post(team=post_team,name=post_name,caption=post_caption,status=post_status,owner=user,tag=post_tag)
         post.save()
         post_files=request.FILES.getlist('multimedia[]')
         for media_file in post_files:
