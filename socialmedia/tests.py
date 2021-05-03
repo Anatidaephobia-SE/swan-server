@@ -7,7 +7,7 @@ from post.models import Post
 from .views import twitter_request_authorize
 from users.authenticators import generate_access_token
 from django.urls import reverse
-
+import os
 # Create your tests here.
 
 class SocialMediaModelTest(TestCase):
