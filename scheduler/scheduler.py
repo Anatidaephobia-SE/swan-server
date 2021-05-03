@@ -19,12 +19,3 @@ class Scheduler():
         data["social_id"] = social_media.id
         data["type"] = int(TaskType.Twitter)
         return json.dumps(data)
-
-from post.models import Post
-from socialmedia.models import SocialMedia
-from datetime import datetime
-def test():
-    p = Post.objects.get(id = 1)
-    social = SocialMedia.objects.get(id = 1)
-    sc = Scheduler()
-    sc.schedule(p, social, TaskType.Twitter, datetime.now())

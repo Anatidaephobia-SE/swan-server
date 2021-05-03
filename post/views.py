@@ -9,7 +9,9 @@ from users.models import User
 from team.models import Team
 from socialmedia.models import SocialMedia
 from socialmedia.twitter import Tweet
-
+from scheduler.scheduler import Scheduler
+from scheduler.models import TaskType
+from datetime import datetime
 class CreatePostView(generics.CreateAPIView):
     queryset = Post.objects.all()
     permission_classes = (IsAuthenticated,)
@@ -60,16 +62,19 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
 
         if serializer.is_valid(True):
             post = serializer.update(instance=post_info, validated_data=serializer.validated_data)    
-            if post.multimedia.count !=0:
-                post.multimedia.clear()
             post_files=request.FILES.getlist('multimedia[]')
+            if len(post_files) != 0:
+                post.multimedia.clear()
             for media_file in post_files:
                 media = Media.objects.create(media=media_file, post_id = post.id)
                 post.multimedia.add(media)
                 
             if post.status == 'Published':
                 socialmedia=SocialMedia.objects.all().get(team=post.team)
-                twitter_response = Tweet(post,socialmedia)
+                # twitter_response = Tweet(post,socialmedia)
+                sc = Scheduler()
+                sc.schedule(post, socialmedia, TaskType.Twitter, datetime.now())
+                return Response(data={"message": "added to tyhe queue"},status=status.HTTP_200_OK)
                 if twitter_response.status_code != 200 :
                     post.status == 'Error'
             return Response(serializer.data,status=status.HTTP_200_OK)

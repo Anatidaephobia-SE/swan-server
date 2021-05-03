@@ -22,10 +22,13 @@ def Queue_jobs():
         return
     for item in list(ready_to_queue):
         print(f"pushing job id {item.id} to the queue")
+        body = json.loads(item.body)
+        body["job_id"] = item.id
+    
         channel.basic_publish(
             exchange='',
             routing_key="task_queue",
-            body=item.body,
+            body=json.dumps(body),
             properties=pika.BasicProperties(
                 delivery_mode = 2, # make message persistent
             )

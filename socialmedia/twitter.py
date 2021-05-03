@@ -59,7 +59,7 @@ def Tweet(post, social_media, schedule_for_async = False):
         sc.schedule(post, social_media, TaskType.Twitter, datetime.datetime.now())
         return Response(data={"msg": "Scheduled for at most 1 minute later."}, status=200)
     else:
-        responses = [upload_media(media, auth) for media in media_list]
+        responses = [upload_media(media.media, auth) for media in media_list]
 
     
     media_ids = []
@@ -135,6 +135,8 @@ async def tweet_with_async_upload(post, social_media):
     response = requests.post(url=UPDATE_STATUS, params=params, auth=auth)
     if(response.status_code == 200):
         print(f"posted tweet with response \"{response.status_code} {response.text}\"")
+        post.status = "Published"
+        post.save()
     else:
         print(f"Error posting post {post.id} in twitter with response \"{response.status_code} {response.text}\".")
     return response
