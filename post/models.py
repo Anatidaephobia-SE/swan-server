@@ -33,6 +33,8 @@ class Post(models.Model):
     multimedia = models.ManyToManyField(Media, related_name = 'Post', blank=True)
     team = models.ForeignKey(Team, related_name = 'Post_team', null = True, on_delete = models.CASCADE)
     tag = models.CharField(null = True, max_length=20,choices = tag_CHOICES)
+    published_id = models.BigIntegerField(blank = True, null=True)
+    
 
 class Comment(models.Model):
     context = models.CharField(blank = True, max_length=280) 

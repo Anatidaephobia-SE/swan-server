@@ -2,9 +2,9 @@ from django.urls import path
 from .views import (signup_view, login_view, update_profile, get_profile)
 
 urlpatterns = [
-    path('signup/', signup_view),
-    path('login/', login_view),
-    path('profile/update/', update_profile),
-    path('profile/<user_email>/', get_profile),
-    path('profile/', get_profile),
+    path('signup/', signup_view, name="signup"),
+    path('login/', login_view, name="login"),
+    path('profile/update/', update_profile, name="update-profile"),
+    path('profile/<user_email>/', get_profile, name="get-profile-by-email"),
+    path('profile/', get_profile, name = "get-profile"),
 ]
