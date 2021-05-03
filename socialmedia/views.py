@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes, api_view
-from .twitter import Authorize_Address, Get_Access_Token, Queue_Tweet, Tweet, Get_Twitter_User
+from .twitter import Authorize_Address, Get_Access_Token, Tweet, Get_Twitter_User
 from rest_framework.response import Response
 from rest_framework import status, generics
 from .models import SocialMedia
