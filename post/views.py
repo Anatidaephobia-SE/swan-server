@@ -71,10 +71,10 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
                 
             if post.status == 'Published':
                 socialmedia=SocialMedia.objects.all().get(team=post.team)
-                # twitter_response = Tweet(post,socialmedia)
-                sc = Scheduler()
-                sc.schedule(post, socialmedia, TaskType.Twitter, datetime.now())
-                return Response(data={"message": "added to tyhe queue"},status=status.HTTP_200_OK)
+                twitter_response = Tweet(post,socialmedia)
+                # sc = Scheduler()
+                # sc.schedule(post, socialmedia, TaskType.Twitter, datetime.now())
+                # return Response(data={"message": "added to tyhe queue"},status=status.HTTP_200_OK)
                 if twitter_response.status_code != 200 :
                     post.status == 'Error'
             return Response(serializer.data,status=status.HTTP_200_OK)
