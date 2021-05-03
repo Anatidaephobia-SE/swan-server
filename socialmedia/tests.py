@@ -146,12 +146,13 @@ class TwitterGetTweetTest(APITestCase):
         self.token = generate_access_token(user)
     def test_get_tweet(self):
         client = APIClient()
-        url = reverse("TweetDetail")
+        url = reverse("socialmedia-urls:TweetDetail")     
         response = client.get(
             url, 
             data={"post_id" : 1}, 
             **{'HTTP_Authorization' : 'bearer ' + self.token}
         )
+        response.__dict__
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['reply_count'], 0)
         self.assertEqual(response.data['retweet_count'], 0)
@@ -160,7 +161,7 @@ class TwitterGetTweetTest(APITestCase):
     
     def test_not_published(self):
         client = APIClient()
-        url = reverse("TweetDetail")        
+        url = reverse("socialmedia-urls:TweetDetail")        
         response = client.get(
             url, 
             data={"post_id" : 2}, 
@@ -170,7 +171,7 @@ class TwitterGetTweetTest(APITestCase):
 
     def test_request_get_tweet_without_social_media(self):
         client = APIClient()
-        url = reverse("TweetDetail")
+        url = reverse("socialmedia-urls:TweetDetail")
         response = client.get(
             url, 
             data={"post_id" : 3}, 
