@@ -3,8 +3,7 @@ from django_minio_backend import MinioBackend, iso_date_prefix
 from team.models import Team
 from users.models import User
 
-priv_bucket = "django-backend-dev-private"
-
+priv_bucket = "django-backend-dev-public"
 
 def iso_date_prefix(instance,file_name_ext: str) -> str:
     return f"{instance.team}/{file_name_ext}"
