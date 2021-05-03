@@ -77,7 +77,7 @@ def Tweet(post, social_media):
             media_ids.append(response.json()['media_id_string'])
     
     params = {
-        'status': post.caption , #TODO post.text
+        'status': post.caption ,
         "media_ids": ','.join(media_ids),
         'lang' : 'en'
     }

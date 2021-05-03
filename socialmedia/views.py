@@ -121,7 +121,10 @@ def get_tweet_info(request):
     if not req_check.have_all:
         return Response({'error': req_check.error_message}, status=status.HTTP_400_BAD_REQUEST)
     post_id = request.query_params.get("post_id")
-    mypost= Post.objects.get(pk=post_id)
+    try:
+        mypost= Post.objects.get(pk=post_id)
+    except Post.DoesNotExist:
+        return Response({'error': "Post not found."}, status=status.HTTP_404_NOT_FOUND)
     if mypost.status!='Published':
         return Response({'error': "This post has not been published yet."}, status=status.HTTP_400_BAD_REQUEST)
 
