@@ -69,7 +69,11 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
                 
             if post.status == 'Published':
                 socialmedia=SocialMedia.objects.all().get(team=post.team)
-                twitter_response = Tweet(post,socialmedia)
+                twitter_response, published_id = Tweet(post,socialmedia)
+                print("*************************",published_id)
+                post.published_id=published_id
+                post.save()
+                print("*************************",post.published_id)
                 if twitter_response.status_code != 200 :
                     post.status == 'Error'
             return Response(serializer.data,status=status.HTTP_200_OK)
