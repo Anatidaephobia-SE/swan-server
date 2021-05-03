@@ -10,6 +10,15 @@ from team.models import Team
 from . import serializers as FileStorage_serializer
 from request_checker.functions import *
 
+from swan.settings import MINIO_ENDPOINT
+import os
+
+
+def change_response(response):
+    response["media"] = response["media"].replace(MINIO_ENDPOINT, os.getenv("BASE_URL_FOR_MINIO"))
+    return response
+
+
 class UploadFileView(generics.CreateAPIView):
     queryset = MediaStorage.objects.all()
     permission_classes = (IsAuthenticated,)
@@ -27,7 +36,8 @@ class UploadFileView(generics.CreateAPIView):
         f.save()
         f.media = file_media
         f.save()
-        return Response(FileStorage_serializer.FileSerializer(f).data, status=status.HTTP_201_CREATED)
+        response = change_response(FileStorage_serializer.FileSerializer(f).data)
+        return Response(response, status=status.HTTP_201_CREATED)
 
 
 class SingleFileView(generics.RetrieveAPIView):
@@ -45,7 +55,8 @@ class SingleFileView(generics.RetrieveAPIView):
 
         file_Info = MediaStorage.objects.all().get(pk=media_pk)
         serializer = FileStorage_serializer.FileSerializer(file_Info)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        response = change_response(serializer.data)
+        return Response(response, status=status.HTTP_200_OK)
 
 class AllMediaView(generics.ListAPIView):
     queryset = MediaStorage.objects.all()
@@ -62,8 +73,8 @@ class AllMediaView(generics.ListAPIView):
 
         mediaList = MediaStorage.objects.all().filter(team=team_id)
         serializer = FileStorage_serializer.FileSerializer(mediaList, many=True)
-        print(serializer)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        response = change_response(serializer.data)
+        return Response(response, status=status.HTTP_200_OK)
 
 class DeleteMediaView(generics.DestroyAPIView):
 
