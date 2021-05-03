@@ -22,7 +22,7 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add =True)
     multimedia = models.ManyToManyField(Media, related_name = 'Post', blank=True)
     team = models.ForeignKey(Team, related_name = 'Post_team', null = True, on_delete = models.CASCADE)
-    published_id = models.PositiveIntegerField(blank = True, null=True)
+    published_id = models.BigIntegerField(blank = True, null=True)
     
 class Comment(models.Model):
     context = models.CharField(blank = True, max_length=280) 
