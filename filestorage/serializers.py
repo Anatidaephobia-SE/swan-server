@@ -11,7 +11,7 @@ class FileSerializer(serializers.ModelSerializer):
     owner = UserSerializer(required=False)
     class Meta:
         model = MediaStorage
-        fields = ('id','title','media','team','owner')
+        fields = ('id','media','team','owner')
     read_only_fields = ('owner','team')    
 
 

@@ -12,7 +12,6 @@ def iso_date_prefix(instance,file_name_ext: str) -> str:
 class MediaStorage(models.Model):
     team = models.ForeignKey(Team, related_name = 'storage_team', null = True, on_delete = models.CASCADE)
     owner = models.ForeignKey(User, related_name = 'media_owner', null=True, on_delete = models.CASCADE)
-    title = models.CharField(unique=True,max_length=255)
     media = models.FileField(verbose_name="Object Upload",
                             storage=MinioBackend(bucket_name=priv_bucket),
                             upload_to=iso_date_prefix)
