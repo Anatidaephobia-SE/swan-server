@@ -41,7 +41,7 @@ DEBUG = True
 
 load_dotenv()
 
-ALLOWED_HOSTS = ['anatidaephobia.pythonanywhere.com', 'localhost']
+ALLOWED_HOSTS = ['anatidaephobia.pythonanywhere.com', 'localhost', '127.0.0.1']
 allowed_hosts_string = os.getenv("ALLOWED_HOSTS")
 
 if allowed_hosts_string != None and len(allowed_hosts_string) != 0:
