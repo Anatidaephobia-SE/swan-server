@@ -24,12 +24,12 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1.1.0/socialmedia/', include(('socialmedia.urls', "socialmedia"), namespace="socialmedia-urls")),
+    path('api/v1/socialmedia/', include(('socialmedia.urls', "socialmedia"), namespace="socialmedia-urls")),
     path("", include("django_prometheus.urls"), name="django-prometheus"),
-    path('api/v1.1.0/users/', include(("users.urls", "users"), namespace="users-url")),
-    path('api/v1.0.0/post/', include(post_urls)),
-    path('api/v1.0.0/team/', include(team_urls)),
-    path('api/v1.1.0/filestorage/', include(filestorage_urls)),
+    path('api/v1/users/', include(("users.urls", "users"), namespace="users-urls")),
+    path('api/v1/post/', include(("post.urls", "post"), namespace="post-urls")),
+    path('api/v1/team/', include(("team.urls", "team"), namespace="team-urls")),
+    path('api/v1/filestorage/', include(("filestorage.urls", "filestorage"), namespace="filestorage-urls")),
 ]
 
 if(settings.DEBUG):
