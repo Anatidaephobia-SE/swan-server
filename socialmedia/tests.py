@@ -51,7 +51,7 @@ class TwitterRequestAuthorizeTest(APITestCase):
         self.team1 = Team.objects.create(url="team11", name="hahaha", head=user)
         self.team2 = Team.objects.create(url="team12", name="hahaha", head=user2)
         client = APIClient()
-        signup_url = reverse("users-url:signup")
+        signup_url = reverse("users-urls:signup")
         client.post(signup_url, data = {'email' : 'hadi@gmail.com', 'password' : '123456', 'confirm_password' : '123456'})
         user = User.objects.get(email = 'hadi@gmail.com')
         user.verified = True
