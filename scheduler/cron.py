@@ -7,13 +7,19 @@ from .consumer import process_jobs
 import asyncio
 import json
 import time
+import os
 def Queue_jobs():
     print(f"[{datetime.now()}]")
     ready_to_queue = Tasks.objects.filter(scheduled_date__lte=datetime.now(), state=int(TaskState.Active))
     print(f"Found {len(ready_to_queue)} tasks to be queued.")
     try:
         print("Connecting to rabbitMQ ...")
-        connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+        credentials = pika.PlainCredentials("root", "Swan@2021")
+        parameters = pika.ConnectionParameters("localhost",
+                                   5672,
+                                   '/',
+                                   credentials)
+        connection = pika.BlockingConnection(parameters)
         channel = connection.channel()
         channel.queue_declare(queue='task_queue', durable=True)
         print("Successfully Connected.")
@@ -44,12 +50,18 @@ def Dequeue_Jobs():
     ready_to_queue = Tasks.objects.filter(scheduled_date__lte=datetime.now(), state=int(TaskState.Active))
     try:
         print("Connecting to rabbitMQ ...")
-        connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+        credentials = pika.PlainCredentials("root", "Swan@2021")
+
+        parameters = pika.ConnectionParameters("localhost",
+                                   5672,
+                                   '/',
+                                   credentials)
+        connection = pika.BlockingConnection(parameters)
         channel = connection.channel()
         channel.queue_declare(queue='task_queue', durable=True)
         print("Successfully Connected.")
-    except:
-        print("Failed to connect to rabbitMQ.")
+    except Exception as e:
+        print("Failed to connect to rabbitMQ. ", e)
         return
     all_jobs = []
     while True:
