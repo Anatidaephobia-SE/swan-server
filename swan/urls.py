@@ -18,6 +18,7 @@ from django.urls import path, include
 from django.conf.urls import url
 import team.urls as team_urls
 import post.urls as post_urls
+import postideas.urls as postideas_urls
 import filestorage.urls as filestorage_urls
 from django.conf.urls.static import static
 from django.conf import settings
@@ -30,6 +31,7 @@ urlpatterns = [
     path('api/v1/post/', include(("post.urls", "post"), namespace="post-urls")),
     path('api/v1/team/', include(("team.urls", "team"), namespace="team-urls")),
     path('api/v1/filestorage/', include(("filestorage.urls", "filestorage"), namespace="filestorage-urls")),
+    path('api/v1/postideas/', include(("postideas.urls", "postideas"), namespace="postideas-urls")),
 ]
 
 if(settings.DEBUG):

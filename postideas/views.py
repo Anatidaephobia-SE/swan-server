@@ -24,8 +24,8 @@ class CreateCardView(generics.CreateAPIView):
         card_description=data['description']
         card_status=data['status']
         card_tag = data['tag']
-        card = Card(team=card_workspace,title=card_title,description=card_description,status=card_status,assignee=user,tag=card_tag)
+        card_assignee = User.objects.get(pk=data['assignee'])
+        card = Card(team=card_workspace,title=card_title,description=card_description,status=card_status,assignee=card_assignee,tag=card_tag)
         card.save()
-        post_files=request.FILES.getlist('multimedia[]')
-        return Response(Card_Serializer.CardSerializer(card).data, status=status.HTTP_201_CREATED)
+        return Response(Card_Serializer.CardAssigneeSerializer(card).data, status=status.HTTP_201_CREATED)
  

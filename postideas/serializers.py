@@ -9,10 +9,16 @@ class UserSerializer(serializers.ModelSerializer):
     read_only_fields = ('id')
 
 class CardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Card
+        fields = ('id','title', 'description', 'assignee', 'created_at', 'team','tag')
+    read_only_fields = ('id')
+
+class CardAssigneeSerializer(serializers.ModelSerializer):
     assignee = UserSerializer(required=False)
     class Meta:
         model = models.Card
-        fields = ('id','title', 'description', 'assignee', 'owner', 'created_at', 'team','tag')
+        fields = ('id','title', 'description', 'assignee', 'created_at', 'team','tag')
     read_only_fields = ('assignee','id')
 
     
