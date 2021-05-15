@@ -9,8 +9,8 @@ import json
 import time
 import os
 from .logger import printlog
-QUEUE_JOBS_LOG_FILE = "scheduler/logs/queue_jobs_printlog.log"
-DEQUEUE_JOBS_LOG_FILE = "scheduler/logs/queue_jobs_printlog.log"
+QUEUE_JOBS_LOG_FILE = "/swan/scheduler/logs/queue_jobs_printlog.log"
+DEQUEUE_JOBS_LOG_FILE = "/swan/scheduler/logs/queue_jobs_printlog.log"
 def Queue_jobs():
     print(f"[{datetime.now()}]")
     printlog(QUEUE_JOBS_LOG_FILE, f"[{datetime.now()}]")
