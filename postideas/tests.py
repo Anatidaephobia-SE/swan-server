@@ -1,7 +1,6 @@
 from django.test import TestCase
 from rest_framework.test import APIClient, APITestCase
 from users.models import User
-from post.models import Post, Comment
 from team.models import Team
 from postideas.models import Card
 from rest_framework import status
@@ -10,7 +9,7 @@ from os import path
 from django.urls import reverse
 
 
-class PostViewTest(APITestCase):
+class CardViewTest(APITestCase):
 
         def setUp(self):
             client = APIClient()
