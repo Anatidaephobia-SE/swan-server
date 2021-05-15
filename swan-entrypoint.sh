@@ -9,5 +9,5 @@ while ! python manage.py migrate  2>&1; do
 done
 
 service cron start && python manage.py crontab add
-
+mkdir  -p ~/swan/scheduler/logs
 exec "$@"
