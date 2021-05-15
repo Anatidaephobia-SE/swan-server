@@ -37,13 +37,13 @@ class AllCardstView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = Card_Serializer.CardAssigneeSerializer
 
-    def get(self, request, pk=None):
+    def get(self, request):
 
         req_check = have_queryparams(request, 'team_pk')
 
         if not req_check.have_all:
             return Response({'error': req_check.error_message}, status=status.HTTP_400_BAD_REQUEST)
-        team_pk = request.query_params.get("team_pk")
+        team_pk = request.query_params.get('team_pk')
 
         cradlistDone = Card.objects.filter(team=team_pk).filter(status="Done")
         cradlistInProgress = Card.objects.filter(team=team_pk).filter(status="In Progress")
@@ -53,3 +53,42 @@ class AllCardstView(generics.ListAPIView):
         workspace_cards['InProgress'] = Card_Serializer.CardAssigneeSerializer(cradlistInProgress, many=True).data
         workspace_cards['Done'] = Card_Serializer.CardAssigneeSerializer(cradlistDone, many=True).data
         return Response(workspace_cards, status=status.HTTP_200_OK)
+
+class DeleteCardView(generics.UpdateAPIView):
+
+    queryset = Card.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = Card_Serializer.CardAssigneeSerializer
+
+    def delete(self, request):
+        
+        req_check = have_queryparams(request, 'card_pk')
+
+        if not req_check.have_all:
+            return Response({'error': req_check.error_message}, status=status.HTTP_400_BAD_REQUEST)
+        card_pk = request.query_params.get('card_pk')
+        user = request.user
+        card_info = Card.objects.get(pk=card_pk)
+        team_head = card_info.team.head
+        card_info.delete()
+        return Response("Card deleted.", status=status.HTTP_200_OK)
+
+
+class MoveCardView(generics.UpdateAPIView):
+
+    queryset = Card.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = Card_Serializer.CardAssigneeSerializer
+
+    def put(self, request):
+        req_check = have_queryparams(request, 'card_pk','status')
+
+        if not req_check.have_all:
+            return Response({'error': req_check.error_message}, status=status.HTTP_400_BAD_REQUEST)
+        card_pk = request.query_params.get('card_pk')
+        card_status=request.query_params.get('status')
+        user = request.user
+        card_info = Card.objects.get(pk=card_pk)
+        card_info.status=card_status
+        card_info.save()
+        return Response(Card_Serializer.CardAssigneeSerializer(card_info).data,status=status.HTTP_200_OK)
