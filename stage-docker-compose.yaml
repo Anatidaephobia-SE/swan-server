@@ -76,6 +76,19 @@ services:
       - "15033:80"
     networks: 
       - swan-stage
-
+  rabbitmq:
+    image: rabbitmq
+    container_name: 'rabbitmq'
+    hostname: dev-rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+      - swan-stage
+    env_file:
+      - rabbitmq.env
 networks: 
   swan-stage:
