@@ -11,6 +11,8 @@ from scheduler.models import TaskType
 import datetime
 from rest_framework.response import Response
 from asgiref.sync import sync_to_async
+from scheduler.logger import printlog
+from scheduler.cron import QUEUE_JOBS_LOG_FILE, DEQUEUE_JOBS_LOG_FILE
 
 REQUEST_TOKEN_ADDRESS = "https://api.twitter.com/oauth/request_token"
 AUTHORIZE_ADDRESS = "https://api.twitter.com/oauth/authorize"
@@ -110,8 +112,7 @@ async def asyncronous_upload_media(media_list, auth):
     return responses
 
 #This function cannot be called from django views. should called from crons.
-from scheduler.logger import printlog
-from scheduler.cron import QUEUE_JOBS_LOG_FILE, DEQUEUE_JOBS_LOG_FILE
+
 async def tweet_with_async_upload(post, social_media):
     consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
     consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
