@@ -63,6 +63,8 @@ jobs:
         MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
         MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
         MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+        RABBITMQ_DEFAULT_USER: ${{ secrets.RABBITMQ_DEFAULT_USER }}
+        RABBITMQ_DEFAULT_PASS: ${{ secrets.RABBITMQ_DEFAULT_PASS }}
         BASE_URL_FOR_MINIO: ${{ secrets.BASE_URL_FOR_MINIO }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
     - name: Run tests
@@ -81,6 +83,8 @@ jobs:
         MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
         MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
         MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+        RABBITMQ_DEFAULT_USER: ${{ secrets.RABBITMQ_DEFAULT_USER }}
+        RABBITMQ_DEFAULT_PASS: ${{ secrets.RABBITMQ_DEFAULT_PASS }}
         BASE_URL_FOR_MINIO: ${{ secrets.BASE_URL_FOR_MINIO }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
@@ -98,6 +102,8 @@ jobs:
         echo "MINIO_ACCESS_KEY=${{ secrets.MINIO_ACCESS_KEY }}" >> swan.env
         echo "MINIO_ENDPOINT=${{ secrets.MINIO_ENDPOINT }}" >> swan.env
         echo "MINIO_SECRET_KEY=${{ secrets.MINIO_SECRET_KEY }}" >> swan.env
+        echo "RABBITMQ_DEFAULT_USER: ${{ secrets.RABBITMQ_DEFAULT_USER }}" >> swan.env
+        echo "RABBITMQ_DEFAULT_PASS: ${{ secrets.RABBITMQ_DEFAULT_PASS }}" >> swan.env
         echo "BASE_URL_FOR_MINIO=${{ secrets.BASE_URL_FOR_MINIO }}" >> swan.env
 
     - name: add postgres service env
@@ -117,7 +123,11 @@ jobs:
         echo "MINIO_ROOT_USER=${{ secrets.MINIO_ROOT_USER }}" >> minio.env
         echo "MINIO_ROOT_PASSWORD=${{ secrets.MINIO_ROOT_PASSWORD }}" >> minio.env
 
-
+    - name: add rabbitmq env
+      run: |
+        echo "RABBITMQ_DEFAULT_USER: ${{ secrets.RABBITMQ_DEFAULT_USER }}" >> rabbitmq.env
+        echo "RABBITMQ_DEFAULT_PASS: ${{ secrets.RABBITMQ_DEFAULT_PASS }}" >> rabbitmq.env
+      
     - name: Build image
       run: |
         docker-compose -f ${{ env.COMPOSE_FILE }} build
@@ -166,6 +176,8 @@ jobs:
           echo "MINIO_ACCESS_KEY=${{ secrets.MINIO_ACCESS_KEY }}" >> swan.env
           echo "MINIO_ENDPOINT=${{ secrets.MINIO_ENDPOINT }}" >> swan.env
           echo "MINIO_SECRET_KEY=${{ secrets.MINIO_SECRET_KEY }}" >> swan.env
+          echo "RABBITMQ_DEFAULT_USER: ${{ secrets.RABBITMQ_DEFAULT_USER }}" >> swan.env
+          echo "RABBITMQ_DEFAULT_PASS: ${{ secrets.RABBITMQ_DEFAULT_PASS }}" >> swan.env
           echo "BASE_URL_FOR_MINIO=${{ secrets.BASE_URL_FOR_MINIO }}" >> swan.env
 
       - name: add postgres service env
@@ -185,6 +197,11 @@ jobs:
           echo "MINIO_ROOT_USER=${{ secrets.MINIO_ROOT_USER }}" >> minio.env
           echo "MINIO_ROOT_PASSWORD=${{ secrets.MINIO_ROOT_PASSWORD }}" >> minio.env
 
+      - name: add rabbitmq env
+        run: |
+          echo "RABBITMQ_DEFAULT_USER: ${{ secrets.RABBITMQ_DEFAULT_USER }}" >> rabbitmq.env
+          echo "RABBITMQ_DEFAULT_PASS: ${{ secrets.RABBITMQ_DEFAULT_PASS }}" >> rabbitmq.env
+        
       - name: Add the private SSH key to the ssh-agent
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
@@ -198,7 +215,7 @@ jobs:
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          scp  -o StrictHostKeyChecking=no -r ./nginx.conf ./minio.env ./server.env ./swan.env ./pg.env ./pgadmin.env ./${{ env.COMPOSE_FILE }} ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/swan-stage
+          scp  -o StrictHostKeyChecking=no -r ./nginx.conf ./minio.env ./server.env ./swan.env ./pg.env ./pgadmin.env ./rabbitmq.env ./${{ env.COMPOSE_FILE }} ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/swan-stage
           ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'ENDSSH'
             cd ~/swan-stage
             source server.env
