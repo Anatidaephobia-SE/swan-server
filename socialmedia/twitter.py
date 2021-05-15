@@ -110,6 +110,8 @@ async def asyncronous_upload_media(media_list, auth):
     return responses
 
 #This function cannot be called from django views. should called from crons.
+from scheduler.logger import printlog
+from scheduler.cron import QUEUE_JOBS_LOG_FILE, DEQUEUE_JOBS_LOG_FILE
 async def tweet_with_async_upload(post, social_media):
     consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
     consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
@@ -123,11 +125,13 @@ async def tweet_with_async_upload(post, social_media):
         responses = await asyncronous_upload_media(media_list, auth)
     except Exception as e:
         print("Error on asyncio upload media!", e)
+        printlog(QUEUE_JOBS_LOG_FILE, f"Error on asyncio upload media! {e}")
         responses =[]
     media_ids = []
     for idx, response in enumerate(responses):
         if(response.status_code != 200):
             print(f"Error uploading media with id {media_list[idx].id} in post {post.id} with error code {response.error_code}.")
+            printlog(QUEUE_JOBS_LOG_FILE, f"Error uploading media with id {media_list[idx].id} in post {post.id} with error code {response.error_code}.")
         else:
             media_ids.append(response.json()['media_id_string'])
     params = {
@@ -138,10 +142,12 @@ async def tweet_with_async_upload(post, social_media):
     response = requests.post(url=UPDATE_STATUS, params=params, auth=auth)
     if(response.status_code == 200):
         print(f"posted tweet with response \"{response.status_code} {response.text}\"")
+        printlog(QUEUE_JOBS_LOG_FILE, f"posted tweet with response \"{response.status_code} {response.text}\"")
         post.status = "Published"
         post.save()
     else:
         print(f"Error posting post {post.id} in twitter with response \"{response.status_code} {response.text}\".")
+        printlog(QUEUE_JOBS_LOG_FILE, f"Error posting post {post.id} in twitter with response \"{response.status_code} {response.text}\".")
     return response
     
 
