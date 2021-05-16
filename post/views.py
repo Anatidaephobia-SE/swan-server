@@ -79,8 +79,8 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
             if post.status == 'Published':
                 socialmedia=SocialMedia.objects.all().get(team=post.team)
                 # sc = Scheduler()
-                # sc.schedule(post, socialmedia, TaskType.Twitter, datetime.now())
-                # return Response(data={"message": "added to tyhe queue"},status=status.HTTP_200_OK)
+                # sc.schedule_post(post, socialmedia, TaskType.Twitter, datetime.now())
+                # return Response(data={"message": "added to tyhe queue", "date": sc.get_post_scheduled_date(post, TaskType.Twitter)},status=status.HTTP_200_OK)
                 twitter_response, published_id = Tweet(post,socialmedia)
                 print("*************************",published_id)
                 post.published_id=published_id

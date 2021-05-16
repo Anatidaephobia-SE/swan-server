@@ -1,5 +1,6 @@
 from django.db import models
 from enum import IntEnum
+from post.models import Post
 # Create your models here.
 
 class TaskType(IntEnum):
@@ -17,3 +18,4 @@ class Tasks(models.Model):
     create_date = models.DateTimeField(auto_now_add=True)
     scheduled_date = models.DateTimeField(null=False)
     state = models.IntegerField(null=False)
+    post = models.ForeignKey(Post, null=True, on_delete=models.CASCADE)
