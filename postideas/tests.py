@@ -40,36 +40,23 @@ class CardViewTest(APITestCase):
 
         def test_move_card(self):
             self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
-            url = reverse("postideas-urls:MoveCard")
-            print("**********************************",self.test_card.id)
-            card_pk=self.test_card.id
+            url = reverse("postideas-urls:MoveCard",kwargs={'pk': self.test_card.id})
             data1 = {
-                    'card_pk':card_pk,
                     'status':'Done'
                     }
-            print("**********************************",data1)
             response = self.client.put(url,data=data1)
-            print(response.__dict__)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
         def test_get_cards(self):
-            url = reverse("postideas-urls:allCard")
-            data2 = {
-                    'team_pk':self.test_team.id,
-                    }
+            url = reverse("postideas-urls:allCard",kwargs={'pk': self.test_team.id})
             self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
-            response = self.client.get(url,data=data2)
+            response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         def test_delete_card(self):  
-            url = reverse("postideas-urls:DeleteCard")
-            card_pk=self.test_card_second.id
-            data3 = {
-                    'card_pk':card_pk
-                    }
+            url = reverse("postideas-urls:DeleteCard",kwargs={'pk': self.test_card_second.id})
             self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
-            response = self.client.delete(url,data=data3)
-            print(response.__dict__)
+            response = self.client.delete(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             
