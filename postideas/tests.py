@@ -48,7 +48,7 @@ class CardViewTest(APITestCase):
                     'status':'Done'
                     }
             print("**********************************",data1)
-            response = self.client.put(url,data1)
+            response = self.client.put(url,data=data1)
             print(response.__dict__)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -56,10 +56,10 @@ class CardViewTest(APITestCase):
         def test_get_cards(self):
             url = reverse("postideas-urls:allCard")
             data2 = {
-                    "team_pk":self.test_team.id,
+                    'team_pk':self.test_team.id,
                     }
             self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
-            response = self.client.get(url,data2)
+            response = self.client.get(url,data=data2)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         def test_delete_card(self):  
@@ -69,7 +69,7 @@ class CardViewTest(APITestCase):
                     'card_pk':card_pk
                     }
             self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
-            response = self.client.delete(url,data3)
+            response = self.client.delete(url,data=data3)
             print(response.__dict__)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             
