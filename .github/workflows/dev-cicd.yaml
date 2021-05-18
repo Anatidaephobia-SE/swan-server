@@ -4,11 +4,11 @@ on:
 
   pull_request:
     branches:
-      - develop-test
+      - develop
 
   push:
     branches:
-      - develop-test
+      - develop
 
 env:
   COMPOSE_FILE: stage-docker-compose.yaml
@@ -88,7 +88,7 @@ jobs:
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
     - name: add swan service env
-      if: github.ref == 'refs/heads/develop-test' #for push only
+      if: github.ref == 'refs/heads/develop' #for push only
       run: |
         echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> swan.env
         echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> swan.env
@@ -107,37 +107,37 @@ jobs:
         echo "BASE_URL_FOR_MINIO=${{ secrets.BASE_URL_FOR_MINIO }}" >> swan.env
 
     - name: add postgres service env
-      if: github.ref == 'refs/heads/develop-test' #for push only
+      if: github.ref == 'refs/heads/develop' #for push only
       run: |
         echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> pg.env
         echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> pg.env
         echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> pg.env
 
     - name: add pgadmin service env
-      if: github.ref == 'refs/heads/develop-test' #for push only
+      if: github.ref == 'refs/heads/develop' #for push only
       run: |
         echo "PGADMIN_DEFAULT_EMAIL=${{ secrets.PGADMIN_DEFAULT_EMAIL }}" >> pgadmin.env
         echo "PGADMIN_DEFAULT_PASSWORD=${{ secrets.PGADMIN_DEFAULT_PASSWORD }}" >> pgadmin.env
         echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> pgadmin.env
 
     - name: add minio env
-      if: github.ref == 'refs/heads/develop-test' #for push only
+      if: github.ref == 'refs/heads/develop' #for push only
       run: |
         echo "MINIO_ROOT_USER=${{ secrets.MINIO_ROOT_USER }}" >> minio.env
         echo "MINIO_ROOT_PASSWORD=${{ secrets.MINIO_ROOT_PASSWORD }}" >> minio.env
 
     - name: add rabbitmq env
-      if: github.ref == 'refs/heads/develop-test' #for push only
+      if: github.ref == 'refs/heads/develop' #for push only
       run: |
         echo "RABBITMQ_DEFAULT_USER: ${{ secrets.RABBITMQ_DEFAULT_USER }}" >> rabbitmq.env
         echo "RABBITMQ_DEFAULT_PASS: ${{ secrets.RABBITMQ_DEFAULT_PASS }}" >> rabbitmq.env
       
     - name: Build image
-      if: github.ref == 'refs/heads/develop-test' #for push only
+      if: github.ref == 'refs/heads/develop' #for push only
       run: |
         docker-compose -f ${{ env.COMPOSE_FILE }} build
     - name: Push image
-      if: github.ref == 'refs/heads/develop-test' #for push only
+      if: github.ref == 'refs/heads/develop' #for push only
       run: |
         export DOCKER_DEV_TAG=${{ github.sha }}
         docker login ${{ secrets.REGISTRY_URL }} --username "${{ secrets.REGISTRY_USERNAME }}" --password "${{ secrets.REGISTRY_PASSWORD }}"
@@ -150,7 +150,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop-test' #for push only
+    if: github.ref == 'refs/heads/develop' #for push only
 
     steps:
       - name: Checkout
