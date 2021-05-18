@@ -87,13 +87,8 @@ jobs:
         BASE_URL_FOR_MINIO: ${{ secrets.BASE_URL_FOR_MINIO }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
-    - name: halt on pull requirements
-      if: github.ref != 'refs/heads/develop-test' #for pull request only
-      run: |
-        exit 0
-      shell: bash
-
     - name: add swan service env
+      if: github.ref == 'refs/heads/develop-test' #for push only
       run: |
         echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> swan.env
         echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> swan.env
@@ -112,31 +107,37 @@ jobs:
         echo "BASE_URL_FOR_MINIO=${{ secrets.BASE_URL_FOR_MINIO }}" >> swan.env
 
     - name: add postgres service env
+      if: github.ref == 'refs/heads/develop-test' #for push only
       run: |
         echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> pg.env
         echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> pg.env
         echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> pg.env
 
     - name: add pgadmin service env
+      if: github.ref == 'refs/heads/develop-test' #for push only
       run: |
         echo "PGADMIN_DEFAULT_EMAIL=${{ secrets.PGADMIN_DEFAULT_EMAIL }}" >> pgadmin.env
         echo "PGADMIN_DEFAULT_PASSWORD=${{ secrets.PGADMIN_DEFAULT_PASSWORD }}" >> pgadmin.env
         echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> pgadmin.env
 
     - name: add minio env
+      if: github.ref == 'refs/heads/develop-test' #for push only
       run: |
         echo "MINIO_ROOT_USER=${{ secrets.MINIO_ROOT_USER }}" >> minio.env
         echo "MINIO_ROOT_PASSWORD=${{ secrets.MINIO_ROOT_PASSWORD }}" >> minio.env
 
     - name: add rabbitmq env
+      if: github.ref == 'refs/heads/develop-test' #for push only
       run: |
         echo "RABBITMQ_DEFAULT_USER: ${{ secrets.RABBITMQ_DEFAULT_USER }}" >> rabbitmq.env
         echo "RABBITMQ_DEFAULT_PASS: ${{ secrets.RABBITMQ_DEFAULT_PASS }}" >> rabbitmq.env
       
     - name: Build image
+      if: github.ref == 'refs/heads/develop-test' #for push only
       run: |
         docker-compose -f ${{ env.COMPOSE_FILE }} build
     - name: Push image
+      if: github.ref == 'refs/heads/develop-test' #for push only
       run: |
         echo ${{ github }}
         export DOCKER_DEV_TAG=${{ github.event.pull_request.head.sha }}
