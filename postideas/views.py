@@ -1,3 +1,4 @@
+from django.db.models.fields import NullBooleanField
 from django.http.response import JsonResponse
 from postideas.models import Card
 from django.shortcuts import render
@@ -26,9 +27,22 @@ class CreateCardView(generics.CreateAPIView):
         card_title=data['title']
         card_description=data['description']
         card_status=data['status']
-        card_tag = data['tag']
-        card_assignee = User.objects.get(pk=data['assignee'])
-        card = Card(team=card_workspace,title=card_title,description=card_description,status=card_status,assignee=card_assignee,tag=card_tag)
+        tag_falg=False
+        assignee_flag=False
+        if 'tag' in data:
+            card_tag = data['tag']
+            tag_falg=True
+        if 'assignee' in data:
+            card_assignee = User.objects.get(pk=data['assignee'])
+            assignee_flag=True
+        if tag_falg and assignee_flag:
+            card = Card(team=card_workspace,title=card_title,description=card_description,status=card_status,assignee=card_assignee,tag=card_tag)
+        elif tag_falg and not assignee_flag:
+            card = Card(team=card_workspace,title=card_title,description=card_description,status=card_status,tag=card_tag)
+        elif assignee_flag and not tag_falg:
+            card = Card(team=card_workspace,title=card_title,description=card_description,status=card_status,assignee=card_assignee)
+        else:
+            card = Card(team=card_workspace,title=card_title,description=card_description,status=card_status)
         card.save()
         return Response(Card_Serializer.CardAssigneeSerializer(card).data, status=status.HTTP_201_CREATED)
  
@@ -39,13 +53,13 @@ class AllCardstView(generics.ListAPIView):
 
     def get(self, request,pk=None):
         team_pk = pk
-        cradlistDone = Card.objects.filter(team=team_pk).filter(status="Done")
-        cradlistInProgress = Card.objects.filter(team=team_pk).filter(status="In Progress")
-        cradlistToDo = Card.objects.filter(team=team_pk).filter(status="TO DO")
+        cradlistDone = Card.objects.filter(team=team_pk).filter(status="done")
+        cradlistInProgress = Card.objects.filter(team=team_pk).filter(status="inProgress")
+        cradlistToDo = Card.objects.filter(team=team_pk).filter(status="todo")
         workspace_cards={}
-        workspace_cards['ToDo'] = Card_Serializer.CardAssigneeSerializer(cradlistToDo, many=True).data
-        workspace_cards['InProgress'] = Card_Serializer.CardAssigneeSerializer(cradlistInProgress, many=True).data
-        workspace_cards['Done'] = Card_Serializer.CardAssigneeSerializer(cradlistDone, many=True).data
+        workspace_cards['todo'] = Card_Serializer.CardAssigneeSerializer(cradlistToDo, many=True).data
+        workspace_cards['inProgress'] = Card_Serializer.CardAssigneeSerializer(cradlistInProgress, many=True).data
+        workspace_cards['done'] = Card_Serializer.CardAssigneeSerializer(cradlistDone, many=True).data
         return Response(workspace_cards, status=status.HTTP_200_OK)
 
 class DeleteCardView(generics.UpdateAPIView):
