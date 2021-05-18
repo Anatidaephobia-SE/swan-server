@@ -157,7 +157,7 @@ jobs:
         uses: actions/checkout@v1
       - name: add server utils env
         run: |
-          echo "$GITHUB_CONTEXT"| jq '.event.commits[].id' | tail -2 | head 1 |sed 's/\"//g' >> extracted_tag.txt
+          echo ${{ github.sha }} >> extracted_tag.txt
           export TAG=$(cat extracted_tag.txt)
           echo "REGISTRY_USERNAME=${{ secrets.REGISTRY_USERNAME }}" >> server.env
           echo "REGISTRY_PASSWORD=${{ secrets.REGISTRY_PASSWORD }}" >> server.env
