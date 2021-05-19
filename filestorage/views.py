@@ -14,7 +14,7 @@ from swan.settings import MINIO_ENDPOINT
 import os
 
 
-def change_response(response):
+def modify_url(response):
     response["media"] = response["media"].replace(MINIO_ENDPOINT, os.getenv("BASE_URL_FOR_MINIO"))
     return response
 
@@ -36,7 +36,7 @@ class UploadFileView(generics.CreateAPIView):
         f.save()
         f.media = file_media
         f.save()
-        response = change_response(FileStorage_serializer.FileSerializer(f).data)
+        response = modify_url(FileStorage_serializer.FileSerializer(f).data)
         return Response(response, status=status.HTTP_201_CREATED)
 
 
