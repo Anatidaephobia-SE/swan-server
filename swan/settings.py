@@ -211,3 +211,4 @@ CRONJOBS = [
     ('* * * * *', 'scheduler.cron.Queue_jobs', '>>'+os.path.join(BASE_DIR,'scheduler/logs/queue_jobs.log')),
     ('* * * * *', 'scheduler.cron.Dequeue_Jobs', '>>'+os.path.join(BASE_DIR,'scheduler/logs/dequeue_jobs.log'))
 ]
+CRONTAB_COMMAND_SUFFIX = '2>&1'

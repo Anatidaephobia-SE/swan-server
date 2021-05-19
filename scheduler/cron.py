@@ -20,10 +20,10 @@ def Queue_jobs():
     try:
         print("Connecting to rabbitMQ ...")
         printlog(QUEUE_JOBS_LOG_FILE, "Connecting to rabbitMQ ...")
-        credentials = pika.PlainCredentials("root", "Swan@2021")
-        parameters = pika.ConnectionParameters("stage-rabbitmq",
+        credentials = pika.PlainCredentials(os.getenv("RABBITMQ_DEFAULT_USER"), os.getenv("RABBITMQ_DEFAULT_PASS"))
+        parameters = pika.ConnectionParameters(os.getenv("RABBITMQ_ENDPOINT"),
                                    5672,
-                                   '/',
+                                   os.getenv("RABBITMQ_DEFAULT_VHOST", "/"),
                                    credentials)
         connection = pika.BlockingConnection(parameters)
         channel = connection.channel()
@@ -60,11 +60,11 @@ def Dequeue_Jobs():
     try:
         print("Connecting to rabbitMQ ...")
         printlog(DEQUEUE_JOBS_LOG_FILE, "Connecting to rabbitMQ ...")
-        credentials = pika.PlainCredentials("root", "Swan@2021")
+        credentials = pika.PlainCredentials(os.getenv("RABBITMQ_DEFAULT_USER"), os.getenv("RABBITMQ_DEFAULT_PASS"))
 
-        parameters = pika.ConnectionParameters("stage-rabbitmq",
+        parameters = pika.ConnectionParameters(os.getenv("RABBITMQ_ENDPOINT"),
                                    5672,
-                                   '/',
+                                   os.getenv("RABBITMQ_DEFAULT_VHOST", "/"),
                                    credentials)
         connection = pika.BlockingConnection(parameters)
         channel = connection.channel()
