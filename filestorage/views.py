@@ -55,7 +55,7 @@ class SingleFileView(generics.RetrieveAPIView):
 
         file_Info = MediaStorage.objects.all().get(pk=media_pk)
         serializer = FileStorage_serializer.FileSerializer(file_Info)
-        response = change_response(serializer.data)
+        response = modify_url(serializer.data)
         return Response(response, status=status.HTTP_200_OK)
 
 class AllMediaView(generics.ListAPIView):
@@ -73,7 +73,7 @@ class AllMediaView(generics.ListAPIView):
 
         mediaList = MediaStorage.objects.all().filter(team=team_id)
         serializer = FileStorage_serializer.FileSerializer(mediaList, many=True)
-        response = change_response(serializer.data)
+        response = modify_url(serializer.data)
         return Response(response, status=status.HTTP_200_OK)
 
 class DeleteMediaView(generics.DestroyAPIView):
