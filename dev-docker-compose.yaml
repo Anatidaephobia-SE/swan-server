@@ -97,7 +97,7 @@ services:
     
   postfix:
     image: instrumentisto/postfix
-    container_name: 'swan-postfix'
+    container_name: 'dev-swan-postfix'
     hostname: dev-postfix
     ports:
       - 25:25
