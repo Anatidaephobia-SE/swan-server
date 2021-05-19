@@ -35,6 +35,7 @@ class Post(models.Model):
     team = models.ForeignKey(Team, related_name = 'Post_team', null = True, on_delete = models.CASCADE)
     tag = models.CharField(blank = True,null = True, max_length=20,choices = tag_CHOICES)
     published_id = models.BigIntegerField(blank = True, null=True)
+    schedule_time = models.DateTimeField(blank=True, null=True)
     
 
 class Comment(models.Model):
