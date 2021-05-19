@@ -50,12 +50,12 @@ class CreatePostView(generics.CreateAPIView):
             if twitter_response.status_code != 200 :
                 return Response("An Error has occured during publishing")
         if post.status == 'Schedule':
-            sc = Scheduler()
-            if 'schedule_post' in data:
-                sc.schedule_post(post, socialmedia, TaskType.Twitter, data['schedule_post'])
-            print("**************************************",sc.get_post_scheduled_date(post, TaskType.Twitter))
-            post.schedule_time=data['schedule_post']
-            return Response(data={"message": "added to tyhe queue", "date": sc.get_post_scheduled_date(post, TaskType.Twitter)},status=status.HTTP_200_OK)
+            #sc = Scheduler()
+            if 'schedule_time' in data:
+                #sc.schedule_post(post, socialmedia, TaskType.Twitter, data['schedule_time'])
+            #print("**************************************",sc.get_post_scheduled_date(post, TaskType.Twitter))
+                post.schedule_time=data['schedule_time']
+            #return Response(data={"message": "added to tyhe queue", "date": sc.get_post_scheduled_date(post, TaskType.Twitter)},status=status.HTTP_200_OK)
         return Response(post_serializer.PostSerializer(post).data, status=status.HTTP_201_CREATED)
 
 class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
@@ -108,12 +108,12 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
                 if twitter_response.status_code != 200 :
                     return Response("An Error has occured during publishing")
             if post.status == 'Schedule':
-                sc = Scheduler()
-                if 'schedule_post' in data:
-                    sc.schedule_post(post, socialmedia, TaskType.Twitter, data['schedule_post'])
-                print("**************************************",sc.get_post_scheduled_date(post, TaskType.Twitter))
-                post.schedule_time=data['schedule_post']
-                return Response(data={"message": "added to tyhe queue", "date": sc.get_post_scheduled_date(post, TaskType.Twitter)},status=status.HTTP_200_OK)
+                #sc = Scheduler()
+                if 'schedule_time' in data:
+                    #sc.schedule_post(post, socialmedia, TaskType.Twitter, data['schedule_time'])
+                #print("**************************************",sc.get_post_scheduled_date(post, TaskType.Twitter))
+                    post.schedule_time=data['schedule_time']
+                #return Response(data={"message": "added to tyhe queue", "date": sc.get_post_scheduled_date(post, TaskType.Twitter)},status=status.HTTP_200_OK)
             return Response(serializer.data,status=status.HTTP_200_OK)
             
         return Response("Bad request.", status=status.HTTP_400_BAD_REQUEST)

@@ -14,7 +14,8 @@ class Media(models.Model):
 class Post(models.Model):
     status_CHOICES = (
         ('Drafts','Drafts'),
-        ('Published','Published')
+        ('Published','Published'),
+        ('Schedule','Schedule')
     )
 
     tag_CHOICES = (
