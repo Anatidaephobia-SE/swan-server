@@ -14,6 +14,7 @@ env:
   COMPOSE_FILE: stage-docker-compose.yaml
   SWAN_IMAGE: swan-stage
   SWAN_IMAGE_WITH_URL: ${{ secrets.REGISTRY_URL }}/develop/swan-stage
+  POSTFIX_CONFIG_FILE: postfix_main.cf
 
 
 jobs:
@@ -222,7 +223,7 @@ jobs:
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          scp  -o StrictHostKeyChecking=no -r ./nginx.conf ./minio.env ./server.env ./swan.env ./pg.env ./pgadmin.env ./rabbitmq.env ./${{ env.COMPOSE_FILE }} ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/swan-stage
+          scp  -o StrictHostKeyChecking=no -r ./nginx.conf ./minio.env ./server.env ./swan.env ./pg.env ./pgadmin.env ./rabbitmq.env ./${env.POSTFIX_CONFIG_FILE} ./${{ env.COMPOSE_FILE }} ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/swan-stage
           ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'ENDSSH'
             cd ~/swan-stage
             source server.env
