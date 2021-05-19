@@ -102,8 +102,8 @@ jobs:
         echo "MINIO_ACCESS_KEY=${{ secrets.MINIO_ACCESS_KEY }}" >> swan.env
         echo "MINIO_ENDPOINT=${{ secrets.MINIO_ENDPOINT }}" >> swan.env
         echo "MINIO_SECRET_KEY=${{ secrets.MINIO_SECRET_KEY }}" >> swan.env
-        echo "RABBITMQ_DEFAULT_USER: ${{ secrets.RABBITMQ_DEFAULT_USER }}" >> swan.env
-        echo "RABBITMQ_DEFAULT_PASS: ${{ secrets.RABBITMQ_DEFAULT_PASS }}" >> swan.env
+        echo "RABBITMQ_DEFAULT_USER=${{ secrets.RABBITMQ_DEFAULT_USER }}" >> swan.env
+        echo "RABBITMQ_DEFAULT_PASS=${{ secrets.RABBITMQ_DEFAULT_PASS }}" >> swan.env
         echo "BASE_URL_FOR_MINIO=${{ secrets.BASE_URL_FOR_MINIO }}" >> swan.env
 
     - name: add postgres service env
@@ -129,8 +129,8 @@ jobs:
     - name: add rabbitmq env
       if: github.ref == 'refs/heads/develop' #for push only
       run: |
-        echo "RABBITMQ_DEFAULT_USER: ${{ secrets.RABBITMQ_DEFAULT_USER }}" >> rabbitmq.env
-        echo "RABBITMQ_DEFAULT_PASS: ${{ secrets.RABBITMQ_DEFAULT_PASS }}" >> rabbitmq.env
+        echo "RABBITMQ_DEFAULT_USER=${{ secrets.RABBITMQ_DEFAULT_USER }}" >> rabbitmq.env
+        echo "RABBITMQ_DEFAULT_PASS=${{ secrets.RABBITMQ_DEFAULT_PASS }}" >> rabbitmq.env
       
     - name: Build image
       if: github.ref == 'refs/heads/develop' #for push only
