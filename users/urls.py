@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import (signup_view, login_view, update_profile, get_profile)
+from .views import (send_email, signup_view, login_view, update_profile, get_profile)
 
 urlpatterns = [
     path('signup/', signup_view, name="signup"),
@@ -7,4 +7,5 @@ urlpatterns = [
     path('profile/update/', update_profile, name="updateProfile"),
     path('profile/<user_email>/', get_profile, name="getProfileByEmail"),
     path('profile/', get_profile, name = "getProfile"),
+    path('email/', send_email, name="sendEmail")
 ]

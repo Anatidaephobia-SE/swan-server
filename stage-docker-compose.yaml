@@ -90,5 +90,15 @@ services:
       - swan-stage
     env_file:
       - rabbitmq.env
+  postfix:
+    image: instrumentisto/postfix
+    container_name: 'swan-stage_postfix'
+    hostname: stage-postfix
+    ports:
+      - 25:25
+    volumes:
+      - ./postfix_main.cf:/etc/postfix/main.cf
+    networks:
+      - swan-stage
 networks: 
   swan-stage:

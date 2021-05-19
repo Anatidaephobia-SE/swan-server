@@ -9,7 +9,7 @@ from users import authenticators
 from users import email_managment
 from .models import User
 from .serializers import UserSerializer
-
+from django.core.mail import send_mail
 
 @api_view(['POST'])
 @authentication_classes([])
@@ -29,6 +29,7 @@ def signup_view(request):
 
     token = authenticators.generate_access_token(new_user)
     email_managment.send_mail(token, email)
+    # send_mail("Yo!", token, "admin@swan-app.ir", [email], fail_silently=False)
     new_user.save()
     return Response({"message": "Successful. Mail sent to user."}, status=status.HTTP_200_OK)
 
@@ -92,3 +93,9 @@ def login_view(request):
     else:
         email_managment.send_mail(token, email)
         return Response({"message": "User not verified. Mail sent to email."}, status=status.HTTP_403_FORBIDDEN)
+
+@api_view(["POST"])
+def send_email(request):
+    email = request.data.get("email", "hadisheikhi77@gmail.com")
+    token = "A beuteaful token!"
+    send_mail("Yo!", token, "admin@swan-app.ir", [email], fail_silently=False)
