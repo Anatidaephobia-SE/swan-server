@@ -64,6 +64,8 @@ jobs:
         MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
         RABBITMQ_DEFAULT_USER: ${{ secrets.RABBITMQ_DEFAULT_USER }}
         RABBITMQ_DEFAULT_PASS: ${{ secrets.RABBITMQ_DEFAULT_PASS }}
+        RABBITMQ_DEFAULT_VHOST: ${{ secrets.RABBITMQ_DEFAULT_VHOST }}
+        RABBITMQ_ENDPOINT: ${{ secrets.RABBITMQ_ENDPOINT }}
         BASE_URL_FOR_MINIO: ${{ secrets.BASE_URL_FOR_MINIO }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
     - name: Run tests
@@ -84,6 +86,8 @@ jobs:
         MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
         RABBITMQ_DEFAULT_USER: ${{ secrets.RABBITMQ_DEFAULT_USER }}
         RABBITMQ_DEFAULT_PASS: ${{ secrets.RABBITMQ_DEFAULT_PASS }}
+        RABBITMQ_DEFAULT_VHOST: ${{ secrets.RABBITMQ_DEFAULT_VHOST }}
+        RABBITMQ_ENDPOINT: ${{ secrets.RABBITMQ_ENDPOINT }}
         BASE_URL_FOR_MINIO: ${{ secrets.BASE_URL_FOR_MINIO }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
@@ -104,6 +108,8 @@ jobs:
         echo "MINIO_SECRET_KEY=${{ secrets.MINIO_SECRET_KEY }}" >> swan.env
         echo "RABBITMQ_DEFAULT_USER=${{ secrets.RABBITMQ_DEFAULT_USER }}" >> swan.env
         echo "RABBITMQ_DEFAULT_PASS=${{ secrets.RABBITMQ_DEFAULT_PASS }}" >> swan.env
+        echo "RABBITMQ_DEFAULT_VHOST=${{ secrets.RABBITMQ_DEFAULT_VHOST }}" >> swan.env
+        echo "RABBITMQ_ENDPOINT=${{ secrets.RABBITMQ_ENDPOINT }}" >> swan.env
         echo "BASE_URL_FOR_MINIO=${{ secrets.BASE_URL_FOR_MINIO }}" >> swan.env
 
     - name: add postgres service env
@@ -131,7 +137,8 @@ jobs:
       run: |
         echo "RABBITMQ_DEFAULT_USER=${{ secrets.RABBITMQ_DEFAULT_USER }}" >> rabbitmq.env
         echo "RABBITMQ_DEFAULT_PASS=${{ secrets.RABBITMQ_DEFAULT_PASS }}" >> rabbitmq.env
-      
+        echo "RABBITMQ_DEFAULT_VHOST=${{ secrets.RABBITMQ_DEFAULT_VHOST }}" >> rabbitmq.env
+        echo "RABBITMQ_ENDPOINT=${{ secrets.RABBITMQ_ENDPOINT }}" >> rabbitmq.env
     - name: Build image
       if: github.ref == 'refs/heads/develop' #for push only
       run: |
@@ -185,6 +192,8 @@ jobs:
           echo "MINIO_SECRET_KEY=${{ secrets.MINIO_SECRET_KEY }}" >> swan.env
           echo "RABBITMQ_DEFAULT_USER=${{ secrets.RABBITMQ_DEFAULT_USER }}" >> swan.env
           echo "RABBITMQ_DEFAULT_PASS=${{ secrets.RABBITMQ_DEFAULT_PASS }}" >> swan.env
+          echo "RABBITMQ_DEFAULT_VHOST=${{ secrets.RABBITMQ_DEFAULT_VHOST }}" >> swan.env
+          echo "RABBITMQ_ENDPOINT=${{ secrets.RABBITMQ_ENDPOINT }}" >> swan.env
           echo "BASE_URL_FOR_MINIO=${{ secrets.BASE_URL_FOR_MINIO }}" >> swan.env
           echo "EMAIL_HOST=${{secrets.EMAIL_HOST}}" >> swan.env
           echo "EMAIL_PORT=${{secrets.EMAIL_PORT}}" >> swan.env
@@ -211,6 +220,8 @@ jobs:
         run: |
           echo "RABBITMQ_DEFAULT_USER=${{ secrets.RABBITMQ_DEFAULT_USER }}" >> rabbitmq.env
           echo "RABBITMQ_DEFAULT_PASS=${{ secrets.RABBITMQ_DEFAULT_PASS }}" >> rabbitmq.env
+          echo "RABBITMQ_DEFAULT_VHOST=${{ secrets.RABBITMQ_DEFAULT_VHOST }}" >> rabbitmq.env
+          echo "RABBITMQ_ENDPOINT=${{ secrets.RABBITMQ_ENDPOINT }}" >> rabbitmq.env
         
       - name: Add the private SSH key to the ssh-agent
         env:
