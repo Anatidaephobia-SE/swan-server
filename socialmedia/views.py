@@ -113,6 +113,10 @@ def get_trends(request):
 
     trends = Get_Trend_Hashtags(woeid)
 
+    for i in range(len(trends)):
+        if not '#' in trends[i]:
+            trends[i] = '#' + trends[i]
+
     return Response({'trends' : trends})
 
 @api_view(["GET"])
