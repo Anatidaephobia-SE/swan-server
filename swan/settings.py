@@ -185,16 +185,14 @@ STATIC_ROOT = '/static/',
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-EMAIL_ADDRESS = 'swan.team2021@gmail.com'
-EMAIL_PASSWORD = 'Sw@n2021'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'stage-postfix'
-EMAIL_PORT = 25
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-EMAIL_USE_TLS = False
-DEFAULT_FROM_EMAIL = 'whatever'
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", '')
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", '')
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS")
+
 # user models
 AUTH_USER_MODEL = 'users.User'
 ACCESS_TOKEN_EXPIRE_TIME = timedelta(days=0, hours=5, minutes=0)

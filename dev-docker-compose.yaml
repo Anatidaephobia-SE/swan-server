@@ -43,7 +43,6 @@ services:
       - postgres
       - minio
       - rabbitmq
-      - postfix
     networks: 
       - swan-stage
   
@@ -94,18 +93,6 @@ services:
       - swan-stage
     env_file:
       - rabbitmq.env
-    
-  postfix:
-    image: instrumentisto/postfix
-    container_name: 'dev-swan-postfix'
-    hostname: dev-postfix
-    ports:
-      - 25:25
-    volumes:
-      - ./postfix_main.cf:/etc/postfix/main.cf
-    networks:
-      - swan-stage
-
     
 networks: 
   swan-stage:
