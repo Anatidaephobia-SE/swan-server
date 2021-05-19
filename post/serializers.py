@@ -33,7 +33,7 @@ class PostSerializer(serializers.ModelSerializer):
     multimedia = StorageSerializer(many=True, read_only=True, required=False)
     class Meta:
         model = models.Post
-        fields = ('id','name', 'caption', 'status', 'owner', 'created_at', 'multimedia','team','tag')
+        fields = ('id','name', 'caption', 'status', 'owner', 'created_at', 'multimedia','team','tag','schedule_time')
     read_only_fields = ('owner','id')
 
 class UpdatePostSerializer(serializers.ModelSerializer):
@@ -41,5 +41,5 @@ class UpdatePostSerializer(serializers.ModelSerializer):
     multimedia = StorageSerializer(many=True, read_only=True, required=False)
     class Meta:
         model = models.Post
-        fields = ('id','name', 'caption', 'status', 'owner', 'created_at', 'multimedia','team','tag')
+        fields = ('id','name', 'caption', 'status', 'multimedia','team','tag','schedule_time')
     read_only_fields = ('id')
