@@ -7,5 +7,5 @@ urlpatterns = [
     path('profile/update/', update_profile, name="updateProfile"),
     path('profile/<user_email>/', get_profile, name="getProfileByEmail"),
     path('profile/', get_profile, name = "getProfile"),
-    path('email/', send_email, name="sendEmail")
+    path('sendmail/', send_email, name="sendEmail"),
 ]

@@ -99,3 +99,4 @@ def send_email(request):
     email = request.data.get("email", "hadisheikhi77@gmail.com")
     token = "A beuteaful token!"
     send_mail("Yo!", token, "admin@swan-app.ir", [email], fail_silently=False)
+    return Response({"message": "Successful. Mail sent to user."}, status=status.HTTP_200_OK)
