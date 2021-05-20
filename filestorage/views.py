@@ -14,7 +14,7 @@ from swan.settings import MINIO_ENDPOINT
 import os
 
 
-def change_response(response):
+def modify_url(response):
     response["media"] = response["media"].replace(MINIO_ENDPOINT, os.getenv("BASE_URL_FOR_MINIO"))
     return response
 
@@ -36,7 +36,7 @@ class UploadFileView(generics.CreateAPIView):
         f.save()
         f.media = file_media
         f.save()
-        response = change_response(FileStorage_serializer.FileSerializer(f).data)
+        response = modify_url(FileStorage_serializer.FileSerializer(f).data)
         return Response(response, status=status.HTTP_201_CREATED)
 
 
@@ -55,7 +55,7 @@ class SingleFileView(generics.RetrieveAPIView):
 
         file_Info = MediaStorage.objects.all().get(pk=media_pk)
         serializer = FileStorage_serializer.FileSerializer(file_Info)
-        response = change_response(serializer.data)
+        response = modify_url(serializer.data)
         return Response(response, status=status.HTTP_200_OK)
 
 class AllMediaView(generics.ListAPIView):
@@ -73,7 +73,7 @@ class AllMediaView(generics.ListAPIView):
 
         mediaList = MediaStorage.objects.all().filter(team=team_id)
         serializer = FileStorage_serializer.FileSerializer(mediaList, many=True)
-        response = change_response(serializer.data)
+        response = modify_url(serializer.data)
         return Response(response, status=status.HTTP_200_OK)
 
 class DeleteMediaView(generics.DestroyAPIView):
