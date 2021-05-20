@@ -63,7 +63,6 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
         data = request.data
         post_info = Post.objects.all().get(pk=pk)
         posts_query = user.owner.all()
-        teams_query = Team.objects.all()
         if not posts_query.filter(pk=pk).exists():
             return Response("You did not create this post!", status=status.HTTP_400_BAD_REQUEST)
         serializer = self.get_serializer(instance=post_info, data=data)
