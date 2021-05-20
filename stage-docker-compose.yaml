@@ -50,7 +50,7 @@ services:
     ports:
       - "10334:8080"
     volumes:
-      - ./docs/swan-doc/swagger.json:/swagger.json
+      - ./docs/swan-doc/openapi.json:/swagger.json
     environment:
       SWAGGER_JSON: /swagger.json
 

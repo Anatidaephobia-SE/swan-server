@@ -2,7 +2,7 @@
     post:
       description: Sign up new user
       tags:
-      	- Users
+        - Users
       requestBody:
         content:
           application/json:
@@ -52,7 +52,7 @@
         - bearerAuth: []
       description: update users profile
       tags:
-      	- Users
+        - Users
       requestBody:
         content:
           multipart/form-data:
@@ -113,7 +113,7 @@
       security: []
       description: Login
       tags:
-      	- Users
+        - Users
       requestBody:
         content:
           application/json:
@@ -194,7 +194,7 @@
         - bearerAuth: []
       description: View profile details.
       tags:
-      	- Users
+        - Users
       responses:
         '200':
           description: Successfully found data.

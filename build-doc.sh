@@ -106,5 +106,5 @@ rm -rf docs
 mkdir -p docs
 
 cp generated-doc.yaml ./docs
-docker run --rm -v "$PWD/docs":/docs swaggerapi/swagger-codegen-cli-v3 generate -i /docs/generated-doc.yaml -l swagger -o /docs/swan-doc
+docker run --rm -v "$PWD/docs":/docs openapitools/openapi-generator-cli generate -i /docs/generated-doc.yaml -g openapi -o /docs/swan-doc
 
