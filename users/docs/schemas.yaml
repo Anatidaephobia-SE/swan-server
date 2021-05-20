@@ -1,0 +1,18 @@
+    User:
+      type: "object"
+      properties:
+        email:
+          type: "string"
+          format: "email"
+        first_name:
+          type: "string"
+        last_name:
+          type: "string"
+        profile_picture:
+          type: "string"
+          format: "byte"
+        last_login:
+          type: "string"
+          format: "date-time"
+      xml:
+        name: "User"

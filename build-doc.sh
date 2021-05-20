@@ -26,7 +26,7 @@ is_paths_yaml_exist() {
 }
 
 is_definitions_yaml_exist() {
-    ls $1/docs 2> /dev/null | grep "definitions.yaml" 1> /dev/null
+    ls $1/docs 2> /dev/null | grep "schemas.yaml" 1> /dev/null
     if [[ $? -eq 0 ]]; then 
         return 0
     else
@@ -45,7 +45,7 @@ add_paths_doc_to_global_doc() {
 }
 
 add_definitions_doc_to_global_doc() {
-    cat $1/docs/definitions.yaml >> generated-doc.yaml
+    cat $1/docs/schemas.yaml >> generated-doc.yaml
     echo -e "\n" >> generated-doc.yaml
 }
 
@@ -56,9 +56,8 @@ add_new_line() {
 build_doc_exit() {
     cat doc-exit.yaml >> generated-doc.yaml
 }
-
+truncate -s 0 generated-doc.yaml
 build_doc_entry
-add_new_line
 get_list_of_folders
 
 declare -a recognized_dirs
@@ -82,18 +81,21 @@ do
   echo "recognized docs folder and yaml's in $dir"
 done
 
-for dir in "${recognized_dirs[@]}"
-do 
-  add_paths_doc_to_global_doc $dir
-done
 
-add_new_line
-echo "definitions:" >> generated-doc.yaml
-add_new_line
+
+#add_new_line
+#echo "definitions:" >> generated-doc.yaml
+#add_new_line
 
 for dir in "${recognized_dirs[@]}"
 do 
   add_definitions_doc_to_global_doc $dir
+done
+echo "paths:" >> generated-doc.yaml
+
+for dir in "${recognized_dirs[@]}"
+do 
+  add_paths_doc_to_global_doc $dir
 done
 
 add_new_line
@@ -104,5 +106,5 @@ rm -rf docs
 mkdir -p docs
 
 cp generated-doc.yaml ./docs
-docker run --rm -v $PWD/docs:/docs swaggerapi/swagger-codegen-cli generate -i /docs/generated-doc.yaml -l swagger -o /docs/swan-doc
+docker run --rm -v "$PWD/docs":/docs swaggerapi/swagger-codegen-cli-v3 generate -i /docs/generated-doc.yaml -l swagger -o /docs/swan-doc
 
