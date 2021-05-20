@@ -27,19 +27,20 @@ class CreatePostView(generics.CreateAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         post_team=Team.objects.get(pk=data['team'])
         post_name=data['name']
-        post_caption=data['caption']
         post_status=data['status']
-        post_tag = data['tag']
-        post = Post(team=post_team,name=post_name,caption=post_caption,status=post_status,owner=user,tag=post_tag)
+        post = Post(team=post_team,name=post_name,status=post_status,owner=user)
         post.save()
         post_files=request.FILES.getlist('multimedia[]')
+        if 'caption' in data:
+            post.caption = data['caption']
+        if 'tag' in data:
+            post.tag = data['tag']
         for media_file in post_files:
             file_team=post_team
             f = MediaStorage.objects.create(team=file_team,owner=user)
             f.media=media_file
             f.save()
-            media = Media.objects.create(media=media_file, post_id = post.id)
-            post.multimedia.add(media)
+            post.multimedia.add(f)
         return Response(post_serializer.PostSerializer(post).data, status=status.HTTP_201_CREATED)
 
 class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
@@ -68,24 +69,28 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
         serializer = self.get_serializer(instance=post_info, data=data)
 
         if serializer.is_valid(True):
-            post = serializer.update(instance=post_info, validated_data=serializer.validated_data)    
+            post = serializer.update(instance=post_info, validated_data=serializer.validated_data)  
             post_files=request.FILES.getlist('multimedia[]')
             if len(post_files) != 0:
-                post.multimedia.clear()
-            for media_file in post_files:
-                media = Media.objects.create(media=media_file, post_id = post.id)
-                post.multimedia.add(media)
-                
+                for media in post.multimedia.all():
+                    media.delete()
+                for media_file in post_files:
+                    file_team=post.team
+                    f = MediaStorage.objects.create(team=file_team,owner=user)
+                    f.media=media_file
+                    f.save()
+                    post.multimedia.add(f)
+            else:
+                if len(post.multimedia.all())>0:
+                    temp=post.multimedia.all()
+                    post.multimedia.clear() 
+                    for media in temp:
+                        media.delete()     
             if post.status == 'Published':
                 socialmedia=SocialMedia.objects.all().get(team=post.team)
-                # sc = Scheduler()
-                # sc.schedule_post(post, socialmedia, TaskType.Twitter, datetime.now())
-                # return Response(data={"message": "added to tyhe queue", "date": sc.get_post_scheduled_date(post, TaskType.Twitter)},status=status.HTTP_200_OK)
                 twitter_response, published_id = Tweet(post,socialmedia)
-                print("*************************",published_id)
                 post.published_id=published_id
                 post.save()
-                print("*************************",post.published_id)
                 if twitter_response.status_code != 200 :
                     post.status == 'Error'
             return Response(serializer.data,status=status.HTTP_200_OK)
