@@ -90,7 +90,9 @@ jobs:
         RABBITMQ_ENDPOINT: ${{ secrets.RABBITMQ_ENDPOINT }}
         BASE_URL_FOR_MINIO: ${{ secrets.BASE_URL_FOR_MINIO }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
-
+    - name: Build Documentation
+      run:  |
+        bash build-doc.sh
     - name: add swan service env
       if: github.ref == 'refs/heads/develop' #for push only
       run: |
