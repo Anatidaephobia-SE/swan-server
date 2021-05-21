@@ -1,0 +1,1013 @@
+openapi: 3.0.1
+info:
+  title: Swan-App
+  description: Swan team
+  version: '0.2'
+servers:
+  - url: 'https://api.stage.swan-app.ir'
+components:
+  securitySchemes:
+    bearerAuth:            
+      type: http
+      scheme: bearer
+      bearerFormat: JWT    
+  responses:
+    '403':
+          description: Auth failed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationFailed"
+              examples:
+                '0':
+                  value: '{ "detail": "Authentication credentials were not provided." }'
+  schemas:
+    AuthenticationFailed:
+      type: object
+      properties:
+        detail:
+          type: string
+    Message:
+      type: object
+      properties:
+        message:
+          type: string
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+    Team:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        url:
+          type: string
+        logo:
+          type: string
+          format: byte
+        created_at:
+          type: string
+          format: date-time
+        members:
+          type: integer
+        head_name:
+          type: string
+    TeamMember:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+        last_name:
+          type: string
+        profile_picture:
+          type: string
+          format: byte
+        last_login:
+          type: string
+          format: date-time
+        is_head:
+          type: boolean
+
+
+    User:
+      type: "object"
+      properties:
+        email:
+          type: "string"
+          format: "email"
+        first_name:
+          type: "string"
+        last_name:
+          type: "string"
+        profile_picture:
+          type: "string"
+          format: "byte"
+        last_login:
+          type: "string"
+          format: "date-time"
+      xml:
+        name: "User"
+
+
+paths:
+  /api/v1/team/create_team:
+    post:
+      description: Creates new team.
+      tags:
+        - Team
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                url:
+                  type: string
+            examples:
+              '0':
+                value: |-
+                  {
+                      "name" : "example",
+                      "url" : "example"
+                  }
+      responses:
+        '200':
+          description: Successful creation of team.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  team:
+                    $ref: "#/components/schemas/Team"
+              examples:
+                '0':
+                  value: '{
+                            "team": {
+                              "id": "integer",
+                              "name": "string",
+                              "url": "string",
+                              "logo": "string",
+                              "created_at": "2021-05-20",
+                              "members": 1,
+                              "head_name": "Hadi Sheikhi"
+                            }
+                          }'
+        '409':
+          description: Register existing team.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{"error": "Team with same url exists"}'
+        '400':
+          description: Missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "name, url parameter(s) are required"
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/team/invite_user:
+    post:
+      description: Invites new user.
+      tags:
+        - Team
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                team_id:
+                  type: integer
+                username:
+                  type: string
+                  format: email
+            examples:
+              '0':
+                value: |-
+                  {
+                      "team_id" : 123,
+                      "username" : "example@gmail.com"
+                  }
+      responses:
+        '200':
+          description: Successful invitation of team.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  team:
+                    $ref: "#/components/schemas/User"
+              examples:
+                '0':
+                  value: '{
+                              "email": "example@gmail.com",
+                              "first_name": "string",
+                              "last_name": "string",
+                              "profile_picture": "string",
+                              "last_login": "2021-05-20T09:04:41.352Z"
+                            }'
+        '404':
+          description: Team or user not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "Team with this id does not exist"
+                          }'
+                '1':
+                  value: '{
+                            "error": "User with this username does not exist"
+                          }'
+        '400':
+          description: Missing parameters or user already invited or joined the team.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "team_id parameter(s) are required"
+                          }'
+                '1':
+                  value: '{
+                            "error": "User already invited or joined to team"
+                          }'
+        '403':
+          description: Permission denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "This user is not head of team."
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/team/accept_invite:
+    post:
+      description: Accept invitation.
+      tags:
+        - Team
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                team_id:
+                  type: integer
+            examples:
+              '0':
+                value: |-
+                  {
+                      "team_id" : 123,
+                  }
+      responses:
+        '200':
+          description: Successfully accepted the invitation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              examples:
+                '0':
+                  value: '{"message": "User joined team successfuly"}'
+        '404':
+          description: Team not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "Team with this id does not exist"
+                          }'
+        '400':
+          description: Missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "team_id parameter(s) are required"
+                          }'
+        '403':
+          description: User is not invited.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "User is not invited to team"
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/team/reject_invite/{team_id}/:
+    delete:
+      description: Reject invitation.
+      parameters:
+        - in: path
+          name: team_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The team's id.
+      tags:
+        - Team
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful reajections of invitation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              examples:
+                '0':
+                  value: '{"message": "User rejected invite successfuly"}'
+        '404':
+          description: Team not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "Team with this id does not exist"
+                          }'
+        '403':
+          description: User is not invited.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "User is not invited to team"
+                          }'
+  /api/v1/team/remove_user/{team_id}/:
+    delete:
+      description:  Remove user.
+      parameters:
+        - in: path
+          name: team_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The team's id.
+        - in: query
+          required: true
+          name: username
+          schema:
+            type: string
+            format: email
+          description: Email you want to delete.
+      tags:
+        - Team
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful reajections of invitation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              examples:
+                '0':
+                  value: '{"message": "User removed successfuly"}'
+        '404':
+          description: Team or user not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "Team with this id does not exist"
+                          }'
+                '1':
+                  value: '{
+                            "error": "User with this username does not exists"
+                          }'
+        '403':
+          description: Permission denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "This user is not head of team"
+                          }'
+                '1':
+                  value: '{
+                            "error": "Head of team can not be removed"
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/team/leave_team/{team_id}/:
+    delete:
+      description:  Leave a team.
+      parameters:
+        - in: path
+          name: team_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The team's id.
+      tags:
+        - Team
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successfully left the team.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              examples:
+                '0':
+                  value: '{"message": "User left the team"}'
+        '404':
+          description: Team not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "Team with this id does not exist"
+                          }'
+        '403':
+          description: Permission denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "Head of team can not leave the team"
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/team/get_invites:
+    get:
+      description:  Get all invites of a user.
+      tags:
+        - Team
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: All invites of a user.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                    $ref: "#/components/schemas/Team"
+              examples:
+                '0':
+                  value: '[
+                            {
+                              "id": "integer",
+                              "name": "string",
+                              "url": "string",
+                              "logo": "string",
+                              "created_at": "2021-05-20",
+                              "members": 1,
+                              "head_name": "Hadi Sheikhi"
+                            },
+                            {
+                              "id": "integer",
+                              "name": "string",
+                              "url": "string",
+                              "logo": "string",
+                              "created_at": "2021-05-20",
+                              "members": 1,
+                              "head_name": "Mr Niggi"
+                            }
+                          ]'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/team/get_team_info:
+    get:
+      description:  Team's infromation.
+      tags:
+        - Team
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          required: true
+          name: team_id
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Team information.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  team:
+                    $ref: "#/components/schemas/Team"
+                  can_edit:
+                    type: boolean
+              examples:
+                '0':
+                  value: '{
+                            "team": {
+                              "id": "integer",
+                              "name": "string",
+                              "url": "string",
+                              "logo": "string",
+                              "created_at": "2021-05-20",
+                              "members": 1,
+                              "head_name": "Hadi Sheikhi"
+                            },
+                            "can_edit" : false
+                          }'
+        '404':
+          description: Team not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "Team with this id does not exist"
+                          }'
+        '403':
+          description: Permission denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "This user is not member of team"
+                          }'
+        '400':
+          description: Missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "team_id parameter(s) are required"
+                          }'
+        
+          
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/team/get_members:
+    get:
+      description:  Team's members.
+      tags:
+        - Team
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          required: true
+          name: team_id
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Team's members.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  members:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TeamMember"
+                  can_edit:
+                    type: boolean
+              examples:
+                '0':
+                  value: '{
+                            "members": [{
+                              "id" : 123,
+                              "email": "example@gmail.com",
+                              "first_name": "string",
+                              "last_name": "string",
+                              "profile_picture": "string",
+                              "last_login": "2021-05-20T09:04:41.352Z",
+                              "is_head" : false
+                            }],
+                            "can_edit" : false
+                          }'
+        '404':
+          description: Team not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "Team with this id does not exist"
+                          }'
+        '403':
+          description: Permission denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "This user is not member of team"
+                          }'
+        '400':
+          description: Missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "team_id parameter(s) are required"
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/team/get_user_teams:
+    get:
+      description:  A user's teams.
+      tags:
+        - Team
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of all teams of a user.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Team"
+              examples:
+                '0':
+                  value: '[
+                            {
+                              "id": "integer",
+                              "name": "string",
+                              "url": "string",
+                              "logo": "string",
+                              "created_at": "2021-05-20",
+                              "members": 1,
+                              "head_name": "Hadi Sheikhi"
+                            }
+                          ]'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/team/update_team_info:
+    put:
+      description: Updates the teams informations.
+      tags:
+        - Team
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                team_id:
+                  type: integer
+            examples:
+              '0':
+                value: |-
+                  {
+                      "team_id" : 123
+                  }
+      responses:
+        '200':
+          description: Updated the team's information.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              examples:
+                '0':
+                  value: '{"message" : "All fields updated"}'
+        '400':
+          description: Missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "name, url parameter(s) are required"
+                          }'
+        '403':
+          description: Permission denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "This user is not head of team"
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  
+
+
+  /api/v1/users/signup/:
+    post:
+      description: Sign up new user
+      tags:
+        - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                email:
+                  type: string
+                confirm_password:
+                  type: string
+            examples:
+              '0':
+                value: |-
+                  {
+                      "email" : "example@gmail.com",
+                      "password" : "*****",
+                      "confirm_password" : "*****"
+                  }
+      responses:
+        '200':
+          description: Successful creation of user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              examples:
+                '0':
+                  value: '{"message":"Successful. Mail sent to user."}'
+        '400':
+          description: Register existing user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              examples:
+                '0':
+                  value: '{"message":"This user already exists"}'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/users/profile/update/:
+    put:
+      security:
+        - bearerAuth: []
+      description: update users profile
+      tags:
+        - Users
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                profile_picture:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Successful creation of user.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+              examples:
+                '0':
+                  value: '{
+                            "user": {
+                                "email": "example@gmail.com",
+                                "first_name": "string",
+                                "last_name": "string",
+                                "profile_picture": "string",
+                                "last_login": "2021-05-20T09:04:41.352Z"
+                            }
+                        }'
+        '400':
+          description: Missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                              "error": "First name not submitted."
+                          }'
+                '1':
+                  value: '{
+                              "error": "Last name not submitted."
+                          }'
+        '403':
+          $ref: "#/components/responses/403"
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/users/login/:
+    post:
+      security: []
+      description: Login
+      tags:
+        - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                email:
+                  type: string
+            examples:
+              '0':
+                value: |-
+                  {
+                      "email" : "example@gmail.com",
+                      "password" : "*****"
+                  }
+      responses:
+        '200':
+          description: Successful login.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: "#/components/schemas/User"
+              examples:
+                '0':
+                  value: '{
+                            "token": "TOKEN",
+                            "user": {
+                                "email": "example@gmail.com",
+                                "first_name": "string",
+                                "last_name": "string",
+                                "profile_picture": "string",
+                                "last_login": "2021-05-20T09:04:41.352Z"
+                            }
+                          }'
+        '403':
+          description: Not verified email.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              examples:
+                '0':
+                  value: '{
+                              "message": "User not verified. Mail sent to email."
+                          }'
+        '401':
+          description: Wrong credentials.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              examples:
+                '0':
+                  value: '{
+                              "message": "Wrong user name password"
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/users/profile/{mail}:
+    get:
+      parameters:
+        - in: path
+          name: mail   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: string
+          description: The user email
+      security: 
+        - bearerAuth: []
+      description: View profile details.
+      tags:
+        - Users
+      responses:
+        '200':
+          description: Successfully found data.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+              examples:
+                '0':
+                  value: '{
+                              "email": "example@gmail.com",
+                              "first_name": "string",
+                              "last_name": "string",
+                              "profile_picture": "string",
+                              "last_login": "2021-05-20T09:04:41.352Z"
+                          }'
+        '403': 
+          $ref: "#/components/responses/403" #Authentication failed
+        '404':
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              examples:
+                '0':
+                  value: '{"message": "User not found"}'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+
+
+
+
