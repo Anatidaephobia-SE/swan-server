@@ -1,6 +1,7 @@
 from django.db import models
 from users.models import User
 from team.models import Team
+from filestorage.models import MediaStorage
 
 def get_user_directory(instance, filename):
     return f'postfiles/{instance.post_id}/{filename}'
@@ -30,9 +31,9 @@ class Post(models.Model):
     status = models.CharField(null = True, default='Draft',max_length=20,choices = status_CHOICES)
     owner = models.ForeignKey(User, related_name = 'owner', null=True, on_delete = models.CASCADE)
     created_at = models.DateTimeField(auto_now_add =True)
-    multimedia = models.ManyToManyField(Media, related_name = 'Post', blank=True)
+    multimedia = models.ManyToManyField(MediaStorage, related_name = 'Post', blank=True)
     team = models.ForeignKey(Team, related_name = 'Post_team', null = True, on_delete = models.CASCADE)
-    tag = models.CharField(null = True, max_length=20,choices = tag_CHOICES)
+    tag = models.CharField(blank = True,null = True, max_length=20,choices = tag_CHOICES)
     published_id = models.BigIntegerField(blank = True, null=True)
     
 
