@@ -8,8 +8,7 @@ from rest_framework.response import Response
 from users import authenticators
 from .models import User
 from .serializers import UserSerializer
-from django.core.mail import send_mail
-
+from django.core.mail import send_mail, EmailMessage
 @api_view(['POST'])
 @authentication_classes([])
 def signup_view(request):
@@ -27,7 +26,10 @@ def signup_view(request):
         return Response({"message": "This user already exists"}, status=status.HTTP_400_BAD_REQUEST)
 
     token = authenticators.generate_access_token(new_user)
-    send_mail("Swan Registeration", token, "swan@swan-app.ir", [email], fail_silently=False)
+    email = EmailMessage("Swan Registeration", get_mail_registeration_text(token), "swan@swan-app.ir", [email], [])
+    email.content_subtype = "html"
+    email.send(fail_silently=False)
+    # send_mail("Swan Registeration", get_mail_registeration_text(token), "swan@swan-app.ir", [email], fail_silently=False)
     new_user.save()
     return Response({"message": "Successful. Mail sent to user."}, status=status.HTTP_200_OK)
 
@@ -88,5 +90,38 @@ def login_view(request):
     if user.verified:
         return Response({"token": token, "user": user_serializer.data}, status=status.HTTP_200_OK)
     else:
-        send_mail("Swan Registeration", token, "swan@swan-app.ir", [email], fail_silently=False)
+        email = EmailMessage("Swan Registeration", get_mail_registeration_text(token), "swan@swan-app.ir", [email], [])
+        email.content_subtype = "html"
+        email.send(fail_silently=False)
+        # send_mail("Swan Registeration", get_mail_registeration_text(token), "swan@swan-app.ir", [email], fail_silently=False)
         return Response({"message": "User not verified. Mail sent to email."}, status=status.HTTP_403_FORBIDDEN)
+
+def get_mail_registeration_text(token):
+    text = f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Verification Email</title>
+    </head>
+    <style>
+        .verify {{
+            border-radius: 10px;
+            background-color: lightskyblue;
+            padding: 10px;
+        }}
+    </style>
+    <body style="text-align: center;">
+
+        <h1>Welcome to Swan</h1>
+        <h3>Automated flow for your digital marketing strategy</h3>
+
+        <p style="margin: 2rem;">You have successfully registered in Swan. In order to continue click on the button.</p>
+        <a href="https://stage.swan-app.ir/sign-up?token={token}" class="verify">Verify</a>
+        
+    </body>
+    </html>
+    """
+    return text
