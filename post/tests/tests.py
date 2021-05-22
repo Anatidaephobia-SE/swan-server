@@ -36,7 +36,7 @@ class PostViewTest(APITestCase):
                 data = {"name":"big opportunities",
                         "caption":"Over the past decade, the availability and demand for data science skills and data-decision decision making has skyrocketed.",
                         "status":"Drafts",
-                        # "multimedia[]":files,
+                        "multimedia[]":files,
                         "team": pk_team
                         }
                 url = reverse("post-urls:createPost")
