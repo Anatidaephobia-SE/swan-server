@@ -33,7 +33,7 @@ jobs:
           - 5432/tcp
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
+        
     steps:
     - uses: actions/checkout@v1
       with:
@@ -65,7 +65,7 @@ jobs:
         RABBITMQ_DEFAULT_USER: ${{ secrets.RABBITMQ_DEFAULT_USER }}
         RABBITMQ_DEFAULT_PASS: ${{ secrets.RABBITMQ_DEFAULT_PASS }}
         RABBITMQ_DEFAULT_VHOST: ${{ secrets.RABBITMQ_DEFAULT_VHOST }}
-        RABBITMQ_ENDPOINT: ${{ secrets.RABBITMQ_ENDPOINT }}
+        RABBITMQ_ENDPOINT: localhost
         BASE_URL_FOR_MINIO: ${{ secrets.BASE_URL_FOR_MINIO }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
     - name: Run tests
@@ -82,7 +82,7 @@ jobs:
         TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
         TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
         MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
-        MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
+        MINIO_ENDPOINT: localhost
         MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
         RABBITMQ_DEFAULT_USER: ${{ secrets.RABBITMQ_DEFAULT_USER }}
         RABBITMQ_DEFAULT_PASS: ${{ secrets.RABBITMQ_DEFAULT_PASS }}
