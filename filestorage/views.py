@@ -36,7 +36,7 @@ class UploadFileView(generics.CreateAPIView):
         f.save()
         f.media = file_media
         f.save()
-        response = modify_url(FileStorage_serializer.FileSerializer(f).data)
+        response = FileStorage_serializer.FileSerializer(f).data
         return Response(response, status=status.HTTP_201_CREATED)
 
 
@@ -55,8 +55,8 @@ class SingleFileView(generics.RetrieveAPIView):
 
         file_Info = MediaStorage.objects.all().get(pk=media_pk)
         serializer = FileStorage_serializer.FileSerializer(file_Info)
-        response = modify_url(serializer.data)
-        return Response(response, status=status.HTTP_200_OK)
+        # response = modify_url(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class AllMediaView(generics.ListAPIView):
     queryset = MediaStorage.objects.all()
@@ -73,8 +73,8 @@ class AllMediaView(generics.ListAPIView):
 
         mediaList = MediaStorage.objects.all().filter(team=team_id)
         serializer = FileStorage_serializer.FileSerializer(mediaList, many=True)
-        response = modify_url(serializer.data)
-        return Response(response, status=status.HTTP_200_OK)
+        # response = modify_url(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class DeleteMediaView(generics.DestroyAPIView):
 
