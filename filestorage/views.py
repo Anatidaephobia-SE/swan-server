@@ -31,7 +31,8 @@ class UploadFileView(generics.CreateAPIView):
         f.save()
         f.media = file_media
         f.save()
-        return Response(FileStorage_serializer.FileSerializer(f).data, status=status.HTTP_201_CREATED)
+        response = FileStorage_serializer.FileSerializer(f).data
+        return Response(response, status=status.HTTP_201_CREATED)
 
 
 class SingleFileView(generics.RetrieveAPIView):
