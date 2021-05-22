@@ -27,22 +27,12 @@ class CreateCardView(generics.CreateAPIView):
         card_title=data['title']
         card_description=data['description']
         card_status=data['status']
-        tag_falg=False
-        assignee_flag=False
+        card = Card(team=card_workspace,title=card_title,description=card_description,status=card_status)
         if 'tag' in data:
-            card_tag = data['tag']
-            tag_falg=True
+            card.tag=data['tag']
         if 'assignee' in data:
             card_assignee = User.objects.get(pk=data['assignee'])
-            assignee_flag=True
-        if tag_falg and assignee_flag:
-            card = Card(team=card_workspace,title=card_title,description=card_description,status=card_status,assignee=card_assignee,tag=card_tag)
-        elif tag_falg and not assignee_flag:
-            card = Card(team=card_workspace,title=card_title,description=card_description,status=card_status,tag=card_tag)
-        elif assignee_flag and not tag_falg:
-            card = Card(team=card_workspace,title=card_title,description=card_description,status=card_status,assignee=card_assignee)
-        else:
-            card = Card(team=card_workspace,title=card_title,description=card_description,status=card_status)
+            card.assignee=card_assignee
         card.save()
         return Response(Card_Serializer.CardAssigneeSerializer(card).data, status=status.HTTP_201_CREATED)
  
