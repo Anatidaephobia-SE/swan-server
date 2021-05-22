@@ -2,7 +2,8 @@ from rest_framework import serializers
 from . import models
 from users.models import User
 from filestorage.models import MediaStorage
-
+from swan.settings import MINIO_ENDPOINT
+import os
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -23,10 +24,13 @@ class PostMediaSerializer(serializers.ModelSerializer):
     read_only_fields = ('id')
 
 class StorageSerializer(serializers.ModelSerializer):
+    media = serializers.SerializerMethodField()
+    def get_media(self, instance):
+        return str(instance.media).replace(MINIO_ENDPOINT, os.getenv("BASE_URL_FOR_MINIO"))
     class Meta:
         model = MediaStorage
         fields = ('id','media')
-    read_only_fields = ('id')
+    read_only_fields = ('id', 'media')
 
 class PostSerializer(serializers.ModelSerializer):
     owner = UserSerializer(required=False)
