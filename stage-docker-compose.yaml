@@ -50,7 +50,7 @@ services:
     ports:
       - "10334:8080"
     volumes:
-      - ./openapi.json:/swagger.json
+      - /openapi.json:/swagger.json
     environment:
       SWAGGER_JSON: /swagger.json
 
