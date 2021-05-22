@@ -90,7 +90,9 @@ jobs:
         RABBITMQ_ENDPOINT: ${{ secrets.RABBITMQ_ENDPOINT }}
         BASE_URL_FOR_MINIO: ${{ secrets.BASE_URL_FOR_MINIO }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
-
+    - name: Build Documentation
+      run:  |
+        bash build-doc.sh
     - name: add swan service env
       if: github.ref == 'refs/heads/develop' #for push only
       run: |
@@ -236,7 +238,7 @@ jobs:
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          scp  -o StrictHostKeyChecking=no -r ./nginx.conf ./minio.env ./server.env ./swan.env ./pg.env ./pgadmin.env ./rabbitmq.env ./postfix_main.cf ./${{ env.COMPOSE_FILE }} ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/swan-stage
+          scp  -o StrictHostKeyChecking=no -r ./nginx.conf ./minio.env ./server.env ./swan.env ./pg.env ./pgadmin.env ./rabbitmq.env ./postfix_main.cf ./docs/swan-doc/openapi.json ./${{ env.COMPOSE_FILE }} ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/swan-stage
           ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'ENDSSH'
             cd ~/swan-stage
             source server.env

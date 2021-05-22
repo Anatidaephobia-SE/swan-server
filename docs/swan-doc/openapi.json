@@ -1,0 +1,1510 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "description" : "Swan team",
+    "title" : "Swan-App",
+    "version" : "0.2"
+  },
+  "servers" : [ {
+    "url" : "https://api.stage.swan-app.ir"
+  } ],
+  "paths" : {
+    "/api/v1/team/create_team" : {
+      "post" : {
+        "description" : "Creates new team.",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/inline_object",
+          "content" : {
+            "application/json" : {
+              "examples" : {
+                "0" : {
+                  "value" : "{\n    \"name\" : \"example\",\n    \"url\" : \"example\"\n}"
+                }
+              },
+              "schema" : {
+                "properties" : {
+                  "name" : {
+                    "type" : "string"
+                  },
+                  "url" : {
+                    "type" : "string"
+                  }
+                },
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"team\": { \"id\": \"integer\", \"name\": \"string\", \"url\": \"string\", \"logo\": \"string\", \"created_at\": \"2021-05-20\", \"members\": 1, \"head_name\": \"Hadi Sheikhi\" } }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200"
+                }
+              }
+            },
+            "description" : "Successful creation of team."
+          },
+          "409" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{\"error\": \"Team with same url exists\"}"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Register existing team."
+          },
+          "400" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"name, url parameter(s) are required\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Missing parameters."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Team" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/team/invite_user" : {
+      "post" : {
+        "description" : "Invites new user.",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/inline_object_1",
+          "content" : {
+            "application/json" : {
+              "examples" : {
+                "0" : {
+                  "value" : "{\n    \"team_id\" : 123,\n    \"username\" : \"example@gmail.com\"\n}"
+                }
+              },
+              "schema" : {
+                "properties" : {
+                  "team_id" : {
+                    "type" : "integer"
+                  },
+                  "username" : {
+                    "format" : "email",
+                    "type" : "string"
+                  }
+                },
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"email\": \"example@gmail.com\", \"first_name\": \"string\", \"last_name\": \"string\", \"profile_picture\": \"string\", \"last_login\": \"2021-05-20T09:04:41.352Z\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_1"
+                }
+              }
+            },
+            "description" : "Successful invitation of team."
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"Team with this id does not exist\" }"
+                  },
+                  "1" : {
+                    "value" : "{ \"error\": \"User with this username does not exist\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Team or user not found."
+          },
+          "400" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"team_id parameter(s) are required\" }"
+                  },
+                  "1" : {
+                    "value" : "{ \"error\": \"User already invited or joined to team\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Missing parameters or user already invited or joined the team."
+          },
+          "403" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"This user is not head of team.\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Permission denied."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Team" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/team/accept_invite" : {
+      "post" : {
+        "description" : "Accept invitation.",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/inline_object_2",
+          "content" : {
+            "application/json" : {
+              "examples" : {
+                "0" : {
+                  "value" : "{\n    \"team_id\" : 123,\n}"
+                }
+              },
+              "schema" : {
+                "properties" : {
+                  "team_id" : {
+                    "type" : "integer"
+                  }
+                },
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{\"message\": \"User joined team successfuly\"}"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Message"
+                }
+              }
+            },
+            "description" : "Successfully accepted the invitation."
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"Team with this id does not exist\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Team not found."
+          },
+          "400" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"team_id parameter(s) are required\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Missing parameters."
+          },
+          "403" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"User is not invited to team\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "User is not invited."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Team" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/team/reject_invite/{team_id}/" : {
+      "delete" : {
+        "description" : "Reject invitation.",
+        "parameters" : [ {
+          "description" : "The team's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "team_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{\"message\": \"User rejected invite successfuly\"}"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Message"
+                }
+              }
+            },
+            "description" : "Successful reajections of invitation."
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"Team with this id does not exist\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Team not found."
+          },
+          "403" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"User is not invited to team\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "User is not invited."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "tags" : [ "Team" ]
+      }
+    },
+    "/api/v1/team/remove_user/{team_id}/" : {
+      "delete" : {
+        "description" : "Remove user.",
+        "parameters" : [ {
+          "description" : "The team's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "team_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        }, {
+          "description" : "Email you want to delete.",
+          "explode" : true,
+          "in" : "query",
+          "name" : "username",
+          "required" : true,
+          "schema" : {
+            "format" : "email",
+            "type" : "string"
+          },
+          "style" : "form"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{\"message\": \"User removed successfuly\"}"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Message"
+                }
+              }
+            },
+            "description" : "Successful reajections of invitation."
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"Team with this id does not exist\" }"
+                  },
+                  "1" : {
+                    "value" : "{ \"error\": \"User with this username does not exists\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Team or user not found."
+          },
+          "403" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"This user is not head of team\" }"
+                  },
+                  "1" : {
+                    "value" : "{ \"error\": \"Head of team can not be removed\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Permission denied."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Team" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/team/leave_team/{team_id}/" : {
+      "delete" : {
+        "description" : "Leave a team.",
+        "parameters" : [ {
+          "description" : "The team's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "team_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{\"message\": \"User left the team\"}"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Message"
+                }
+              }
+            },
+            "description" : "Successfully left the team."
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"Team with this id does not exist\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Team not found."
+          },
+          "403" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"Head of team can not leave the team\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Permission denied."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Team" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/team/get_invites" : {
+      "get" : {
+        "description" : "Get all invites of a user.",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "[ { \"id\": \"integer\", \"name\": \"string\", \"url\": \"string\", \"logo\": \"string\", \"created_at\": \"2021-05-20\", \"members\": 1, \"head_name\": \"Hadi Sheikhi\" }, { \"id\": \"integer\", \"name\": \"string\", \"url\": \"string\", \"logo\": \"string\", \"created_at\": \"2021-05-20\", \"members\": 1, \"head_name\": \"Mr Niggi\" } ]"
+                  }
+                },
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/Team"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "All invites of a user."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Team" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/team/get_team_info" : {
+      "get" : {
+        "description" : "Team's infromation.",
+        "parameters" : [ {
+          "explode" : true,
+          "in" : "query",
+          "name" : "team_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "form"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"team\": { \"id\": \"integer\", \"name\": \"string\", \"url\": \"string\", \"logo\": \"string\", \"created_at\": \"2021-05-20\", \"members\": 1, \"head_name\": \"Hadi Sheikhi\" }, \"can_edit\" : false }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_2"
+                }
+              }
+            },
+            "description" : "Team information."
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"Team with this id does not exist\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Team not found."
+          },
+          "403" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"This user is not member of team\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Permission denied."
+          },
+          "400" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"team_id parameter(s) are required\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Missing parameters."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Team" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/team/get_members" : {
+      "get" : {
+        "description" : "Team's members.",
+        "parameters" : [ {
+          "explode" : true,
+          "in" : "query",
+          "name" : "team_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "form"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"members\": [{ \"id\" : 123, \"email\": \"example@gmail.com\", \"first_name\": \"string\", \"last_name\": \"string\", \"profile_picture\": \"string\", \"last_login\": \"2021-05-20T09:04:41.352Z\", \"is_head\" : false }], \"can_edit\" : false }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_3"
+                }
+              }
+            },
+            "description" : "Team's members."
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"Team with this id does not exist\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Team not found."
+          },
+          "403" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"This user is not member of team\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Permission denied."
+          },
+          "400" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"team_id parameter(s) are required\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Missing parameters."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Team" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/team/get_user_teams" : {
+      "get" : {
+        "description" : "A user's teams.",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "[ { \"id\": \"integer\", \"name\": \"string\", \"url\": \"string\", \"logo\": \"string\", \"created_at\": \"2021-05-20\", \"members\": 1, \"head_name\": \"Hadi Sheikhi\" } ]"
+                  }
+                },
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/Team"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "List of all teams of a user."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Team" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/team/update_team_info" : {
+      "put" : {
+        "description" : "Updates the teams informations.",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/inline_object_3",
+          "content" : {
+            "application/json" : {
+              "examples" : {
+                "0" : {
+                  "value" : "{\n    \"team_id\" : 123\n}"
+                }
+              },
+              "schema" : {
+                "properties" : {
+                  "team_id" : {
+                    "type" : "integer"
+                  }
+                },
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{\"message\" : \"All fields updated\"}"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Message"
+                }
+              }
+            },
+            "description" : "Updated the team's information."
+          },
+          "400" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"name, url parameter(s) are required\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Missing parameters."
+          },
+          "403" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"This user is not head of team\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Permission denied."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Team" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/users/signup/" : {
+      "post" : {
+        "description" : "Sign up new user",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/inline_object_4",
+          "content" : {
+            "application/json" : {
+              "examples" : {
+                "0" : {
+                  "value" : "{\n    \"email\" : \"example@gmail.com\",\n    \"password\" : \"*****\",\n    \"confirm_password\" : \"*****\"\n}"
+                }
+              },
+              "schema" : {
+                "properties" : {
+                  "password" : {
+                    "type" : "string"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  },
+                  "confirm_password" : {
+                    "type" : "string"
+                  }
+                },
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{\"message\":\"Successful. Mail sent to user.\"}"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Message"
+                }
+              }
+            },
+            "description" : "Successful creation of user."
+          },
+          "400" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{\"message\":\"This user already exists\"}"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Message"
+                }
+              }
+            },
+            "description" : "Register existing user."
+          }
+        },
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Users" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/users/profile/update/" : {
+      "put" : {
+        "description" : "update users profile",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/inline_object_5",
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "properties" : {
+                  "first_name" : {
+                    "type" : "string"
+                  },
+                  "last_name" : {
+                    "type" : "string"
+                  },
+                  "profile_picture" : {
+                    "format" : "binary",
+                    "type" : "string"
+                  }
+                },
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"user\": { \"email\": \"example@gmail.com\", \"first_name\": \"string\", \"last_name\": \"string\", \"profile_picture\": \"string\", \"last_login\": \"2021-05-20T09:04:41.352Z\" } }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_4"
+                }
+              }
+            },
+            "description" : "Successful creation of user."
+          },
+          "400" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"First name not submitted.\" }"
+                  },
+                  "1" : {
+                    "value" : "{ \"error\": \"Last name not submitted.\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Missing parameters."
+          },
+          "403" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"detail\": \"Authentication credentials were not provided.\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/AuthenticationFailed"
+                }
+              }
+            },
+            "description" : "Auth failed."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Users" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/users/login/" : {
+      "post" : {
+        "description" : "Login",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/inline_object_6",
+          "content" : {
+            "application/json" : {
+              "examples" : {
+                "0" : {
+                  "value" : "{\n    \"email\" : \"example@gmail.com\",\n    \"password\" : \"*****\"\n}"
+                }
+              },
+              "schema" : {
+                "properties" : {
+                  "password" : {
+                    "type" : "string"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                },
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"token\": \"TOKEN\", \"user\": { \"email\": \"example@gmail.com\", \"first_name\": \"string\", \"last_name\": \"string\", \"profile_picture\": \"string\", \"last_login\": \"2021-05-20T09:04:41.352Z\" } }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_5"
+                }
+              }
+            },
+            "description" : "Successful login."
+          },
+          "403" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"message\": \"User not verified. Mail sent to email.\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Message"
+                }
+              }
+            },
+            "description" : "Not verified email."
+          },
+          "401" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"message\": \"Wrong user name password\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Message"
+                }
+              }
+            },
+            "description" : "Wrong credentials."
+          }
+        },
+        "security" : [ ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Users" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/users/profile/{mail}" : {
+      "get" : {
+        "description" : "View profile details.",
+        "parameters" : [ {
+          "description" : "The user email",
+          "explode" : false,
+          "in" : "path",
+          "name" : "mail",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"email\": \"example@gmail.com\", \"first_name\": \"string\", \"last_name\": \"string\", \"profile_picture\": \"string\", \"last_login\": \"2021-05-20T09:04:41.352Z\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/User"
+                }
+              }
+            },
+            "description" : "Successfully found data."
+          },
+          "403" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"detail\": \"Authentication credentials were not provided.\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/AuthenticationFailed"
+                }
+              }
+            },
+            "description" : "Auth failed."
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{\"message\": \"User not found\"}"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Message"
+                }
+              }
+            },
+            "description" : "User not found."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Users" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    }
+  },
+  "components" : {
+    "requestBodies" : {
+      "inline_object_1" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/inline_object_1"
+            }
+          }
+        }
+      },
+      "inline_object" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/inline_object"
+            }
+          }
+        }
+      },
+      "inline_object_6" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/inline_object_6"
+            }
+          }
+        }
+      },
+      "inline_object_5" : {
+        "content" : {
+          "multipart/form-data" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/inline_object_5"
+            }
+          }
+        }
+      },
+      "inline_object_4" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/inline_object_4"
+            }
+          }
+        }
+      },
+      "inline_object_3" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/inline_object_3"
+            }
+          }
+        }
+      },
+      "inline_object_2" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/inline_object_2"
+            }
+          }
+        }
+      }
+    },
+    "responses" : {
+      "403" : {
+        "content" : {
+          "application/json" : {
+            "examples" : {
+              "0" : {
+                "value" : "{ \"detail\": \"Authentication credentials were not provided.\" }"
+              }
+            },
+            "schema" : {
+              "$ref" : "#/components/schemas/AuthenticationFailed"
+            }
+          }
+        },
+        "description" : "Auth failed."
+      }
+    },
+    "schemas" : {
+      "AuthenticationFailed" : {
+        "properties" : {
+          "detail" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "Message" : {
+        "properties" : {
+          "message" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "Error" : {
+        "properties" : {
+          "error" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "Team" : {
+        "properties" : {
+          "id" : {
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "url" : {
+            "type" : "string"
+          },
+          "logo" : {
+            "format" : "byte",
+            "type" : "string"
+          },
+          "created_at" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "members" : {
+            "type" : "integer"
+          },
+          "head_name" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "TeamMember" : {
+        "properties" : {
+          "id" : {
+            "type" : "integer"
+          },
+          "email" : {
+            "format" : "email",
+            "type" : "string"
+          },
+          "first_name" : {
+            "type" : "string"
+          },
+          "last_name" : {
+            "type" : "string"
+          },
+          "profile_picture" : {
+            "format" : "byte",
+            "type" : "string"
+          },
+          "last_login" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "is_head" : {
+            "type" : "boolean"
+          }
+        },
+        "type" : "object"
+      },
+      "User" : {
+        "properties" : {
+          "email" : {
+            "format" : "email",
+            "type" : "string"
+          },
+          "first_name" : {
+            "type" : "string"
+          },
+          "last_name" : {
+            "type" : "string"
+          },
+          "profile_picture" : {
+            "format" : "byte",
+            "type" : "string"
+          },
+          "last_login" : {
+            "format" : "date-time",
+            "type" : "string"
+          }
+        },
+        "type" : "object",
+        "xml" : {
+          "name" : "User"
+        }
+      },
+      "inline_object" : {
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "url" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "inline_response_200" : {
+        "properties" : {
+          "team" : {
+            "$ref" : "#/components/schemas/Team"
+          }
+        },
+        "type" : "object"
+      },
+      "inline_object_1" : {
+        "properties" : {
+          "team_id" : {
+            "type" : "integer"
+          },
+          "username" : {
+            "format" : "email",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "inline_response_200_1" : {
+        "properties" : {
+          "team" : {
+            "$ref" : "#/components/schemas/User"
+          }
+        },
+        "type" : "object"
+      },
+      "inline_object_2" : {
+        "properties" : {
+          "team_id" : {
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "inline_response_200_2" : {
+        "properties" : {
+          "team" : {
+            "$ref" : "#/components/schemas/Team"
+          },
+          "can_edit" : {
+            "type" : "boolean"
+          }
+        },
+        "type" : "object"
+      },
+      "inline_response_200_3" : {
+        "properties" : {
+          "members" : {
+            "items" : {
+              "$ref" : "#/components/schemas/TeamMember"
+            },
+            "type" : "array"
+          },
+          "can_edit" : {
+            "type" : "boolean"
+          }
+        },
+        "type" : "object"
+      },
+      "inline_object_3" : {
+        "properties" : {
+          "team_id" : {
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "inline_object_4" : {
+        "properties" : {
+          "password" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "confirm_password" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "inline_object_5" : {
+        "properties" : {
+          "first_name" : {
+            "type" : "string"
+          },
+          "last_name" : {
+            "type" : "string"
+          },
+          "profile_picture" : {
+            "format" : "binary",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "inline_response_200_4" : {
+        "properties" : {
+          "user" : {
+            "$ref" : "#/components/schemas/User"
+          }
+        },
+        "type" : "object"
+      },
+      "inline_object_6" : {
+        "properties" : {
+          "password" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "inline_response_200_5" : {
+        "properties" : {
+          "token" : {
+            "type" : "string"
+          },
+          "user" : {
+            "$ref" : "#/components/schemas/User"
+          }
+        },
+        "type" : "object"
+      }
+    },
+    "securitySchemes" : {
+      "bearerAuth" : {
+        "bearerFormat" : "JWT",
+        "scheme" : "bearer",
+        "type" : "http"
+      }
+    }
+  }
+}

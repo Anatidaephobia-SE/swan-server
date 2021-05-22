@@ -1,0 +1,39 @@
+    Team:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        url:
+          type: string
+        logo:
+          type: string
+          format: byte
+        created_at:
+          type: string
+          format: date-time
+        members:
+          type: integer
+        head_name:
+          type: string
+    TeamMember:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+        last_name:
+          type: string
+        profile_picture:
+          type: string
+          format: byte
+        last_login:
+          type: string
+          format: date-time
+        is_head:
+          type: boolean
