@@ -13,7 +13,7 @@ class FileSerializer(serializers.ModelSerializer):
     owner = UserSerializer(required=False)
     media = serializers.SerializerMethodField()
     def get_media(self, instance):
-        return str(instance.media).replace(MINIO_ENDPOINT, os.getenv("BASE_URL_FOR_MINIO"))
+        return str(instance.media.url).replace(MINIO_ENDPOINT, os.getenv("BASE_URL_FOR_MINIO")).replace("http", "https")
     class Meta:
         model = MediaStorage
         fields = ('id','media','team','owner')

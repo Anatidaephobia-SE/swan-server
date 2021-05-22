@@ -33,8 +33,10 @@ class CreatePostView(generics.CreateAPIView):
         post_files=request.FILES.getlist('multimedia[]')
         if 'caption' in data:
             post.caption = data['caption']
+            post.save()
         if 'tag' in data:
             post.tag = data['tag']
+            post.save()
         for media_file in post_files:
             file_team=post_team
             f = MediaStorage.objects.create(team=file_team,owner=user)
@@ -54,6 +56,7 @@ class CreatePostView(generics.CreateAPIView):
             if 'schedule_time' in data:
                 sc.schedule_post(post, socialmedia, TaskType.Twitter, data['schedule_time'])
                 post.schedule_time=data['schedule_time']
+                post.save()
                 return Response(data={"message": "added to the queue", "date": sc.get_post_scheduled_date(post, TaskType.Twitter)},status=status.HTTP_200_OK)
         return Response(post_serializer.PostSerializer(post).data, status=status.HTTP_201_CREATED)
 
@@ -109,9 +112,11 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
                     return Response("An Error has occured during publishing")
             if post.status == 'Schedule':
                 sc = Scheduler()
+                socialmedia=SocialMedia.objects.all().get(team=post.team)
                 if 'schedule_time' in data:
                     sc.schedule_post(post, socialmedia, TaskType.Twitter, data['schedule_time'])
                     post.schedule_time=data['schedule_time']
+                    post.save()
                     return Response(data={"message": "added to tyhe queue", "date": sc.get_post_scheduled_date(post, TaskType.Twitter)},status=status.HTTP_200_OK)
             return Response(serializer.data,status=status.HTTP_200_OK)
             
