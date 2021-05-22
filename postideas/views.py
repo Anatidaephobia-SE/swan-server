@@ -30,9 +30,11 @@ class CreateCardView(generics.CreateAPIView):
         card = Card(team=card_workspace,title=card_title,description=card_description,status=card_status)
         if 'tag' in data:
             card.tag=data['tag']
+            card.save()
         if 'assignee' in data:
             card_assignee = User.objects.get(pk=data['assignee'])
             card.assignee=card_assignee
+            card.save()
         card.save()
         return Response(Card_Serializer.CardAssigneeSerializer(card).data, status=status.HTTP_201_CREATED)
  
