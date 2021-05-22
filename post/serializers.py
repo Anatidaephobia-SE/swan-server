@@ -26,7 +26,7 @@ class PostMediaSerializer(serializers.ModelSerializer):
 class StorageSerializer(serializers.ModelSerializer):
     media = serializers.SerializerMethodField()
     def get_media(self, instance):
-        return str(instance.media).replace(MINIO_ENDPOINT, os.getenv("BASE_URL_FOR_MINIO"))
+        return str(instance.media.url).replace(MINIO_ENDPOINT, os.getenv("BASE_URL_FOR_MINIO"))
     class Meta:
         model = MediaStorage
         fields = ('id','media')
