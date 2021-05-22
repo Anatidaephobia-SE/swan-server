@@ -42,7 +42,7 @@ jobs:
           MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
           MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
         volumes:
-          - ./minio-data:/data
+          - /home/minio-data:/data
         options: --name=minio --health-cmd "curl http://localhost:9000/minio/health/live"
 
     steps:
