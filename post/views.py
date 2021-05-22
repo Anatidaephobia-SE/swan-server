@@ -40,8 +40,7 @@ class CreatePostView(generics.CreateAPIView):
             f = MediaStorage.objects.create(team=file_team,owner=user)
             f.media=media_file
             f.save()
-            media = Media.objects.create(media=media_file, post_id = post.id)
-            post.multimedia.add(media)
+            post.multimedia.add(f)
         if post.status == 'Published':
             socialmedia=SocialMedia.objects.all().get(team=post.team)
             twitter_response, published_id = Tweet(post,socialmedia)
