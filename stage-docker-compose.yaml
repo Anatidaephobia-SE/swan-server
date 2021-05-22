@@ -50,9 +50,13 @@ services:
     ports:
       - "10334:8080"
     volumes:
-      - ./openapi.json:/swagger.json
+      - type: bind
+        source: ./openapi.json
+        target: /home/openapi.json
     environment:
-      SWAGGER_JSON: /swagger.json
+      SWAGGER_JSON: /home/openapi.json
+    networks:
+      - swan-stage
 
   minio:
     image: minio/minio
