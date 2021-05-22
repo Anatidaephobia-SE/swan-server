@@ -33,18 +33,7 @@ jobs:
           - 5432/tcp
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
-      minio:
-        image: minio/minio
-        ports:
-          - 9000:9000
-        env:
-          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
-          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
-        volumes:
-          - ./minio-data:/data
-        options: --name=minio --health-cmd "curl http://localhost:9000/minio/health/live"
-
+        
     steps:
     - uses: actions/checkout@v1
       with:
