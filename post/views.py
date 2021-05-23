@@ -47,6 +47,7 @@ class CreatePostView(generics.CreateAPIView):
             socialmedia=SocialMedia.objects.all().get(team=post.team)
             twitter_response, published_id = Tweet(post,socialmedia)
             post.published_id=published_id
+            post.schedule_time = datetime.now()
             post.save()
             if twitter_response.status_code != 200 :
                 return Response("An Error has occured during publishing")
