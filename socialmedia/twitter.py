@@ -139,6 +139,8 @@ async def tweet_with_async_upload(post, social_media):
     if(response.status_code == 200):
         print(f"posted tweet with response \"{response.status_code} {response.text}\"")
         post.status = "Published"
+        post.published_id = response.json()['id']
+        post.schedule_time = datetime.datetime.now()
         post.save()
     else:
         print(f"Error posting post {post.id} in twitter with response \"{response.status_code} {response.text}\".")
