@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'scheduler',
     'filestorage',
     'postideas',
+    'notification',
 ]
 CORS_ORIGIN_ALLOW_ALL = True
 
