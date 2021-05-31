@@ -1,7 +1,5 @@
 from django.db import models
-from users.models import User
 from team.models import Team
-from filestorage.models import MediaStorage
 
 class Email(models.Model):
 
