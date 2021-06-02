@@ -10,3 +10,6 @@ class Email(models.Model):
     sender = models.ForeignKey(Team, related_name = 'team_email', null = True, on_delete = models.CASCADE)
     created_at = models.DateTimeField(auto_now_add =True)
     schedule_time = models.DateTimeField(blank=True, null=True)
+
+class EmailAPI(models.Model):
+    url = models.TextField(null=False, max_length=200)
