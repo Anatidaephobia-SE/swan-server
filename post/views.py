@@ -103,16 +103,19 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
                     post.multimedia.clear() 
                     for media in temp:
                         media.delete()     
+            sc = Scheduler()
+            if post.status == "Drafts":
+                sc.cancel_schedule(post, TaskType.Twitter)
             if post.status == 'Published':
                 socialmedia=SocialMedia.objects.all().get(team=post.team)
                 twitter_response, published_id = Tweet(post,socialmedia)
                 post.published_id=published_id
                 post.schedule_time = datetime.now()
+                sc.cancel_schedule(post, TaskType.Twitter)
                 post.save()
                 if twitter_response.status_code != 200 :
                     return Response("An Error has occured during publishing")
             if post.status == 'Schedule':
-                sc = Scheduler()
                 socialmedia=SocialMedia.objects.all().get(team=post.team)
                 if 'schedule_time' in data:
                     sc.schedule_post(post, socialmedia, TaskType.Twitter, data['schedule_time'])
