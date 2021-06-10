@@ -12,7 +12,7 @@ from scheduler.scheduler import Scheduler
 from scheduler.models import TaskType
 from datetime import datetime
 from filestorage.models import MediaStorage
-
+from .reciever_retrieval import recieve_mail_list
 class CreateTemplatetView(generics.CreateAPIView):
     queryset = Template.objects.all()
     permission_classes = (IsAuthenticated,)
@@ -24,7 +24,6 @@ class CreateTemplatetView(generics.CreateAPIView):
         serializer = self.get_serializer(data=data)
         if not serializer.is_valid(True):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        #fields = ('id','template_name', 'body_text', 'subject', 'reciviers','sender','created_at','schedule_time')
         template_name=data['name']
         reciviers = data['reciviers']
         sender=data['sender']
@@ -35,7 +34,10 @@ class CreateTemplatetView(generics.CreateAPIView):
             temp.body_text = data['body_text']
         if 'subject' in data:
             temp.subject = data['subject']
-
+        emails=recieve_mail_list(reciviers)
+        print(emails)
+        #for e in emails:
+            #send_email()
         # if post.status == 'Published':
         #     socialmedia=SocialMedia.objects.all().get(team=post.team)
         #     twitter_response, published_id = Tweet(post,socialmedia)
