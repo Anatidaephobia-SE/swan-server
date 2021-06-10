@@ -1,8 +1,10 @@
 import requests
 
-def recieve_mail_list(url, email_uuid):
-    params = {"email_id" : email_uuid}
-    response = requests.get(url, params=params)
+def recieve_mail_list(url):
+    #, email_uuid):
+    #params = {"email_id" : email_uuid}
+    response = requests.get(url)
+    #, params=params)
     if(response.status_code != 200):
         return None
     try:
