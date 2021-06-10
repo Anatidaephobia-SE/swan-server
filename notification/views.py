@@ -25,11 +25,11 @@ class CreateTemplatetView(generics.CreateAPIView):
         if not serializer.is_valid(True):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         #fields = ('id','template_name', 'body_text', 'subject', 'reciviers','sender','created_at','schedule_time')
-        template_name=data['template_name']
+        template_name=data['name']
         reciviers = data['reciviers']
         sender=data['sender']
         template_team=Team.objects.get(pk=data['template_team'])
-        temp=Template.objects.create(template_name=template_name,reciviers=reciviers,sender=sender,template_team=template_team)
+        temp=Template.objects.create(name=template_name,reciviers=reciviers,sender=sender,template_team=template_team)
 
         if 'body_text' in data:
             temp.body_text = data['body_text']
@@ -52,4 +52,4 @@ class CreateTemplatetView(generics.CreateAPIView):
         #         post.schedule_time=data['schedule_time']
         #         post.save()
         #         return Response(data={"message": "added to the queue", "date": sc.get_post_scheduled_date(post, TaskType.Twitter)},status=status.HTTP_200_OK)
-        return Response(template_serializer.PostSerializer(temp).data, status=status.HTTP_201_CREATED)
+        return Response(template_serializer.TemplateSerializer(temp).data, status=status.HTTP_201_CREATED)
