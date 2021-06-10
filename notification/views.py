@@ -28,7 +28,8 @@ class CreateTemplatetView(generics.CreateAPIView):
         reciviers = data['reciviers']
         sender=data['sender']
         template_team=Team.objects.get(pk=data['template_team'])
-        temp=Template.objects.create(name=template_name,reciviers=reciviers,sender=sender,template_team=template_team)
+        status=data['status']
+        temp=Template.objects.create(name=template_name,reciviers=reciviers,sender=sender,template_team=template_team,status=status)
 
         if 'body_text' in data:
             temp.body_text = data['body_text']
