@@ -9,7 +9,7 @@ def recieve_mail_list(url):
         return None
     try:
         emails = response.json().get("recievers", None)
-        emails = [e for e in emails.split(',') if '@' in e]
+        emails = [e for e in e.pop('id',None)]
         return emails
     except Exception as e:
         return None
