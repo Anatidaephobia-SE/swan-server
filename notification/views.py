@@ -24,14 +24,37 @@ class CreateTemplatetView(generics.CreateAPIView):
         template_team=Team.objects.get(pk=data['template_team'])
         template_status=data['status']
         temp=Template.objects.create(name=template_name,reciviers=reciviers,sender=sender,template_team=template_team,status=template_status)
+        
+        emails=recieve_mail_list(reciviers)
 
+        #get variables in api
+        api_vars=[]
+        if len(emails)>0:
+            api_vars = list(emails[0].keys())
+        
         if 'body_text' in data:
             temp.body_text = data['body_text']
+
+            #check for the variables
+            if len(api_vars)>0: 
+                for var in api_vars:
+                    if not temp.body_text.__contains__(f'%^{var}^%'):
+                        return Response(data=var,status=status.HTTP_406_NOT_ACCEPTABLE)
+                        # "Variable {var} that you have provided don't exist in your given API."
+
         if 'subject' in data:
             temp.subject = data['subject']
         if temp.status=='Send':
-            emails=recieve_mail_list(reciviers)
-            print(emails)
+            for e in emails:
+                #replace variables 
+                for var in api_vars:
+                    temp.body_text.replace(f'%^{var}^%',e['var'])
+                #send_email(temp_subject,body_text,...)
+        if temp.status=='Schedule':
+            #replace variables 
+            for e in emails:
+                for var in api_vars:
+                    temp.body_text.replace(f'%^{var}^%',e['var'])
             #for e in emails:
                 #send_email(temp_subject,body_text,...)
         return Response(template_serializer.TemplateSerializer(temp).data, status=status.HTTP_201_CREATED)
