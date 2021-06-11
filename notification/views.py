@@ -51,18 +51,23 @@ class CreateTemplatetView(generics.CreateAPIView):
         if temp.status=='Send':
             for e in emails:
                 #replace variables 
+                email_text=""
                 for var in api_vars:
                     if var=='email':
                         continue
                     email_text = temp.body_text.replace(f'%^{var}^%',e[f'{var}'])
                     print(email_text)
-                #send_email(temp_subject,body_text,...)
+                #send_email(email_text,body_text,...)
 
         if temp.status=='Schedule':
             #replace variables 
             for e in emails:
+                email_text=""
                 for var in api_vars:
-                    temp.body_text.replace(f'%^{var}^%',e['var'])
-                #Schedule_email(temp_subject,body_text,...)
-                
+                    if var=='email':
+                        continue
+                    email_text = temp.body_text.replace(f'%^{var}^%',e[f'{var}'])
+                    print(email_text)
+                #Schedule_email(email_text,body_text,...)
+
         return Response(template_serializer.TemplateSerializer(temp).data, status=status.HTTP_201_CREATED)
