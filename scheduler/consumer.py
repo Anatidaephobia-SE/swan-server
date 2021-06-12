@@ -5,6 +5,7 @@ from socialmedia.twitter import tweet_with_async_upload
 from socialmedia.models import SocialMedia
 from post.models import Post
 from notification.NotificationSender import NotificationSender
+from notification.models import Template
 from asgiref.sync import sync_to_async
 import os
 CHUNK_SIZE = 100
@@ -25,11 +26,9 @@ async def process_jobs(bodies):
                 job_ids.append(job_id)
             elif body['type'] == int(TaskType.Email):
                 job_id = body['job_id']
-                title = body[title]
-                text = body['body']
-                from_ = body['from']
-                recievers = body['recievers']
-                job = notification_sender.send_mail_async(title, text, from_, recievers)
+                mail_id = body['mail']
+                mail = await sync_to_async(Template.objects.get)(id=mail_id)
+                job = notification_sender.send_mail_async(mail)
                 jobs.append(job)
                 job_ids.append(job_id)
         responses = await asyncio.gather(*jobs)

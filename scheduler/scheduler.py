@@ -1,6 +1,5 @@
 from .models import TaskType, Tasks, TaskState
 from post.models import Post
-from notification.reciever_retrieval import recieve_mail_list
 import json
 class Scheduler():
     def schedule_post(self, post, social_media, task_type : TaskType, schedule_date):
@@ -31,16 +30,9 @@ class Scheduler():
         else:
             return False
     def build_mail_temp_body(self, mail):
-        ##TODO change mail uuid
-        recievers = recieve_mail_list("https://60bf6c0a97295a0017c42c36.mockapi.io/api/v1/emails/1", "uuid")
-        if recievers is None:
-            return None
         data = {}
-        data["body"] = mail.body_text
-        data["from"] = "sample@sample.org" ## TODO set it to sender mail
+        data['mail'] = mail.id
         data["type"] = int(TaskType.Email)
-        data["title"] = mail.template_name
-        data["recievers"] = recievers
         return json.dumps(data)
 
     def build_twitter_post_body(self, post, social_media):
