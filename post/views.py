@@ -106,6 +106,8 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
             sc = Scheduler()
             if post.status == "Drafts":
                 sc.cancel_schedule(post, TaskType.Twitter)
+                post.schedule_time = None
+                post.save()
             if post.status == 'Published':
                 socialmedia=SocialMedia.objects.all().get(team=post.team)
                 twitter_response, published_id = Tweet(post,socialmedia)
