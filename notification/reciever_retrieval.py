@@ -1,13 +1,20 @@
 import requests
 
-def recieve_mail_list(url, email_uuid):
-    params = {"email_id" : email_uuid}
-    response = requests.get(url, params=params)
+def recieve_mail_list(url):
+    #, email_uuid):
+    #params = {"email_id" : email_uuid}
+    response = requests.get(url)
+    #, params=params)
+    print("********************",response.status_code)
     if(response.status_code != 200):
         return None
     try:
-        emails = response.json().get("recievers", None)
-        emails = [e for e in emails.split(',') if '@' in e]
+        emails=response.json()
+        print("****************",type(emails))
+        for e in emails:
+            e=e.pop('id',None)
+        #emails = [e for e in emails e=e.pop('id',None)]
+        print(emails)
         return emails
     except Exception as e:
         return None
