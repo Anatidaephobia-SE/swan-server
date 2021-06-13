@@ -1,23 +1,15 @@
-name: Swan Develop CI/CD
-
 on:
-
-  pull_request:
-    branches:
-      - develop
-
-  push:
-    branches:
-      - develop
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '00 18 * * *'
 
 env:
   COMPOSE_FILE: stage-docker-compose.yaml
   SWAN_IMAGE: swan-stage
   SWAN_IMAGE_WITH_URL: ${{ secrets.REGISTRY_URL }}/develop/swan-stage
 
-
 jobs:
-  build:
+  nightly-test:
 
     runs-on: ubuntu-latest
 
@@ -37,7 +29,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
       with:
-        ref: ${{ github.event.pull_request.head.sha }}
+        ref: develop
     - name: Set up Python 3.7
       uses: actions/setup-python@v1
       with:
@@ -120,7 +112,6 @@ jobs:
       run:  |
         bash build-doc.sh
     - name: add swan service env
-      if: github.ref == 'refs/heads/develop' #for push only
       run: |
         echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> swan.env
         echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> swan.env
@@ -141,138 +132,28 @@ jobs:
         echo "BASE_URL_FOR_MINIO=${{ secrets.BASE_URL_FOR_MINIO }}" >> swan.env
 
     - name: add postgres service env
-      if: github.ref == 'refs/heads/develop' #for push only
       run: |
         echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> pg.env
         echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> pg.env
         echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> pg.env
 
     - name: add pgadmin service env
-      if: github.ref == 'refs/heads/develop' #for push only
       run: |
         echo "PGADMIN_DEFAULT_EMAIL=${{ secrets.PGADMIN_DEFAULT_EMAIL }}" >> pgadmin.env
         echo "PGADMIN_DEFAULT_PASSWORD=${{ secrets.PGADMIN_DEFAULT_PASSWORD }}" >> pgadmin.env
         echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> pgadmin.env
 
     - name: add minio env
-      if: github.ref == 'refs/heads/develop' #for push only
       run: |
         echo "MINIO_ROOT_USER=${{ secrets.MINIO_ROOT_USER }}" >> minio.env
         echo "MINIO_ROOT_PASSWORD=${{ secrets.MINIO_ROOT_PASSWORD }}" >> minio.env
 
     - name: add rabbitmq env
-      if: github.ref == 'refs/heads/develop' #for push only
       run: |
         echo "RABBITMQ_DEFAULT_USER=${{ secrets.RABBITMQ_DEFAULT_USER }}" >> rabbitmq.env
         echo "RABBITMQ_DEFAULT_PASS=${{ secrets.RABBITMQ_DEFAULT_PASS }}" >> rabbitmq.env
         echo "RABBITMQ_DEFAULT_VHOST=${{ secrets.RABBITMQ_DEFAULT_VHOST }}" >> rabbitmq.env
         echo "RABBITMQ_ENDPOINT=${{ secrets.RABBITMQ_ENDPOINT }}" >> rabbitmq.env
     - name: Build image
-      if: github.ref == 'refs/heads/develop' #for push only
       run: |
         docker-compose -f ${{ env.COMPOSE_FILE }} build
-    - name: Push image
-      if: github.ref == 'refs/heads/develop' #for push only
-      run: |
-        export DOCKER_DEV_TAG=${{ github.sha }}
-        docker login ${{ secrets.REGISTRY_URL }} --username "${{ secrets.REGISTRY_USERNAME }}" --password "${{ secrets.REGISTRY_PASSWORD }}"
-        docker tag ${{ env.SWAN_IMAGE }} ${{ env.SWAN_IMAGE_WITH_URL }}:$DOCKER_DEV_TAG
-        docker push ${{ env.SWAN_IMAGE_WITH_URL }}:$DOCKER_DEV_TAG
-      env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
-        
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop' #for push only
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-      - name: add server utils env
-        run: |
-          echo ${{ github.sha }} >> extracted_tag.txt
-          export TAG=$(cat extracted_tag.txt)
-          echo "REGISTRY_USERNAME=${{ secrets.REGISTRY_USERNAME }}" >> server.env
-          echo "REGISTRY_PASSWORD=${{ secrets.REGISTRY_PASSWORD }}" >> server.env
-          echo "REGISTRY_URL=${{ secrets.REGISTRY_URL }}" >> server.env
-          echo "SWAN_IMAGE=${{ env.SWAN_IMAGE }}" >> server.env
-          echo "SWAN_IMAGE_WITH_URL=${{ env.SWAN_IMAGE_WITH_URL }}" >> server.env
-          echo "COMPOSE_FILE=${{ env.COMPOSE_FILE }}" >> server.env
-          echo "DOCKER_DEV_TAG=$TAG" >> server.env
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-
-      - name: add swan service env
-        run: |
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> swan.env
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> swan.env
-          echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> swan.env
-          echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}" >> swan.env
-          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> swan.env
-          echo "TWITTER_CONSUMER_KEY=${{ secrets.TWITTER_CONSUMER_KEY }}" >> swan.env
-          echo "TWITTER_CONSUMER_SECRET=${{ secrets.TWITTER_CONSUMER_SECRET }}" >> swan.env
-          echo "TWITTER_ACCESS_TOKEN=${{ secrets.TWITTER_ACCESS_TOKEN }}" >> swan.env
-          echo "TWITTER_ACCESS_TOKEN_SECRET=${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}" >> swan.env
-          echo "MINIO_ACCESS_KEY=${{ secrets.MINIO_ACCESS_KEY }}" >> swan.env
-          echo "MINIO_ENDPOINT=${{ secrets.MINIO_ENDPOINT }}" >> swan.env
-          echo "MINIO_SECRET_KEY=${{ secrets.MINIO_SECRET_KEY }}" >> swan.env
-          echo "RABBITMQ_DEFAULT_USER=${{ secrets.RABBITMQ_DEFAULT_USER }}" >> swan.env
-          echo "RABBITMQ_DEFAULT_PASS=${{ secrets.RABBITMQ_DEFAULT_PASS }}" >> swan.env
-          echo "RABBITMQ_DEFAULT_VHOST=${{ secrets.RABBITMQ_DEFAULT_VHOST }}" >> swan.env
-          echo "RABBITMQ_ENDPOINT=${{ secrets.RABBITMQ_ENDPOINT }}" >> swan.env
-          echo "BASE_URL_FOR_MINIO=${{ secrets.BASE_URL_FOR_MINIO }}" >> swan.env
-          echo "EMAIL_HOST=${{secrets.EMAIL_HOST}}" >> swan.env
-          echo "EMAIL_PORT=${{secrets.EMAIL_PORT}}" >> swan.env
-          echo "EMAIL_USE_TLS=${{secrets.EMAIL_USE_TLS}}" >> swan.env
-
-      - name: add postgres service env
-        run: |
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> pg.env
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> pg.env
-          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> pg.env
-
-      - name: add pgadmin service env
-        run: |
-          echo "PGADMIN_DEFAULT_EMAIL=${{ secrets.PGADMIN_DEFAULT_EMAIL }}" >> pgadmin.env
-          echo "PGADMIN_DEFAULT_PASSWORD=${{ secrets.PGADMIN_DEFAULT_PASSWORD }}" >> pgadmin.env
-          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> pgadmin.env
-
-      - name: add minio env
-        run: |
-          echo "MINIO_ROOT_USER=${{ secrets.MINIO_ROOT_USER }}" >> minio.env
-          echo "MINIO_ROOT_PASSWORD=${{ secrets.MINIO_ROOT_PASSWORD }}" >> minio.env
-
-      - name: add rabbitmq env
-        run: |
-          echo "RABBITMQ_DEFAULT_USER=${{ secrets.RABBITMQ_DEFAULT_USER }}" >> rabbitmq.env
-          echo "RABBITMQ_DEFAULT_PASS=${{ secrets.RABBITMQ_DEFAULT_PASS }}" >> rabbitmq.env
-          echo "RABBITMQ_DEFAULT_VHOST=${{ secrets.RABBITMQ_DEFAULT_VHOST }}" >> rabbitmq.env
-          echo "RABBITMQ_ENDPOINT=${{ secrets.RABBITMQ_ENDPOINT }}" >> rabbitmq.env
-        
-      - name: Add the private SSH key to the ssh-agent
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-          mkdir -p ~/.ssh
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-          ssh-add - <<< "${{ secrets.DEPLOY_KEY }}"
-      
-      - name: Deploy images on Server
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-          scp  -o StrictHostKeyChecking=no -r ./nginx.conf ./minio.env ./server.env ./swan.env ./pg.env ./pgadmin.env ./rabbitmq.env ./postfix_main.cf ./docs/swan-doc/openapi.json ./${{ env.COMPOSE_FILE }} ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/swan-stage
-          ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'ENDSSH'
-            cd ~/swan-stage
-            source server.env
-            docker login $REGISTRY_URL --username $REGISTRY_USERNAME --password $REGISTRY_PASSWORD
-            docker pull $SWAN_IMAGE_WITH_URL:$DOCKER_DEV_TAG
-            export SWAN_IMAGE=$SWAN_IMAGE_WITH_URL:$DOCKER_DEV_TAG
-            docker-compose -f $COMPOSE_FILE up -d
-            rm -rf server.env
-          ENDSSH
-
-
