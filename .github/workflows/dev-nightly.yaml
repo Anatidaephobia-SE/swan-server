@@ -3,7 +3,7 @@ name: Nightly develop test
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string
-    - cron:  '10 18 * * *'
+    - cron:  '15 18 * * *'
 
 env:
   COMPOSE_FILE: stage-docker-compose.yaml
