@@ -13,7 +13,20 @@ services:
       - pg.env
     networks: 
       - swan-stage
-      
+
+  pg-admin:
+    image: dpage/pgadmin4
+    container_name: swan-stage_pgadmin
+    hostname: pgadmin4
+    ports:
+      - "10333:80"
+    env_file: 
+      - pgadmin.env
+    depends_on:
+      - postgres
+    networks: 
+      - swan-stage
+
   swan:
     image: "${SWAN_IMAGE}"
     build: .
