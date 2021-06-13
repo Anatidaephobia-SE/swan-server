@@ -22,7 +22,14 @@ class Scheduler():
             task = Tasks.objects.get(post=post, task_type=task_type)
             return task.scheduled_date
         return None
-
+    def cancel_schedule(self, post, task_type):
+        task = Tasks.objects.filter(post=post, task_type=task_type).first()
+        if(task is None):
+            return True
+        if task.state == TaskState.Done:
+            return False
+        task.delete()
+        return True
     def build_twitter_post_body(self, post, social_media):
         data = {}
         data["post_id"] = post.id
