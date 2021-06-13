@@ -1,5 +1,6 @@
 from django.db import models
 from team.models import Team
+from users.models import User
 
 class Template(models.Model):
     status_CHOICES = (
@@ -16,6 +17,7 @@ class Template(models.Model):
     created_at = models.DateTimeField(auto_now_add =True)
     schedule_time = models.DateTimeField(blank=True, null=True)
     status = models.CharField(null = True, default='Draft',max_length=20,choices = status_CHOICES)
+    owner = models.ForeignKey(User, related_name = 'template_owner', null=True, on_delete = models.CASCADE)
     
 class EmailAPI(models.Model):
     url = models.TextField(null=False, max_length=200)

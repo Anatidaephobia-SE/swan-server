@@ -23,13 +23,12 @@ class CreateTemplatetView(generics.CreateAPIView):
         sender=data['sender']
         template_team=Team.objects.get(pk=data['template_team'])
         template_status=data['status']
-        temp=Template.objects.create(name=template_name,reciviers=reciviers,sender=sender,template_team=template_team,status=template_status)
+        temp=Template.objects.create(name=template_name,reciviers=reciviers,sender=sender,template_team=template_team,status=template_status,owner=user)
         
         emails=recieve_mail_list(reciviers)
 
         #get variables in api
         api_vars=[]
-        print(reciviers)
         if len(emails)>0:
             api_vars = list(emails[0].keys())
         
@@ -56,7 +55,6 @@ class CreateTemplatetView(generics.CreateAPIView):
                     if var=='email':
                         continue
                     email_text = temp.body_text.replace(f'%^{var}^%',e[f'{var}'])
-                    print(email_text)
                 #send_email(email_text,body_text,...)
 
         if temp.status=='Schedule':
@@ -67,7 +65,80 @@ class CreateTemplatetView(generics.CreateAPIView):
                     if var=='email':
                         continue
                     email_text = temp.body_text.replace(f'%^{var}^%',e[f'{var}'])
-                    print(email_text)
-                #Schedule_email(email_text,body_text,...)
+                temp.schedule_time = data['schedule_time']
+                temp.save()
+                #Schedule_email(email_text,body_text,temp.schedule_time...)
+                
 
         return Response(template_serializer.TemplateSerializer(temp).data, status=status.HTTP_201_CREATED)
+
+
+class UpdateTemplateView(generics.RetrieveUpdateDestroyAPIView):
+
+    queryset = Template.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = template_serializer.UpdateTemplateSerializer
+
+    def get(self, request, pk=None):
+        user = request.user
+        template_info = Template.objects.all().get(pk=pk)
+        templates_query = user.template_owner.all()
+        if not templates_query.filter(pk=pk).exists():
+            return Response("You did not create this template!", status=status.HTTP_400_BAD_REQUEST)
+        serializer = template_serializer.UpdateTemplateSerializer(template_info)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # def put(self, request, pk=None):
+    #     user = request.user
+    #     data = request.data
+    #     template_info = Template.objects.all().get(pk=pk)
+    #     templates_query = user.template_owner.all()
+    #     if not templates_query.filter(pk=pk).exists():
+    #         return Response("You did not create this template!", status=status.HTTP_400_BAD_REQUEST)
+    #     print(data)
+    #     serializer = self.get_serializer(instance=template_info, data=data)
+    #     if serializer.is_valid(True):
+    #         temp = serializer.update(instance=template_info, validated_data=serializer.validated_data)  
+
+    #         emails=recieve_mail_list(temp.reciviers)
+    #         #get variables in api
+    #         api_vars=[]
+    #         if len(emails)>0:
+    #             api_vars = list(emails[0].keys())
+
+    #         if temp.status == 'Send':
+                
+    #             for e in emails:
+    #                 #replace variables 
+    #                 email_text=""
+    #                 for var in api_vars:
+    #                     if var=='email':
+    #                         continue
+    #                     email_text = temp.body_text.replace(f'%^{var}^%',e[f'{var}'])
+    #                 #send_email(email_text,body_text,...)
+    #             # temp.schedule_time = datetime.now()
+    #             # temp.save()
+
+    #         if temp.status == 'Schedule':
+    #             #replace variables 
+    #             for e in emails:
+    #                 email_text=""
+    #                 for var in api_vars:
+    #                     if var=='email':
+    #                         continue
+    #                     email_text = temp.body_text.replace(f'%^{var}^%',e[f'{var}'])
+    #                 #Schedule_email(email_text,body_text,...)
+    #             temp.schedule_time = data['schedule_time']
+    #             # temp.save()
+
+    #     print(serializer.errors)    
+    #     return Response("Bad request.", status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk=None):
+        user = request.user
+        template_info = Template.objects.all().get(pk=pk)
+        templates_query = user.template_owner.all()
+        if not templates_query.filter(pk=pk).exists():
+            return Response("You did not create this template.", status=status.HTTP_400_BAD_REQUEST)
+        template_info.delete()
+        return Response("templatet deleted.", status=status.HTTP_200_OK)

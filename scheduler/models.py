@@ -1,7 +1,7 @@
 from django.db import models
 from enum import IntEnum
 from post.models import Post
-from notification.models import Email
+from notification.models import Template
 # Create your models here.
 
 class TaskType(IntEnum):
@@ -20,4 +20,4 @@ class Tasks(models.Model):
     scheduled_date = models.DateTimeField(null=False)
     state = models.IntegerField(null=False)
     post = models.ForeignKey(Post, null=True, on_delete=models.CASCADE)
-    mail = models.ForeignKey(Email, null=True, on_delete=models.CASCADE)
+    mail = models.ForeignKey(Template, null=True, on_delete=models.CASCADE)
