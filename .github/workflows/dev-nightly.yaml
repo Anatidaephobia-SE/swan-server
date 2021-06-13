@@ -1,7 +1,7 @@
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string
-    - cron:  '00 18 * * *'
+    - cron:  '10 18 * * *'
 
 env:
   COMPOSE_FILE: stage-docker-compose.yaml
