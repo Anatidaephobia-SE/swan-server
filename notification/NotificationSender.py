@@ -10,7 +10,7 @@ class NotificationSender:
     async def send_mail_async(self, template):
         start_idx = 0
         jobs = []
-        recievers = recieve_mail_list(template.recievers)
+        recievers = recieve_mail_list(template.reciviers)
         for reciever in recievers:
             job = sync_to_async(send_mail)(template, reciever)
             jobs.append(job)
