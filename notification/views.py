@@ -25,7 +25,7 @@ class CreateTemplatetView(generics.CreateAPIView):
         sender=data['sender']
         template_team=Team.objects.get(pk=data['template_team'])
         template_status=data['status']
-        #TODO recieve schedule time and subject
+        #TODO recieve schedule
         temp=Template.objects.create(name=template_name,reciviers=reciviers,sender=sender,template_team=template_team,status=template_status)
         
         emails=recieve_mail_list(reciviers)
@@ -50,13 +50,13 @@ class CreateTemplatetView(generics.CreateAPIView):
 
         if 'subject' in data:
             temp.subject = data['subject']
-
+        temp.save()
         if temp.status=='Send':
             for e in emails:
                 notification_sender.send_mail(temp, e)
 
         if temp.status=='Schedule':
             #replace variables 
-            scheduler.schedule_mail(temp, datetime.datetime.now() + datetime.datetime(0, 0, 0, 0, 2)) #TODO recieve shcedule time
+            scheduler.schedule_mail(temp, datetime.datetime.now()) 
 
         return Response(template_serializer.TemplateSerializer(temp).data, status=status.HTTP_201_CREATED)
