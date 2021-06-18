@@ -23,6 +23,18 @@ class Scheduler():
             task = Tasks.objects.get(post=post, task_type=task_type)
             return task.scheduled_date
         return None
+    def schedule_mail(self, mail, schedule_date):
+        body = self.build_mail_temp_body(mail)
+        if body:
+            Tasks.objects.create(task_type=int(TaskType.Email), mail=mail, body=body, scheduled_date=schedule_date, state=TaskState.Active)
+            return True
+        else:
+            return False
+    def build_mail_temp_body(self, mail):
+        data = {}
+        data['mail'] = mail.id
+        data["type"] = int(TaskType.Email)
+        return json.dumps(data)
     def cancel_schedule(self, post, task_type):
         task = Tasks.objects.filter(post=post, task_type=task_type).first()
         if(task is None):
