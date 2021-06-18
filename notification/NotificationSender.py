@@ -3,7 +3,6 @@ from os import terminal_size
 from asgiref.sync import sync_to_async
 from django.core.mail import EmailMessage, send_mail
 from .reciever_retrieval import recieve_mail_list
-
 class NotificationSender:
     def __init__(self):
         pass
@@ -28,3 +27,4 @@ class NotificationSender:
         message = EmailMessage(template.subject, body, template.sender, [email], [])
         return message.send(fail_silently=True)
 
+Instance  = NotificationSender()
