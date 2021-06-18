@@ -1,3 +1,4 @@
+from notification.NotificationSender import Instance
 from .models import TaskType, Tasks, TaskState
 from post.models import Post
 import json
@@ -30,9 +31,26 @@ class Scheduler():
             return False
         task.delete()
         return True
+
+    def schedule_mail(self, mail, schedule_date):
+        body = self.build_mail_temp_body(mail)
+        if body:
+            Tasks.objects.create(task_type=int(TaskType.Email), mail=mail, body=body, scheduled_date=schedule_date, state=TaskState.Active)
+            return True
+        else:
+            return False
+    def build_mail_temp_body(self, mail):
+        data = {}
+        data['mail'] = mail.id
+        data["type"] = int(TaskType.Email)
+        return json.dumps(data)
+        
     def build_twitter_post_body(self, post, social_media):
         data = {}
         data["post_id"] = post.id
         data["social_id"] = social_media.id
         data["type"] = int(TaskType.Twitter)
         return json.dumps(data)
+
+
+Instance = Scheduler()
