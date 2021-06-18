@@ -25,6 +25,7 @@ class CreateTemplatetView(generics.CreateAPIView):
         sender=data['sender']
         template_team=Team.objects.get(pk=data['template_team'])
         template_status=data['status']
+        #TODO recieve schedule time and subject
         temp=Template.objects.create(name=template_name,reciviers=reciviers,sender=sender,template_team=template_team,status=template_status)
         
         emails=recieve_mail_list(reciviers)
