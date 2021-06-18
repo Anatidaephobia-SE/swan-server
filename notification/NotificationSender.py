@@ -17,7 +17,7 @@ class NotificationSender:
         print(f"Successfully sent mail {template.name} to {sum(responses)} out of total {len(recievers)} recievers.")
         return sum(responses)
     def send_mail(self, template, reciever_data):
-        body = template.body
+        body = template.body_text
         api_vars = reciever_data.keys()
         email = reciever_data['email']
         for var in api_vars:
