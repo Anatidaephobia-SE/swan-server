@@ -4,7 +4,7 @@ from scheduler.models import TaskType, Tasks, TaskState
 from socialmedia.twitter import tweet_with_async_upload
 from socialmedia.models import SocialMedia
 from post.models import Post
-from notification.NotificationSender import NotificationSender
+from notification.NotificationSender import Instance as notification_sender
 from notification.models import Template
 from asgiref.sync import sync_to_async
 import os
@@ -15,7 +15,6 @@ async def process_jobs(bodies):
     try:
         os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
         loop = asyncio.get_event_loop()
-        notification_sender = NotificationSender()
         for body in bodies:
             if body['type'] == int(TaskType.Twitter):                
                 socialmedia = await sync_to_async(SocialMedia.objects.get)(id=body['social_id'])

@@ -1,3 +1,4 @@
+from notification.NotificationSender import Instance
 from .models import TaskType, Tasks, TaskState
 from post.models import Post
 import json
@@ -50,3 +51,6 @@ class Scheduler():
         data["social_id"] = social_media.id
         data["type"] = int(TaskType.Twitter)
         return json.dumps(data)
+
+
+Instance = Scheduler()

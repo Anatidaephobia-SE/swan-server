@@ -6,7 +6,9 @@ from . import serializers as template_serializer
 from .models import Template
 from team.models import Team
 from .reciever_retrieval import recieve_mail_list
-
+from .NotificationSender import Instance as notification_sender
+from scheduler.scheduler import Instance as scheduler
+import datetime
 class CreateTemplatetView(generics.CreateAPIView):
     queryset = Template.objects.all()
     permission_classes = (IsAuthenticated,)
@@ -50,24 +52,10 @@ class CreateTemplatetView(generics.CreateAPIView):
 
         if temp.status=='Send':
             for e in emails:
-                #replace variables 
-                email_text=""
-                for var in api_vars:
-                    if var=='email':
-                        continue
-                    email_text = temp.body_text.replace(f'%^{var}^%',e[f'{var}'])
-                    print(email_text)
-                #send_email(email_text,body_text,...)
+                notification_sender.send_mail(temp, e)
 
         if temp.status=='Schedule':
             #replace variables 
-            for e in emails:
-                email_text=""
-                for var in api_vars:
-                    if var=='email':
-                        continue
-                    email_text = temp.body_text.replace(f'%^{var}^%',e[f'{var}'])
-                    print(email_text)
-                #Schedule_email(email_text,body_text,...)
+            scheduler.schedule_mail(temp, datetime.datetime.now() + datetime.datetime(0, 0, 0, 0, 2)) #TODO recieve shcedule time
 
         return Response(template_serializer.TemplateSerializer(temp).data, status=status.HTTP_201_CREATED)
