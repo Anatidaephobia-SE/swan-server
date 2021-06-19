@@ -1,0 +1,28 @@
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        caption:
+          type: string
+        status:
+          type: string
+        owner:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        multimedia:
+          type: string
+          format: byte
+        team:
+          type: integer
+        tag:
+          type: string
+        published_id:
+          type: integer
+        schedule_time:
+          type: string
+          format: date-time
