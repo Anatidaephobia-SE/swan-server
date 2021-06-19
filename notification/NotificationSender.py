@@ -1,24 +1,26 @@
 import asyncio
 from os import terminal_size
 from asgiref.sync import sync_to_async
-from django.core.mail import EmailMessage, send_mail
+from django.core.mail import EmailMessage
 from .reciever_retrieval import recieve_mail_list
-
 class NotificationSender:
     def __init__(self):
         pass
     async def send_mail_async(self, template):
         start_idx = 0
         jobs = []
-        recievers = recieve_mail_list(template.recievers)
+        recievers = recieve_mail_list(template.reciviers)
         for reciever in recievers:
-            job = sync_to_async(send_mail)(template, reciever)
+            job = sync_to_async(self.send_mail)(template, reciever)
             jobs.append(job)
         responses = await asyncio.gather(*jobs)
         print(f"Successfully sent mail {template.name} to {sum(responses)} out of total {len(recievers)} recievers.")
+        if(sum(responses) >= 0.75 * len(recievers)):
+            template.status = "Send"
+            template.save()
         return sum(responses)
     def send_mail(self, template, reciever_data):
-        body = template.body
+        body = template.body_text
         api_vars = reciever_data.keys()
         email = reciever_data['email']
         for var in api_vars:
@@ -28,3 +30,4 @@ class NotificationSender:
         message = EmailMessage(template.subject, body, template.sender, [email], [])
         return message.send(fail_silently=True)
 
+Instance  = NotificationSender()

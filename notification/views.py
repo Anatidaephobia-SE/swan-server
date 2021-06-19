@@ -6,7 +6,9 @@ from . import serializers as template_serializer
 from .models import Template
 from team.models import Team
 from .reciever_retrieval import recieve_mail_list
-
+from .NotificationSender import Instance as notification_sender
+from scheduler.scheduler import Instance as scheduler
+import datetime
 class CreateTemplatetView(generics.CreateAPIView):
     queryset = Template.objects.all()
     permission_classes = (IsAuthenticated,)
@@ -24,6 +26,7 @@ class CreateTemplatetView(generics.CreateAPIView):
         template_team=Team.objects.get(pk=data['template_team'])
         template_status=data['status']
         temp=Template.objects.create(name=template_name,reciviers=reciviers,sender=sender,template_team=template_team,status=template_status,owner=user)
+
         
         emails=recieve_mail_list(reciviers)
 
@@ -48,30 +51,18 @@ class CreateTemplatetView(generics.CreateAPIView):
 
         if 'subject' in data:
             temp.subject = data['subject']
-            temp.save()
 
+        temp.save()
         if temp.status=='Send':
             for e in emails:
-                #replace variables 
-                email_text=""
-                for var in api_vars:
-                    if var=='email':
-                        continue
-                    email_text = temp.body_text.replace(f'%^{var}^%',e[f'{var}'])
-                #send_email(email_text,body_text,...)
+                notification_sender.send_mail(temp, e)
 
         if temp.status=='Schedule':
             #replace variables 
-            for e in emails:
-                email_text=""
-                for var in api_vars:
-                    if var=='email':
-                        continue
-                    email_text = temp.body_text.replace(f'%^{var}^%',e[f'{var}'])
-                temp.schedule_time = data['schedule_time']
-                temp.save()
-                #Schedule_email(email_text,body_text,temp.schedule_time...)
-                
+            temp.schedule_time = data['schedule_time']
+            temp.save()
+            scheduler.schedule_mail(temp, datetime.datetime.now()) 
+
 
         return Response(template_serializer.TemplateSerializer(temp).data, status=status.HTTP_201_CREATED)
 
