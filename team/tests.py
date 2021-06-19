@@ -28,7 +28,7 @@ class TestViews(TestCase):
 
         create_team_resp = self.client.post(create_team_url, data = {'name' : 'test_name', 'url' : 'test_url'}, **{'HTTP_Authorization' : 'bear ' + self.token})
 
-        assert create_team_resp.status_code == 200
+        self.assertEqual(create_team_resp.status_code, 200)
         assert 'test_name' == create_team_resp.json()['team']['name']
         assert 'test_url' == create_team_resp.json()['team']['url']
 
@@ -48,15 +48,16 @@ class TestViews(TestCase):
         user.verified = True
         user.save(update_fields = ['verified'])
 
-        invite_resp = self.client.post(invite_url, data = {'team_url' : 'test_url', 'username' : 'amir.j1882@gmail.com'}, **{'HTTP_Authorization' : 'bear ' + self.token})
-        assert invite_resp.status_code == 404
+        invite_resp = self.client.post(invite_url, data = {'team_id' : '1234', 'username' : 'amir.j1882@gmail.com'}, **{'HTTP_Authorization' : 'bear ' + self.token})
+        self.assertEqual(invite_resp.status_code, 404)
 
         create_team_resp = self.client.post(create_team_url, data = {'name' : 'test_name', 'url' : 'test_url'}, **{'HTTP_Authorization' : 'bear ' + self.token})
+        id = create_team_resp.data.get("team").get("id")
+        invite_resp2 = self.client.post(invite_url, data = {'team_id' : id, 'username' : 'amir.j1882@gmail.com'}, **{'HTTP_Authorization' : 'bear ' + self.token})
 
-        invite_resp2 = self.client.post(invite_url, data = {'team_url' : 'test_url', 'username' : 'amir.j1882@gmail.com'}, **{'HTTP_Authorization' : 'bear ' + self.token})
-
-        assert invite_resp2.status_code == 200
+        self.assertEqual(invite_resp2.status_code, 200)
 
         
-        invite_resp3 = self.client.post(invite_url, data = {'team_url' : 'test_url', 'username' : 'nothing'}, **{'HTTP_Authorization' : 'bear ' + self.token})
-        assert invite_resp3.status_code == 404
+        invite_resp3 = self.client.post(invite_url, data = {'team_id' : id, 'username' : 'nothing'}, **{'HTTP_Authorization' : 'bear ' + self.token})
+        self.assertEqual(invite_resp3.status_code, 404)
+    
