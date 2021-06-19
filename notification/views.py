@@ -31,7 +31,8 @@ class CreateTemplatetView(generics.CreateAPIView):
                                        template_team=template_team, status=template_status, owner=user)
 
         emails = recieve_mail_list(reciviers)
-
+        if emails==None:
+            return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
         #get variables in api
         api_vars = []
         if len(emails) > 0:
@@ -91,15 +92,15 @@ class UpdateTemplateView(generics.RetrieveUpdateDestroyAPIView):
         templates_query = user.template_owner.all()
         if not templates_query.filter(pk=pk).exists():
             return Response("You did not create this template!", status=status.HTTP_400_BAD_REQUEST)
-        print(data)
         serializer = self.get_serializer(instance=template_info, data=data)
-        print(serializer.is_valid(True))
         #raise_exception=
         if serializer.is_valid(True):
             temp = serializer.update(
                 instance=template_info, validated_data=serializer.validated_data)
 
             emails = recieve_mail_list(temp.reciviers)
+            if emails==None:
+                return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
             #get variables in api
             api_vars = []
             if len(emails) > 0:
@@ -130,8 +131,6 @@ class UpdateTemplateView(generics.RetrieveUpdateDestroyAPIView):
                 scheduler.schedule_mail(temp, data['schedule_time'])
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        print("*******************************************************************",
-              serializer.errors)
         return Response("Bad request.", status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk=None):
