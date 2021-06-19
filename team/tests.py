@@ -7,8 +7,8 @@ class TestViews(TestCase):
 
     def setUp(self):
         self.client = Client()
-        signup_url = reverse("users-url:signup")
-        login_url = reverse("users-url:login")
+        signup_url = reverse("users-urls:signup")
+        login_url = reverse("users-urls:login")
         self.client.post(signup_url, data = {'email' : 'amir.j1881@gmail.com', 'password' : '123456', 'confirm_password' : '123456'})
         user = User.objects.get(email = 'amir.j1881@gmail.com')
         user.verified = True
@@ -42,7 +42,7 @@ class TestViews(TestCase):
         self.assertEqual(unauth_resp.status_code, 403)
         create_team_url = reverse("team-urls:createTeam")
         self.setUp()
-        signup_url = reverse("users-url:signup")
+        signup_url = reverse("users-urls:signup")
         self.client.post(signup_url, data = {'email' : 'amir.j1882@gmail.com', 'password' : '123456', 'confirm_password' : '123456'})
         user = User.objects.get(email = 'amir.j1882@gmail.com')
         user.verified = True
