@@ -1,0 +1,74 @@
+    CreateTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+        body_text:
+          type: string
+        subject:
+          type: string
+        reciviers:
+          type: string
+        sender:
+          type: string
+        template_team:
+          type: integer
+        status:
+          type: string
+          enum: [Draft, Send, Schedule]
+        schedule_time:
+          type: string
+          format: date-time
+    Template:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        body_text:
+          type: string
+        subject:
+          type: string
+        reciviers:
+          type: string
+        sender:
+          type: string
+        template_team:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        schedule_time:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [Draft, Send, Schedule]
+        owner:
+          $ref: "#/components/schemas/User"
+    UpdateTemplate:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        body_text:
+          type: string
+        subject:
+          type: string
+        reciviers:
+          type: string
+        sender:
+          type: string
+        template_team:
+          type: integer
+        schedule_time:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [Draft, Send, Schedule]
+        owner:
+          $ref: "#/components/schemas/User"

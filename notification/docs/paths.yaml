@@ -1,0 +1,289 @@
+  /api/v1/notification/create_template/:
+    post:
+      description: Creates new mail template.
+      tags:
+        - Notification
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+         application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTemplate"
+      responses:
+        '406':
+          description: Receivers API is wrong. You recieve this message when your API variables are not available in body_text. The returning value is the variable name in api.
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: 'name'
+        '201':
+          description: Template created.
+          content:
+            application/json:
+              schema:
+                $ref : "#/components/schemas/Template"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "body_text": "string",
+                            "subject": "string",
+                            "reciviers": "string",
+                            "sender": "example@example.com",
+                            "template_team": 1,
+                            "created_at": "2021-06-19T21:38:19.413618+04:30",
+                            "schedule_time": null,
+                            "status": "Draft",
+                            "owner": {
+                              "email" : "example23@example.com",
+                              "first_name" : "string",
+                              "last_name" : "string",
+                              "profile_picture" : "string",
+                              "last_login" : "2021-06-19T21:38:19.413618+04:30"
+                            }
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/notification/update_template/{template_id}/:
+    get:
+      description:  Get updated Template information.
+      tags:
+        - Notification
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: template_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The template's id.
+      responses:
+        '200':
+          description: Get updated Template.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateTemplate"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "body_text": "string",
+                            "subject": "string",
+                            "reciviers": "string",
+                            "sender": "example@example.com",
+                            "template_team": 1,
+                            "schedule_time": null,
+                            "status": "Draft",
+                            "owner": {
+                              "email" : "example23@example.com",
+                              "first_name" : "string",
+                              "last_name" : "string",
+                              "profile_picture" : "string",
+                              "last_login" : "2021-06-19T21:38:19.413618+04:30"
+                            }
+                          }'
+        '400':
+          description: Permisssion Denied.
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: 'You did not create this template!'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    put:
+      description:  Update Template information.
+      tags:
+        - Notification
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: template_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The post's id.
+      requestBody:
+        content:
+         application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTemplate"
+      responses:
+        '200':
+          description: Updated post.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UpdateTemplate"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "body_text": "string",
+                            "subject": "string",
+                            "reciviers": "string",
+                            "sender": "example@example.com",
+                            "template_team": 1,
+                            "schedule_time": null,
+                            "status": "Draft",
+                            "owner": {
+                              "email" : "example23@example.com",
+                              "first_name" : "string",
+                              "last_name" : "string",
+                              "profile_picture" : "string",
+                              "last_login" : "2021-06-19T21:38:19.413618+04:30"
+                            }
+                          }'
+        '400':
+          description: Permisssion Denied.
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: 'You did not create this template!'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    delete:
+      description:  Delete post.
+      tags:
+        - Notification
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: template_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The post's id.
+      responses:
+        '200':
+          description: Deleted post.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: '"Template deleted."'
+        '400':
+          description: Permisssion Denied.
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: 'You did not create this template!'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/notification/single_template/{template_id}/:
+    get:
+      description:  Get updated Template information.
+      tags:
+        - Notification
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: template_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The template's id.
+      responses:
+        '200':
+          description: Get Template.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateTemplate"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "body_text": "string",
+                            "subject": "string",
+                            "reciviers": "string",
+                            "sender": "example@example.com",
+                            "template_team": 1,
+                            "schedule_time": null,
+                            "status": "Draft",
+                            "owner": {
+                              "email" : "example23@example.com",
+                              "first_name" : "string",
+                              "last_name" : "string",
+                              "profile_picture" : "string",
+                              "last_login" : "2021-06-19T21:38:19.413618+04:30"
+                            }
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+  /api/v1/notification/all_template/{team_id}/:
+    get:
+      description:  Get updated Template information.
+      tags:
+        - Notification
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: team_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The team id.
+      responses:
+        '200':
+          description: Get updated post.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UpdateTemplate"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "body_text": "string",
+                            "subject": "string",
+                            "reciviers": "string",
+                            "sender": "example@example.com",
+                            "template_team": 1,
+                            "schedule_time": null,
+                            "status": "Draft",
+                            "owner": {
+                              "email" : "example23@example.com",
+                              "first_name" : "string",
+                              "last_name" : "string",
+                              "profile_picture" : "string",
+                              "last_login" : "2021-06-19T21:38:19.413618+04:30"
+                            }
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
