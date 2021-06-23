@@ -32,7 +32,7 @@ class CreateTemplatetView(generics.CreateAPIView):
 
         emails = recieve_mail_list(reciviers)
         if emails==None:
-            return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+            return Response("Invalid url, bad request",status=status.HTTP_406_NOT_ACCEPTABLE)
         #get variables in api
         api_vars = []
         if len(emails) > 0:
@@ -57,6 +57,7 @@ class CreateTemplatetView(generics.CreateAPIView):
 
         if temp.status == 'Send':
             temp.schedule_time = datetime.datetime.now()
+            temp.save()
             for e in emails:
                 notification_sender.send_mail(temp, e)
 
