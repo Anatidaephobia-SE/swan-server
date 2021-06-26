@@ -79,7 +79,7 @@ def login_view(request):
     email = request.data.get('email', None)
     password = request.data.get("password", None)
     if email is None:
-        return Response({"message": "First name not submitted."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "Email cannot be empty."}, status=status.HTTP_400_BAD_REQUEST)
 
     user = authenticate(email=email, password=password)
     if user is None:
