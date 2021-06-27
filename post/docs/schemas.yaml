@@ -1,4 +1,4 @@
-    Post:
+   Post:
       type: object
       properties:
         id:
@@ -9,20 +9,83 @@
           type: string
         status:
           type: string
+          enum: [Schedule, Draft, Published]
         owner:
-          type: integer
+          $ref: "#/components/schemas/User"
         created_at:
           type: string
           format: date-time
         multimedia:
-          type: string
-          format: byte
+          type: array
+          items:
+            $ref: "#/components/schemas/Media"
         team:
           type: integer
         tag:
           type: string
-        published_id:
+          enum: [Ads, Branding, Celebration, News, Quots, Sales]
+        schedule_time:
+          type: string
+          format: date-time
+    Comment:
+      type: object
+      properties:
+        id:
           type: integer
+        context:
+          type: string
+        author:
+          $ref: "#/components/schemas/User"
+        created_at:
+          type: string
+          format: date-time
+        post:
+          type: integer
+
+    UpdatedPost:
+      type: object
+      properties:
+        id:
+            type: integer
+        name:
+          type: string
+        caption:
+          type: string
+        status:
+          type: string
+          enum: [Schedule, Draft, Published]
+        multimedia:
+          type: array
+          items:
+            $ref: "#/components/schemas/Media"
+        team:
+          type: integer
+        tag:
+          type: string
+          enum: [Ads, Branding, Celebration, News, Quots, Sales]
+        schedule_time:
+          type: string
+          format: date-time
+    CreatePost:
+      type: object
+      properties:
+        name:
+          type: string
+        caption:
+          type: string
+        status:
+          type: string
+          enum: [Schedule, Draft, Published]
+        multimedia:
+          type: array
+          items:
+            type: string
+            format: binary
+        team:
+          type: integer
+        tag:
+          type: string
+          enum: [Ads, Branding, Celebration, News, Quots, Sales]
         schedule_time:
           type: string
           format: date-time

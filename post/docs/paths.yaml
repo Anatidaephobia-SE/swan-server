@@ -206,22 +206,7 @@
               examples:
                 '0':
                   value: '{
-                            "id": 1,
-                            "name": "string",
-                            "caption": "string",
-                            "status": "Drafts",
-                            "multimedia": [
-                                {
-                                    "id": 1,
-                                    "media": "/media/postfiles/1/HadiBadi.jpg"
-                                },
-                                {
-                                    "id": 2,
-                                    "media": "/media/postfiles/1/HadiBadi.jpg"
-                                }
-                            ],
-                            "team": 1,
-                            "tag": ""
+                            "context": "string"
                         }'
       servers:
         - url: 'https://api.stage.swan-app.ir'
@@ -288,3 +273,97 @@
                         }'
       servers:
         - url: 'https://api.stage.swan-app.ir'
+
+  /api/v1/post/all_comment/{post_id}/:
+    get:
+      description:  Get all comments of a post.
+      tags:
+        - Comment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: post_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The post's id.
+      responses:
+        '200':
+          description: Get all comments of a post.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comment"
+              examples:
+                '0':
+                  value: '[{
+                            "id": 1,
+                            "context": "string",
+                            "author": 
+                            {
+                                "id": 2,
+                                "email": "example@gmail.com",
+                                "first_name": "string",
+                                "last_name": "string",
+                                "profile_picture": null
+                            },
+                            "created_at": "2021-05-20T16:29:01.572745Z",
+                            "post":1
+                        },
+                        {
+                            "id": 2,
+                            "context": "string",
+                            "author": 
+                            {
+                                "id": 2,
+                                "email": "example@gmail.com",
+                                "first_name": "string",
+                                "last_name": "string",
+                                "profile_picture":null
+                            },
+                            "created_at": "2021-05-20T16:29:01.572745Z",
+                            "post":1
+                        }]'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+
+  /api/v1/post/delete_comment/{comment_id}/:
+    delete:
+      description:  Delete Comment.
+      tags:
+        - Comment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: comment_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The Comment's id.
+      responses:
+        '200':
+          description: Deleted Comment.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: 'Comment deleted.'
+        '400':
+          description: Bad request.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: '"You did not create this card."'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
