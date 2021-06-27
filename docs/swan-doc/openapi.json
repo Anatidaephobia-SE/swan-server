@@ -9,11 +9,240 @@
     "url" : "https://api.stage.swan-app.ir"
   } ],
   "paths" : {
+    "/api/v1/filestorage/upload/" : {
+      "post" : {
+        "description" : "upload new file.",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/inline_object",
+          "content" : {
+            "application/json" : {
+              "examples" : {
+                "0" : {
+                  "value" : {
+                    "team" : 1,
+                    "media" : "/media/postfiles/1/HadiBadi.jpg"
+                  }
+                }
+              },
+              "schema" : {
+                "properties" : {
+                  "name" : {
+                    "type" : "string"
+                  },
+                  "url" : {
+                    "type" : "string"
+                  }
+                },
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : {
+                      "media" : "http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example"
+                    }
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200"
+                }
+              }
+            },
+            "description" : "Successful upload."
+          },
+          "400" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"media, team parameter(s) are required\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Missing parameters."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "MediaStorage" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/filestorage/delete_media/{media_id}/" : {
+      "delete" : {
+        "description" : "Delete media.",
+        "parameters" : [ {
+          "description" : "The media's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "media_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "text/plain" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "\"Media deleted.\""
+                  }
+                },
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Deleted media."
+          },
+          "400" : {
+            "content" : {
+              "text/plain" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "\"You did not create this media.\""
+                  }
+                },
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Bad request."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "MediaStorage" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/filestorage/all_media/{team_id}/" : {
+      "get" : {
+        "description" : "Get all comments of a post.",
+        "parameters" : [ {
+          "description" : "The team's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "team_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        }, {
+          "description" : "Get all media of a team.",
+          "explode" : true,
+          "in" : "query",
+          "name" : "page",
+          "required" : false,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "form"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "2" : {
+                    "value" : "[{ \"id\": 1, \"media\":\"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example\" }, { \"id\": 2, \"media\":\"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example2\" } ]"
+                  }
+                },
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/MediaStorage"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Get all media of a team."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "MediaStorage" ]
+      }
+    },
+    "/api/v1/filestorage/single_media/{media_id}/" : {
+      "get" : {
+        "description" : "Get a single post information.",
+        "parameters" : [ {
+          "description" : "The media's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "media_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"id\": 1, \"media\":\"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example\" }"
+                  }
+                },
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/MediaStorage"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Get a single media information."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "MediaStorage" ]
+      }
+    },
     "/api/v1/team/create_team" : {
       "post" : {
         "description" : "Creates new team.",
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/inline_object",
+          "$ref" : "#/components/requestBodies/inline_object_1",
           "content" : {
             "application/json" : {
               "examples" : {
@@ -45,7 +274,7 @@
                   }
                 },
                 "schema" : {
-                  "$ref" : "#/components/schemas/inline_response_200"
+                  "$ref" : "#/components/schemas/inline_response_200_1"
                 }
               }
             },
@@ -98,7 +327,7 @@
       "post" : {
         "description" : "Invites new user.",
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/inline_object_1",
+          "$ref" : "#/components/requestBodies/inline_object_2",
           "content" : {
             "application/json" : {
               "examples" : {
@@ -131,7 +360,7 @@
                   }
                 },
                 "schema" : {
-                  "$ref" : "#/components/schemas/inline_response_200_1"
+                  "$ref" : "#/components/schemas/inline_response_200_2"
                 }
               }
             },
@@ -205,7 +434,7 @@
       "post" : {
         "description" : "Accept invitation.",
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/inline_object_2",
+          "$ref" : "#/components/requestBodies/inline_object_3",
           "content" : {
             "application/json" : {
               "examples" : {
@@ -586,7 +815,7 @@
                   }
                 },
                 "schema" : {
-                  "$ref" : "#/components/schemas/inline_response_200_2"
+                  "$ref" : "#/components/schemas/inline_response_200_3"
                 }
               }
             },
@@ -673,7 +902,7 @@
                   }
                 },
                 "schema" : {
-                  "$ref" : "#/components/schemas/inline_response_200_3"
+                  "$ref" : "#/components/schemas/inline_response_200_4"
                 }
               }
             },
@@ -776,7 +1005,7 @@
       "put" : {
         "description" : "Updates the teams informations.",
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/inline_object_3",
+          "$ref" : "#/components/requestBodies/inline_object_4",
           "content" : {
             "application/json" : {
               "examples" : {
@@ -858,7 +1087,7 @@
       "post" : {
         "description" : "Sign up new user",
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/inline_object_4",
+          "$ref" : "#/components/requestBodies/inline_object_5",
           "content" : {
             "application/json" : {
               "examples" : {
@@ -928,7 +1157,7 @@
       "put" : {
         "description" : "update users profile",
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/inline_object_5",
+          "$ref" : "#/components/requestBodies/inline_object_6",
           "content" : {
             "multipart/form-data" : {
               "schema" : {
@@ -959,7 +1188,7 @@
                   }
                 },
                 "schema" : {
-                  "$ref" : "#/components/schemas/inline_response_200_4"
+                  "$ref" : "#/components/schemas/inline_response_200_5"
                 }
               }
             },
@@ -1015,7 +1244,7 @@
       "post" : {
         "description" : "Login",
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/inline_object_6",
+          "$ref" : "#/components/requestBodies/inline_object_7",
           "content" : {
             "application/json" : {
               "examples" : {
@@ -1047,7 +1276,7 @@
                   }
                 },
                 "schema" : {
-                  "$ref" : "#/components/schemas/inline_response_200_5"
+                  "$ref" : "#/components/schemas/inline_response_200_6"
                 }
               }
             },
@@ -1188,9 +1417,18 @@
           }
         }
       },
-      "inline_object_6" : {
+      "inline_object_7" : {
         "content" : {
           "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/inline_object_7"
+            }
+          }
+        }
+      },
+      "inline_object_6" : {
+        "content" : {
+          "multipart/form-data" : {
             "schema" : {
               "$ref" : "#/components/schemas/inline_object_6"
             }
@@ -1199,7 +1437,7 @@
       },
       "inline_object_5" : {
         "content" : {
-          "multipart/form-data" : {
+          "application/json" : {
             "schema" : {
               "$ref" : "#/components/schemas/inline_object_5"
             }
@@ -1271,6 +1509,24 @@
       "Error" : {
         "properties" : {
           "error" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "MediaStorage" : {
+        "properties" : {
+          "id" : {
+            "type" : "integer"
+          },
+          "team" : {
+            "type" : "integer"
+          },
+          "owner" : {
+            "type" : "integer"
+          },
+          "media" : {
+            "format" : "byte",
             "type" : "string"
           }
         },
@@ -1373,12 +1629,31 @@
       "inline_response_200" : {
         "properties" : {
           "team" : {
-            "$ref" : "#/components/schemas/Team"
+            "$ref" : "#/components/schemas/MediaStorage"
           }
         },
         "type" : "object"
       },
       "inline_object_1" : {
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "url" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "inline_response_200_1" : {
+        "properties" : {
+          "team" : {
+            "$ref" : "#/components/schemas/Team"
+          }
+        },
+        "type" : "object"
+      },
+      "inline_object_2" : {
         "properties" : {
           "team_id" : {
             "type" : "integer"
@@ -1390,7 +1665,7 @@
         },
         "type" : "object"
       },
-      "inline_response_200_1" : {
+      "inline_response_200_2" : {
         "properties" : {
           "team" : {
             "$ref" : "#/components/schemas/User"
@@ -1398,7 +1673,7 @@
         },
         "type" : "object"
       },
-      "inline_object_2" : {
+      "inline_object_3" : {
         "properties" : {
           "team_id" : {
             "type" : "integer"
@@ -1406,7 +1681,7 @@
         },
         "type" : "object"
       },
-      "inline_response_200_2" : {
+      "inline_response_200_3" : {
         "properties" : {
           "team" : {
             "$ref" : "#/components/schemas/Team"
@@ -1417,7 +1692,7 @@
         },
         "type" : "object"
       },
-      "inline_response_200_3" : {
+      "inline_response_200_4" : {
         "properties" : {
           "members" : {
             "items" : {
@@ -1431,7 +1706,7 @@
         },
         "type" : "object"
       },
-      "inline_object_3" : {
+      "inline_object_4" : {
         "properties" : {
           "team_id" : {
             "type" : "integer"
@@ -1439,7 +1714,7 @@
         },
         "type" : "object"
       },
-      "inline_object_4" : {
+      "inline_object_5" : {
         "properties" : {
           "password" : {
             "type" : "string"
@@ -1453,7 +1728,7 @@
         },
         "type" : "object"
       },
-      "inline_object_5" : {
+      "inline_object_6" : {
         "properties" : {
           "first_name" : {
             "type" : "string"
@@ -1468,7 +1743,7 @@
         },
         "type" : "object"
       },
-      "inline_response_200_4" : {
+      "inline_response_200_5" : {
         "properties" : {
           "user" : {
             "$ref" : "#/components/schemas/User"
@@ -1476,7 +1751,7 @@
         },
         "type" : "object"
       },
-      "inline_object_6" : {
+      "inline_object_7" : {
         "properties" : {
           "password" : {
             "type" : "string"
@@ -1487,7 +1762,7 @@
         },
         "type" : "object"
       },
-      "inline_response_200_5" : {
+      "inline_response_200_6" : {
         "properties" : {
           "token" : {
             "type" : "string"

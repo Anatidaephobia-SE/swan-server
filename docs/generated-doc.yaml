@@ -37,6 +37,22 @@ components:
       properties:
         error:
           type: string
+    MediaStorage:
+      type: object
+      properties:
+        id:
+          type: integer
+        team:
+          type: integer
+        owner:
+          type: integer
+        media:
+          type: string
+          format: byte
+
+
+
+
     Team:
       type: object
       properties:
@@ -99,6 +115,175 @@ components:
 
 
 paths:
+  /api/v1/filestorage/upload/:
+    post:
+      description: upload new file.
+      tags:
+        - MediaStorage
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                url:
+                  type: string
+            examples:
+              '0':
+                value: 
+                  {
+                      "team" : 1,
+                      "media": "/media/postfiles/1/HadiBadi.jpg"
+                      
+                  }
+      responses:
+        '200':
+          description: Successful upload.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  team:
+                    $ref: "#/components/schemas/MediaStorage"
+              examples:
+                '0':
+                  value: {
+                          "media":"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example"
+                          }
+        '400':
+          description: Missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "media, team parameter(s) are required"
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/filestorage/delete_media/{media_id}/:
+    delete:
+      description:  Delete media.
+      tags:
+        - MediaStorage
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: media_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The media's id.
+      responses:
+        '200':
+          description: Deleted media.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: '"Media deleted."'
+        '400':
+          description: Bad request.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: '"You did not create this media."'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+
+  /api/v1/filestorage/all_media/{team_id}/:
+    get:
+      description:  Get all comments of a post.
+      tags:
+        - MediaStorage
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: team_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The team's id.
+        - in: query
+          name: page   # Note the name is the same as in the path
+          required: false
+          schema:
+            type: integer
+          description: Get all media of a team.
+      responses:
+        '200':
+          description:  Get all media of a team.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MediaStorage"
+              examples:
+                '2':
+                  value: '[{
+                            "id": 1,
+                            "media":"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example"
+                        },
+                        {
+                            "id": 2,
+                            "media":"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example2"
+                        }
+                        ]'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+  /api/v1/filestorage/single_media/{media_id}/:
+    get:
+      description:  Get a single post information.
+      tags:
+        - MediaStorage
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: media_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The media's id.
+      responses:
+        '200':
+          description: Get a single media information.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MediaStorage"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "media":"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example"
+                        }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+  
+
+
   /api/v1/team/create_team:
     post:
       description: Creates new team.

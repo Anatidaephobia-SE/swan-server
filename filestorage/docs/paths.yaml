@@ -1,5 +1,4 @@
-      
-    /api/v1/filestorage/upload/:
+  /api/v1/filestorage/upload/:
     post:
       description: upload new file.
       tags:
