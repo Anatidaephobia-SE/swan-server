@@ -67,6 +67,28 @@ components:
           type: string
           format: date-time
     Comment:
+    CreateTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+        body_text:
+          type: string
+        subject:
+          type: string
+        reciviers:
+          type: string
+        sender:
+          type: string
+        template_team:
+          type: integer
+        status:
+          type: string
+          enum: [Draft, Send, Schedule]
+        schedule_time:
+          type: string
+          format: date-time
+    Template:
       type: object
       properties:
         id:
@@ -129,6 +151,77 @@ components:
           type: string
           format: date-time
 
+        name:
+          type: string
+        body_text:
+          type: string
+        subject:
+          type: string
+        reciviers:
+          type: string
+        sender:
+          type: string
+        template_team:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        schedule_time:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [Draft, Send, Schedule]
+        owner:
+          $ref: "#/components/schemas/User"
+    UpdateTemplate:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        body_text:
+          type: string
+        subject:
+          type: string
+        reciviers:
+          type: string
+        sender:
+          type: string
+        template_team:
+          type: integer
+        schedule_time:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [Draft, Send, Schedule]
+        owner:
+          $ref: "#/components/schemas/User"
+
+
+    Card:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        assignee:
+          $ref: "#/components/schemas/User"
+        created_at:
+          type: string
+          format: date-time
+        sender:
+          type: string
+        team:
+          $ref: "#/components/schemas/Team"
+        tag:
+          type: string
+          enum: [Low priority, High priority, Medium priority]
 
     Team:
       type: object
@@ -197,10 +290,18 @@ paths:
       description: Creates new post.
       tags:
         - Post
+
+  /api/v1/notification/create_template/:
+    post:
+      description: Creates new mail template.
+      tags:
+        - Notification
+
       security:
         - bearerAuth: []
       requestBody:
         content:
+
           multipart/form-data:
             schema:
               $ref: "#/components/schemas/CreatePost"
@@ -239,15 +340,62 @@ paths:
                             "team": 1,
                             "tag": "Ads"
                         }'
+
+         application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTemplate"
+      responses:
+        '406':
+          description: Receivers API is wrong. You recieve this message when your API variables are not available in body_text. The returning value is the variable name in api.
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: 'name'
+        '201':
+          description: Template created.
+          content:
+            application/json:
+              schema:
+                $ref : "#/components/schemas/Template"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "body_text": "string",
+                            "subject": "string",
+                            "reciviers": "string",
+                            "sender": "example@example.com",
+                            "template_team": 1,
+                            "created_at": "2021-06-19T21:38:19.413618+04:30",
+                            "schedule_time": null,
+                            "status": "Draft",
+                            "owner": {
+                              "email" : "example23@example.com",
+                              "first_name" : "string",
+                              "last_name" : "string",
+                              "profile_picture" : "string",
+                              "last_login" : "2021-06-19T21:38:19.413618+04:30"
+                            }
+                          }'
       servers:
         - url: 'https://api.stage.swan-app.ir'
     servers:
       - url: 'https://api.stage.swan-app.ir'
+
   /api/v1/post/update_post/{post_id}/:
     get:
       description:  Get updated post information.
       tags:
         - Post
+  /api/v1/notification/update_template/{template_id}/:
+    get:
+      description:  Get updated Template information.
+      tags:
+        - Notification
       security:
         - bearerAuth: []
       parameters:
@@ -266,6 +414,18 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/UpdatedPost"
+          name: template_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The template's id.
+      responses:
+        '200':
+          description: Get updated Template.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateTemplate"
               examples:
                 '0':
                   value: '{
@@ -291,16 +451,55 @@ paths:
     put:
       description:  Update post information.
       tags:
-        - Post
+                            "body_text": "string",
+                            "subject": "string",
+                            "reciviers": "string",
+                            "sender": "example@example.com",
+                            "template_team": 1,
+                            "schedule_time": null,
+                            "status": "Draft",
+                            "owner": {
+                              "email" : "example23@example.com",
+                              "first_name" : "string",
+                              "last_name" : "string",
+                              "profile_picture" : "string",
+                              "last_login" : "2021-06-19T21:38:19.413618+04:30"
+                            }
+                          }'
+        '400':
+          description: Permisssion Denied.
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: 'You did not create this template!'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    put:
+      description:  Update Template information.
+      tags:
+        - Notification
       security:
         - bearerAuth: []
       parameters:
         - in: path
+
           name: post_id   # Note the name is the same as in the path
+
+          name: template_id   # Note the name is the same as in the path
+
           required: true
           schema:
             type: integer
           description: The post's id.
+
+      requestBody:
+        content:
+         application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTemplate"
       responses:
         '200':
           description: Updated post.
@@ -310,6 +509,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/UpdatedPost"
+                  $ref: "#/components/schemas/UpdateTemplate"
               examples:
                 '0':
                   value: '{
@@ -330,17 +530,44 @@ paths:
                             "team": 1,
                             "tag": ""
                         }'
+
+                            "body_text": "string",
+                            "subject": "string",
+                            "reciviers": "string",
+                            "sender": "example@example.com",
+                            "template_team": 1,
+                            "schedule_time": null,
+                            "status": "Draft",
+                            "owner": {
+                              "email" : "example23@example.com",
+                              "first_name" : "string",
+                              "last_name" : "string",
+                              "profile_picture" : "string",
+                              "last_login" : "2021-06-19T21:38:19.413618+04:30"
+                            }
+                          }'
+        '400':
+          description: Permisssion Denied.
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: 'You did not create this template!'
       servers:
         - url: 'https://api.stage.swan-app.ir'
     delete:
       description:  Delete post.
       tags:
         - Post
+        - Notification
       security:
         - bearerAuth: []
       parameters:
         - in: path
           name: post_id   # Note the name is the same as in the path
+          name: template_id   # Note the name is the same as in the path
           required: true
           schema:
             type: integer
@@ -354,16 +581,23 @@ paths:
                 type: string
               examples:
                 '0':
+
                   value: '"Post deleted."'
         '400':
           description: Bad request.
           content:
             text/plain:
+                  value: '"Template deleted."'
+        '400':
+          description: Permisssion Denied.
+          content:
+            application/json:
               schema:
                 type: string
               examples:
                 '0':
                   value: '"You did not create this post."'
+                  value: 'You did not create this template!'
       servers:
         - url: 'https://api.stage.swan-app.ir'
     servers:
@@ -373,6 +607,11 @@ paths:
       description:  Create new comment.
       tags:
         - Post
+  /api/v1/notification/single_template/{template_id}/:
+    get:
+      description:  Get updated Template information.
+      tags:
+        - Notification
       security:
         - bearerAuth: []
       parameters:
@@ -391,6 +630,57 @@ paths:
       responses:
         '200':
           description: Updated post.
+          name: template_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The template's id.
+      responses:
+        '200':
+          description: Get Template.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateTemplate"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "body_text": "string",
+                            "subject": "string",
+                            "reciviers": "string",
+                            "sender": "example@example.com",
+                            "template_team": 1,
+                            "schedule_time": null,
+                            "status": "Draft",
+                            "owner": {
+                              "email" : "example23@example.com",
+                              "first_name" : "string",
+                              "last_name" : "string",
+                              "profile_picture" : "string",
+                              "last_login" : "2021-06-19T21:38:19.413618+04:30"
+                            }
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+  /api/v1/notification/all_template/{team_id}/:
+    get:
+      description:  Get updated Template information.
+      tags:
+        - Notification
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: team_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The team id.
+      responses:
+        '200':
+          description: Get updated post.
           content:
             application/json:
               schema:
@@ -409,6 +699,71 @@ paths:
       description:  Get all posts of a team.
       tags:
         - Post
+                  $ref: "#/components/schemas/UpdateTemplate"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "body_text": "string",
+                            "subject": "string",
+                            "reciviers": "string",
+                            "sender": "example@example.com",
+                            "template_team": 1,
+                            "schedule_time": null,
+                            "status": "Draft",
+                            "owner": {
+                              "email" : "example23@example.com",
+                              "first_name" : "string",
+                              "last_name" : "string",
+                              "profile_picture" : "string",
+                              "last_login" : "2021-06-19T21:38:19.413618+04:30"
+                            }
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+
+  /api/v1/postideas/create_card/:
+    post:
+      description: Creates new card.
+      tags:
+        - Card
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+         application/json:
+            schema:
+              $ref: "#/components/schemas/Card"
+      responses:
+        '201':
+          description: card created.
+          content:
+            application/json:
+              schema:
+                $ref : "#/components/schemas/Card"
+              examples:
+                '0':
+                  value: '{
+                            "title": "string",
+                            "description": "some string",
+                            "status": "TO DO",
+                            "assignee": 1,
+                            "team": 1,
+                            "tag": "Low priority"
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+      
+  /api/v1/postideas/all_card/{team_id}/:
+    get:
+      description:  Get all cards of a team.
+      tags:
+        - Card
       security:
         - bearerAuth: []
       parameters:
@@ -421,6 +776,7 @@ paths:
       responses:
         '200':
           description: Get all posts of a team.
+          description: Get all cards of a team.
           content:
             application/json:
               schema:
@@ -473,6 +829,38 @@ paths:
       description:  Get all comments of a post.
       tags:
         - Comment
+=======
+                  $ref: "#/components/schemas/Card"
+              examples:
+                '0':
+                  value: '{
+                            "ToDo": [  {          
+                            "id": 1,
+                            "title": "first test",
+                            "description": "lalallalalalal",
+                            "status": "TO DO",
+                            "assignee": 
+                              {     
+                                "id": 2,                
+                                "email": "example@yahoo.com",
+                                "first_name": null,
+                                "last_name": null,
+                                "profile_picture": null
+                              },
+                            "created_at": "2021-05-15T15:56:27.806050Z",
+                            "team": 1,
+                            "tag": "Low priority"
+                              }],
+                            "InProgress": [],
+                            "Done": []
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+  /api/v1/postideas/Move_Card/{card_id}/:
+    put:
+      description:  move a card.
+      tags:
+        - Card
       security:
         - bearerAuth: []
       parameters:
@@ -485,6 +873,14 @@ paths:
       responses:
         '200':
           description: Get all comments of a post.
+          name: card_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The cars's id.
+      responses:
+        '200':
+          description: move a single card.
           content:
             application/json:
               schema:
@@ -529,6 +925,35 @@ paths:
       description:  Delete Comment.
       tags:
         - Comment
+                  $ref: "#/components/schemas/Card"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "title": "string",
+                            "description": "some string",
+                            "status": "TO DO",
+                            "assignee": 
+                              {     
+                                "id": 2,                
+                                "email": "example@yahoo.com",
+                                "first_name": null,
+                                "last_name": null,
+                                "profile_picture": null
+                              },
+                            "created_at": "2021-05-15T15:56:27.806050Z",
+                            "team": 1,
+                            "tag": "Low priority"
+                          }'
+
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+
+  /api/v1/postideas/Delete_Card/{card_id}/:
+    delete:
+      description:  Delete card.
+      tags:
+        - Card
       security:
         - bearerAuth: []
       parameters:
@@ -541,6 +966,14 @@ paths:
       responses:
         '200':
           description: Deleted Comment.
+          name: card_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The card's id.
+      responses:
+        '200':
+          description: Deleted card.
           content:
             text/plain:
               schema:
@@ -548,6 +981,7 @@ paths:
               examples:
                 '0':
                   value: 'Comment deleted.'
+                  value: 'card deleted.'
         '400':
           description: Bad request.
           content:

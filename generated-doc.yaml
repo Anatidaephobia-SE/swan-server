@@ -37,6 +37,7 @@ components:
       properties:
         error:
           type: string
+
     Post:
       type: object
       properties:
@@ -67,10 +68,34 @@ components:
           type: string
           format: date-time
     Comment:
+=======
+    CreateTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+        body_text:
+          type: string
+        subject:
+          type: string
+        reciviers:
+          type: string
+        sender:
+          type: string
+        template_team:
+          type: integer
+        status:
+          type: string
+          enum: [Draft, Send, Schedule]
+        schedule_time:
+          type: string
+          format: date-time
+    Template:
       type: object
       properties:
         id:
           type: integer
+
         context:
           type: string
         author:
@@ -129,6 +154,77 @@ components:
           type: string
           format: date-time
 
+        name:
+          type: string
+        body_text:
+          type: string
+        subject:
+          type: string
+        reciviers:
+          type: string
+        sender:
+          type: string
+        template_team:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        schedule_time:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [Draft, Send, Schedule]
+        owner:
+          $ref: "#/components/schemas/User"
+    UpdateTemplate:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        body_text:
+          type: string
+        subject:
+          type: string
+        reciviers:
+          type: string
+        sender:
+          type: string
+        template_team:
+          type: integer
+        schedule_time:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [Draft, Send, Schedule]
+        owner:
+          $ref: "#/components/schemas/User"
+
+
+    Card:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        assignee:
+          $ref: "#/components/schemas/User"
+        created_at:
+          type: string
+          format: date-time
+        sender:
+          type: string
+        team:
+          $ref: "#/components/schemas/Team"
+        tag:
+          type: string
+          enum: [Low priority, High priority, Medium priority]
 
     Team:
       type: object
@@ -197,6 +293,11 @@ paths:
       description: Creates new post.
       tags:
         - Post
+  /api/v1/notification/create_template/:
+    post:
+      description: Creates new mail template.
+      tags:
+        - Notification
       security:
         - bearerAuth: []
       requestBody:
@@ -239,6 +340,46 @@ paths:
                             "team": 1,
                             "tag": "Ads"
                         }'
+         application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTemplate"
+      responses:
+        '406':
+          description: Receivers API is wrong. You recieve this message when your API variables are not available in body_text. The returning value is the variable name in api.
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: 'name'
+        '201':
+          description: Template created.
+          content:
+            application/json:
+              schema:
+                $ref : "#/components/schemas/Template"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "body_text": "string",
+                            "subject": "string",
+                            "reciviers": "string",
+                            "sender": "example@example.com",
+                            "template_team": 1,
+                            "created_at": "2021-06-19T21:38:19.413618+04:30",
+                            "schedule_time": null,
+                            "status": "Draft",
+                            "owner": {
+                              "email" : "example23@example.com",
+                              "first_name" : "string",
+                              "last_name" : "string",
+                              "profile_picture" : "string",
+                              "last_login" : "2021-06-19T21:38:19.413618+04:30"
+                            }
+                          }'
       servers:
         - url: 'https://api.stage.swan-app.ir'
     servers:
@@ -248,10 +389,16 @@ paths:
       description:  Get updated post information.
       tags:
         - Post
+  /api/v1/notification/update_template/{template_id}/:
+    get:
+      description:  Get updated Template information.
+      tags:
+        - Notification
       security:
         - bearerAuth: []
       parameters:
         - in: path
+
           name: post_id   # Note the name is the same as in the path
           required: true
           schema:
@@ -271,6 +418,7 @@ paths:
                   value: '{
                             "id": 1,
                             "name": "string",
+
                             "caption": "string",
                             "status": "Drafts",
                             "multimedia": [
@@ -292,15 +440,36 @@ paths:
       description:  Update post information.
       tags:
         - Post
+        '400':
+          description: Permisssion Denied.
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: 'You did not create this template!'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    put:
+      description:  Update Template information.
+      tags:
+        - Notification
       security:
         - bearerAuth: []
       parameters:
         - in: path
           name: post_id   # Note the name is the same as in the path
+          name: template_id   # Note the name is the same as in the path
           required: true
           schema:
             type: integer
           description: The post's id.
+      requestBody:
+        content:
+         application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTemplate"
       responses:
         '200':
           description: Updated post.
@@ -310,6 +479,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/UpdatedPost"
+                  $ref: "#/components/schemas/UpdateTemplate"
               examples:
                 '0':
                   value: '{
@@ -330,6 +500,30 @@ paths:
                             "team": 1,
                             "tag": ""
                         }'
+                            "body_text": "string",
+                            "subject": "string",
+                            "reciviers": "string",
+                            "sender": "example@example.com",
+                            "template_team": 1,
+                            "schedule_time": null,
+                            "status": "Draft",
+                            "owner": {
+                              "email" : "example23@example.com",
+                              "first_name" : "string",
+                              "last_name" : "string",
+                              "profile_picture" : "string",
+                              "last_login" : "2021-06-19T21:38:19.413618+04:30"
+                            }
+                          }'
+        '400':
+          description: Permisssion Denied.
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: 'You did not create this template!'
       servers:
         - url: 'https://api.stage.swan-app.ir'
     delete:
@@ -409,7 +603,7 @@ paths:
       description:  Get all posts of a team.
       tags:
         - Post
-      security:
+
         - bearerAuth: []
       parameters:
         - in: path
@@ -473,6 +667,7 @@ paths:
       description:  Get all comments of a post.
       tags:
         - Comment
+
       security:
         - bearerAuth: []
       parameters:
@@ -485,6 +680,7 @@ paths:
       responses:
         '200':
           description: Get all comments of a post.
+
           content:
             application/json:
               schema:
@@ -529,6 +725,7 @@ paths:
       description:  Delete Comment.
       tags:
         - Comment
+
       security:
         - bearerAuth: []
       parameters:
@@ -547,6 +744,7 @@ paths:
                 type: string
               examples:
                 '0':
+
                   value: 'Comment deleted.'
         '400':
           description: Bad request.
