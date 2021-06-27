@@ -327,6 +327,191 @@
         "url" : "https://api.stage.swan-app.ir"
       } ]
     },
+    "/api/v1/postideas/create_card/" : {
+      "post" : {
+        "description" : "Creates new card.",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Card"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"title\": \"string\", \"description\": \"some string\", \"status\": \"TO DO\", \"assignee\": 1, \"team\": 1, \"tag\": \"Low priority\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Card"
+                }
+              }
+            },
+            "description" : "card created."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Card" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/postideas/all_card/{team_id}/" : {
+      "get" : {
+        "description" : "Get all cards of a team.",
+        "parameters" : [ {
+          "description" : "The team's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "team_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"ToDo\": [  { \"id\": 1, \"title\": \"first test\", \"description\": \"lalallalalalal\", \"status\": \"TO DO\", \"assignee\": { \"id\": 2, \"email\": \"example@yahoo.com\", \"first_name\": null, \"last_name\": null, \"profile_picture\": null }, \"created_at\": \"2021-05-15T15:56:27.806050Z\", \"team\": 1, \"tag\": \"Low priority\" }], \"InProgress\": [], \"Done\": [] }"
+                  }
+                },
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/Card"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Get all cards of a team."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Card" ]
+      }
+    },
+    "/api/v1/postideas/Move_Card/{card_id}/" : {
+      "put" : {
+        "description" : "move a card.",
+        "parameters" : [ {
+          "description" : "The cars's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "card_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"id\": 1, \"title\": \"string\", \"description\": \"some string\", \"status\": \"TO DO\", \"assignee\": { \"id\": 2, \"email\": \"example@yahoo.com\", \"first_name\": null, \"last_name\": null, \"profile_picture\": null }, \"created_at\": \"2021-05-15T15:56:27.806050Z\", \"team\": 1, \"tag\": \"Low priority\" }"
+                  }
+                },
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/Card"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "move a single card."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Card" ]
+      }
+    },
+    "/api/v1/postideas/Delete_Card/{card_id}/" : {
+      "delete" : {
+        "description" : "Delete card.",
+        "parameters" : [ {
+          "description" : "The card's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "card_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "text/plain" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "card deleted."
+                  }
+                },
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Deleted card."
+          },
+          "400" : {
+            "content" : {
+              "text/plain" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "\"You did not create this card.\""
+                  }
+                },
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Bad request."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Card" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
     "/api/v1/team/create_team" : {
       "post" : {
         "description" : "Creates new team.",
@@ -1699,6 +1884,37 @@
           },
           "owner" : {
             "$ref" : "#/components/schemas/User"
+          }
+        },
+        "type" : "object"
+      },
+      "Card" : {
+        "properties" : {
+          "title" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "assignee" : {
+            "$ref" : "#/components/schemas/User"
+          },
+          "created_at" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "sender" : {
+            "type" : "string"
+          },
+          "team" : {
+            "$ref" : "#/components/schemas/Team"
+          },
+          "tag" : {
+            "enum" : [ "Low priority", "High priority", "Medium priority" ],
+            "type" : "string"
           }
         },
         "type" : "object"

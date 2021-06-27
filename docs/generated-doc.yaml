@@ -112,6 +112,29 @@ components:
         owner:
           $ref: "#/components/schemas/User"
 
+
+    Card:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        assignee:
+          $ref: "#/components/schemas/User"
+        created_at:
+          type: string
+          format: date-time
+        sender:
+          type: string
+        team:
+          $ref: "#/components/schemas/Team"
+        tag:
+          type: string
+          enum: [Low priority, High priority, Medium priority]
+
     Team:
       type: object
       properties:
@@ -459,6 +482,172 @@ paths:
                               "last_login" : "2021-06-19T21:38:19.413618+04:30"
                             }
                           }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+
+  /api/v1/postideas/create_card/:
+    post:
+      description: Creates new card.
+      tags:
+        - Card
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+         application/json:
+            schema:
+              $ref: "#/components/schemas/Card"
+      responses:
+        '201':
+          description: card created.
+          content:
+            application/json:
+              schema:
+                $ref : "#/components/schemas/Card"
+              examples:
+                '0':
+                  value: '{
+                            "title": "string",
+                            "description": "some string",
+                            "status": "TO DO",
+                            "assignee": 1,
+                            "team": 1,
+                            "tag": "Low priority"
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+      
+  /api/v1/postideas/all_card/{team_id}/:
+    get:
+      description:  Get all cards of a team.
+      tags:
+        - Card
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: team_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The team's id.
+      responses:
+        '200':
+          description: Get all cards of a team.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Card"
+              examples:
+                '0':
+                  value: '{
+                            "ToDo": [  {          
+                            "id": 1,
+                            "title": "first test",
+                            "description": "lalallalalalal",
+                            "status": "TO DO",
+                            "assignee": 
+                              {     
+                                "id": 2,                
+                                "email": "example@yahoo.com",
+                                "first_name": null,
+                                "last_name": null,
+                                "profile_picture": null
+                              },
+                            "created_at": "2021-05-15T15:56:27.806050Z",
+                            "team": 1,
+                            "tag": "Low priority"
+                              }],
+                            "InProgress": [],
+                            "Done": []
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+  /api/v1/postideas/Move_Card/{card_id}/:
+    put:
+      description:  move a card.
+      tags:
+        - Card
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: card_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The cars's id.
+      responses:
+        '200':
+          description: move a single card.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Card"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "title": "string",
+                            "description": "some string",
+                            "status": "TO DO",
+                            "assignee": 
+                              {     
+                                "id": 2,                
+                                "email": "example@yahoo.com",
+                                "first_name": null,
+                                "last_name": null,
+                                "profile_picture": null
+                              },
+                            "created_at": "2021-05-15T15:56:27.806050Z",
+                            "team": 1,
+                            "tag": "Low priority"
+                          }'
+
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+
+  /api/v1/postideas/Delete_Card/{card_id}/:
+    delete:
+      description:  Delete card.
+      tags:
+        - Card
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: card_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The card's id.
+      responses:
+        '200':
+          description: Deleted card.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: 'card deleted.'
+        '400':
+          description: Bad request.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: '"You did not create this card."'
       servers:
         - url: 'https://api.stage.swan-app.ir'
     servers:
