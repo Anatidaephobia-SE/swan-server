@@ -1,0 +1,369 @@
+  /api/v1/post/create_post/:
+    post:
+      description: Creates new post.
+      tags:
+        - Post
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CreatePost"
+      responses:
+        '201':
+          description: Successful creation of post.
+          content:
+            application/json:
+              schema:
+                  $ref: "#/components/schemas/Post"
+              examples:
+                '0':
+                  value: '{
+                            "id": 2,
+                            "name": "string",
+                            "caption": "string",
+                            "status": "Drafts",
+                            "owner": {
+                                "id": 2,
+                                "email": "example@gmail.com",
+                                "first_name": "string",
+                                "last_name": "string",
+                                "profile_picture": "/media/userprofile/2/HadiBadi.jpg"
+                            },
+                            "created_at": "2021-05-20T16:29:01.572745Z",
+                            "multimedia": [
+                                {
+                                    "id": 3,
+                                    "media": "/media/postfiles/2/HadiBadi.jpg"
+                                },
+                                {
+                                    "id": 4,
+                                    "media": "/media/postfiles/2/HadiBadi.png"
+                                }
+                            ],
+                            "team": 1,
+                            "tag": "Ads"
+                        }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/post/update_post/{post_id}/:
+    get:
+      description:  Get updated post information.
+      tags:
+        - Post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: post_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The post's id.
+      responses:
+        '200':
+          description: Get updated post.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UpdatedPost"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "caption": "string",
+                            "status": "Drafts",
+                            "multimedia": [
+                                {
+                                    "id": 1,
+                                    "media": "/media/postfiles/1/HadiBadi.jpg"
+                                },
+                                {
+                                    "id": 2,
+                                    "media": "/media/postfiles/1/HadiBadi.jpg"
+                                }
+                            ],
+                            "team": 1,
+                            "tag": ""
+                        }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    put:
+      description:  Update post information.
+      tags:
+        - Post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: post_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The post's id.
+      responses:
+        '200':
+          description: Updated post.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UpdatedPost"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "caption": "string",
+                            "status": "Drafts",
+                            "multimedia": [
+                                {
+                                    "id": 1,
+                                    "media": "/media/postfiles/1/HadiBadi.jpg"
+                                },
+                                {
+                                    "id": 2,
+                                    "media": "/media/postfiles/1/HadiBadi.jpg"
+                                }
+                            ],
+                            "team": 1,
+                            "tag": ""
+                        }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    delete:
+      description:  Delete post.
+      tags:
+        - Post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: post_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The post's id.
+      responses:
+        '200':
+          description: Deleted post.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: '"Post deleted."'
+        '400':
+          description: Bad request.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: '"You did not create this post."'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/post/create_comment/{post_id}/:
+    put:
+      description:  Create new comment.
+      tags:
+        - Post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: post_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The post's id.
+        - in: query
+          name: page   # Note the name is the same as in the path
+          required: false
+          schema:
+            type: integer
+          description: The post's id.
+      responses:
+        '200':
+          description: Updated post.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comment"
+              examples:
+                '0':
+                  value: '{
+                            "context": "string"
+                        }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+  /api/v1/post/all_post/{team_id}/:
+    get:
+      description:  Get all posts of a team.
+      tags:
+        - Post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: team_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The team's id.
+      responses:
+        '200':
+          description: Get all posts of a team.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UpdatedPost"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "caption": "string",
+                            "status": "Drafts",
+                            "multimedia": [
+                                {
+                                    "id": 1,
+                                    "media": "/media/postfiles/1/HadiBadi.jpg"
+                                },
+                                {
+                                    "id": 2,
+                                    "media": "/media/postfiles/1/HadiBadi.jpg"
+                                }
+                            ],
+                            "team": 1,
+                            "tag": ""
+                        },
+                        {
+                            "id": 2,
+                            "name": "string",
+                            "caption": "string",
+                            "status": "Drafts",
+                            "multimedia": [
+                                {
+                                    "id": 1,
+                                    "media": "/media/postfiles/1/HadiBadi.jpg"
+                                },
+                                {
+                                    "id": 2,
+                                    "media": "/media/postfiles/1/HadiBadi.jpg"
+                                }
+                            ],
+                            "team": 1,
+                            "tag": ""
+                        }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+
+  /api/v1/post/all_comment/{post_id}/:
+    get:
+      description:  Get all comments of a post.
+      tags:
+        - Comment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: post_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The post's id.
+      responses:
+        '200':
+          description: Get all comments of a post.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comment"
+              examples:
+                '0':
+                  value: '[{
+                            "id": 1,
+                            "context": "string",
+                            "author": 
+                            {
+                                "id": 2,
+                                "email": "example@gmail.com",
+                                "first_name": "string",
+                                "last_name": "string",
+                                "profile_picture": null
+                            },
+                            "created_at": "2021-05-20T16:29:01.572745Z",
+                            "post":1
+                        },
+                        {
+                            "id": 2,
+                            "context": "string",
+                            "author": 
+                            {
+                                "id": 2,
+                                "email": "example@gmail.com",
+                                "first_name": "string",
+                                "last_name": "string",
+                                "profile_picture":null
+                            },
+                            "created_at": "2021-05-20T16:29:01.572745Z",
+                            "post":1
+                        }]'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+
+  /api/v1/post/delete_comment/{comment_id}/:
+    delete:
+      description:  Delete Comment.
+      tags:
+        - Comment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: comment_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The Comment's id.
+      responses:
+        '200':
+          description: Deleted Comment.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: 'Comment deleted.'
+        '400':
+          description: Bad request.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: '"You did not create this card."'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'

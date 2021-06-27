@@ -37,6 +37,214 @@ components:
       properties:
         error:
           type: string
+    MediaStorage:
+      type: object
+      properties:
+        id:
+          type: integer
+        team:
+          type: integer
+        owner:
+          type: integer
+        media:
+          type: string
+          format: byte
+
+
+
+
+    CreateTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+        body_text:
+          type: string
+        subject:
+          type: string
+        reciviers:
+          type: string
+        sender:
+          type: string
+        template_team:
+          type: integer
+        status:
+          type: string
+          enum: [Draft, Send, Schedule]
+        schedule_time:
+          type: string
+          format: date-time
+    Template:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        body_text:
+          type: string
+        subject:
+          type: string
+        reciviers:
+          type: string
+        sender:
+          type: string
+        template_team:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        schedule_time:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [Draft, Send, Schedule]
+        owner:
+          $ref: "#/components/schemas/User"
+    UpdateTemplate:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        body_text:
+          type: string
+        subject:
+          type: string
+        reciviers:
+          type: string
+        sender:
+          type: string
+        template_team:
+          type: integer
+        schedule_time:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [Draft, Send, Schedule]
+        owner:
+          $ref: "#/components/schemas/User"
+
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        caption:
+          type: string
+        status:
+          type: string
+          enum: [Schedule, Draft, Published]
+        owner:
+          $ref: "#/components/schemas/User"
+        created_at:
+          type: string
+          format: date-time
+        multimedia:
+          type: array
+          items:
+            $ref: "#/components/schemas/Media"
+        team:
+          type: integer
+        tag:
+          type: string
+          enum: [Ads, Branding, Celebration, News, Quots, Sales]
+        schedule_time:
+          type: string
+          format: date-time
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+        context:
+          type: string
+        author:
+          $ref: "#/components/schemas/User"
+        created_at:
+          type: string
+          format: date-time
+        post:
+          type: integer
+
+    UpdatedPost:
+      type: object
+      properties:
+        id:
+            type: integer
+        name:
+          type: string
+        caption:
+          type: string
+        status:
+          type: string
+          enum: [Schedule, Draft, Published]
+        multimedia:
+          type: array
+          items:
+            $ref: "#/components/schemas/Media"
+        team:
+          type: integer
+        tag:
+          type: string
+          enum: [Ads, Branding, Celebration, News, Quots, Sales]
+        schedule_time:
+          type: string
+          format: date-time
+    CreatePost:
+      type: object
+      properties:
+        name:
+          type: string
+        caption:
+          type: string
+        status:
+          type: string
+          enum: [Schedule, Draft, Published]
+        multimedia:
+          type: array
+          items:
+            type: string
+            format: binary
+        team:
+          type: integer
+        tag:
+          type: string
+          enum: [Ads, Branding, Celebration, News, Quots, Sales]
+        schedule_time:
+          type: string
+          format: date-time
+
+
+
+    Card:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        assignee:
+          $ref: "#/components/schemas/User"
+        created_at:
+          type: string
+          format: date-time
+        sender:
+          type: string
+        team:
+          $ref: "#/components/schemas/Team"
+        tag:
+          type: string
+          enum: [Low priority, High priority, Medium priority]
+
     Team:
       type: object
       properties:
@@ -99,6 +307,1001 @@ components:
 
 
 paths:
+  /api/v1/filestorage/upload/:
+    post:
+      description: upload new file.
+      tags:
+        - MediaStorage
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                url:
+                  type: string
+            examples:
+              '0':
+                value: 
+                  {
+                      "team" : 1,
+                      "media": "/media/postfiles/1/HadiBadi.jpg"
+                      
+                  }
+      responses:
+        '200':
+          description: Successful upload.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  team:
+                    $ref: "#/components/schemas/MediaStorage"
+              examples:
+                '0':
+                  value: {
+                          "media":"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example"
+                          }
+        '400':
+          description: Missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                '0':
+                  value: '{
+                            "error": "media, team parameter(s) are required"
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/filestorage/delete_media/{media_id}/:
+    delete:
+      description:  Delete media.
+      tags:
+        - MediaStorage
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: media_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The media's id.
+      responses:
+        '200':
+          description: Deleted media.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: '"Media deleted."'
+        '400':
+          description: Bad request.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: '"You did not create this media."'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+
+  /api/v1/filestorage/all_media/{team_id}/:
+    get:
+      description:  Get all comments of a post.
+      tags:
+        - MediaStorage
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: team_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The team's id.
+        - in: query
+          name: page   # Note the name is the same as in the path
+          required: false
+          schema:
+            type: integer
+          description: Get all media of a team.
+      responses:
+        '200':
+          description:  Get all media of a team.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MediaStorage"
+              examples:
+                '2':
+                  value: '[{
+                            "id": 1,
+                            "media":"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example"
+                        },
+                        {
+                            "id": 2,
+                            "media":"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example2"
+                        }
+                        ]'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+  /api/v1/filestorage/single_media/{media_id}/:
+    get:
+      description:  Get a single post information.
+      tags:
+        - MediaStorage
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: media_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The media's id.
+      responses:
+        '200':
+          description: Get a single media information.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MediaStorage"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "media":"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example"
+                        }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+  
+
+
+  /api/v1/notification/create_template/:
+    post:
+      description: Creates new mail template.
+      tags:
+        - Notification
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+         application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTemplate"
+      responses:
+        '406':
+          description: Receivers API is wrong. You recieve this message when your API variables are not available in body_text. The returning value is the variable name in api.
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: 'name'
+        '201':
+          description: Template created.
+          content:
+            application/json:
+              schema:
+                $ref : "#/components/schemas/Template"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "body_text": "string",
+                            "subject": "string",
+                            "reciviers": "string",
+                            "sender": "example@example.com",
+                            "template_team": 1,
+                            "created_at": "2021-06-19T21:38:19.413618+04:30",
+                            "schedule_time": null,
+                            "status": "Draft",
+                            "owner": {
+                              "email" : "example23@example.com",
+                              "first_name" : "string",
+                              "last_name" : "string",
+                              "profile_picture" : "string",
+                              "last_login" : "2021-06-19T21:38:19.413618+04:30"
+                            }
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/notification/update_template/{template_id}/:
+    get:
+      description:  Get updated Template information.
+      tags:
+        - Notification
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: template_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The template's id.
+      responses:
+        '200':
+          description: Get updated Template.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateTemplate"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "body_text": "string",
+                            "subject": "string",
+                            "reciviers": "string",
+                            "sender": "example@example.com",
+                            "template_team": 1,
+                            "schedule_time": null,
+                            "status": "Draft",
+                            "owner": {
+                              "email" : "example23@example.com",
+                              "first_name" : "string",
+                              "last_name" : "string",
+                              "profile_picture" : "string",
+                              "last_login" : "2021-06-19T21:38:19.413618+04:30"
+                            }
+                          }'
+        '400':
+          description: Permisssion Denied.
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: 'You did not create this template!'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    put:
+      description:  Update Template information.
+      tags:
+        - Notification
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: template_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The post's id.
+      requestBody:
+        content:
+         application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTemplate"
+      responses:
+        '200':
+          description: Updated post.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UpdateTemplate"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "body_text": "string",
+                            "subject": "string",
+                            "reciviers": "string",
+                            "sender": "example@example.com",
+                            "template_team": 1,
+                            "schedule_time": null,
+                            "status": "Draft",
+                            "owner": {
+                              "email" : "example23@example.com",
+                              "first_name" : "string",
+                              "last_name" : "string",
+                              "profile_picture" : "string",
+                              "last_login" : "2021-06-19T21:38:19.413618+04:30"
+                            }
+                          }'
+        '400':
+          description: Permisssion Denied.
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: 'You did not create this template!'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    delete:
+      description:  Delete post.
+      tags:
+        - Notification
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: template_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The post's id.
+      responses:
+        '200':
+          description: Deleted post.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: '"Template deleted."'
+        '400':
+          description: Permisssion Denied.
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: 'You did not create this template!'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/notification/single_template/{template_id}/:
+    get:
+      description:  Get updated Template information.
+      tags:
+        - Notification
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: template_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The template's id.
+      responses:
+        '200':
+          description: Get Template.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateTemplate"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "body_text": "string",
+                            "subject": "string",
+                            "reciviers": "string",
+                            "sender": "example@example.com",
+                            "template_team": 1,
+                            "schedule_time": null,
+                            "status": "Draft",
+                            "owner": {
+                              "email" : "example23@example.com",
+                              "first_name" : "string",
+                              "last_name" : "string",
+                              "profile_picture" : "string",
+                              "last_login" : "2021-06-19T21:38:19.413618+04:30"
+                            }
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+  /api/v1/notification/all_template/{team_id}/:
+    get:
+      description:  Get updated Template information.
+      tags:
+        - Notification
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: team_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The team id.
+      responses:
+        '200':
+          description: Get updated post.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UpdateTemplate"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "body_text": "string",
+                            "subject": "string",
+                            "reciviers": "string",
+                            "sender": "example@example.com",
+                            "template_team": 1,
+                            "schedule_time": null,
+                            "status": "Draft",
+                            "owner": {
+                              "email" : "example23@example.com",
+                              "first_name" : "string",
+                              "last_name" : "string",
+                              "profile_picture" : "string",
+                              "last_login" : "2021-06-19T21:38:19.413618+04:30"
+                            }
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+
+  /api/v1/post/create_post/:
+    post:
+      description: Creates new post.
+      tags:
+        - Post
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CreatePost"
+      responses:
+        '201':
+          description: Successful creation of post.
+          content:
+            application/json:
+              schema:
+                  $ref: "#/components/schemas/Post"
+              examples:
+                '0':
+                  value: '{
+                            "id": 2,
+                            "name": "string",
+                            "caption": "string",
+                            "status": "Drafts",
+                            "owner": {
+                                "id": 2,
+                                "email": "example@gmail.com",
+                                "first_name": "string",
+                                "last_name": "string",
+                                "profile_picture": "/media/userprofile/2/HadiBadi.jpg"
+                            },
+                            "created_at": "2021-05-20T16:29:01.572745Z",
+                            "multimedia": [
+                                {
+                                    "id": 3,
+                                    "media": "/media/postfiles/2/HadiBadi.jpg"
+                                },
+                                {
+                                    "id": 4,
+                                    "media": "/media/postfiles/2/HadiBadi.png"
+                                }
+                            ],
+                            "team": 1,
+                            "tag": "Ads"
+                        }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/post/update_post/{post_id}/:
+    get:
+      description:  Get updated post information.
+      tags:
+        - Post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: post_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The post's id.
+      responses:
+        '200':
+          description: Get updated post.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UpdatedPost"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "caption": "string",
+                            "status": "Drafts",
+                            "multimedia": [
+                                {
+                                    "id": 1,
+                                    "media": "/media/postfiles/1/HadiBadi.jpg"
+                                },
+                                {
+                                    "id": 2,
+                                    "media": "/media/postfiles/1/HadiBadi.jpg"
+                                }
+                            ],
+                            "team": 1,
+                            "tag": ""
+                        }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    put:
+      description:  Update post information.
+      tags:
+        - Post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: post_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The post's id.
+      responses:
+        '200':
+          description: Updated post.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UpdatedPost"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "caption": "string",
+                            "status": "Drafts",
+                            "multimedia": [
+                                {
+                                    "id": 1,
+                                    "media": "/media/postfiles/1/HadiBadi.jpg"
+                                },
+                                {
+                                    "id": 2,
+                                    "media": "/media/postfiles/1/HadiBadi.jpg"
+                                }
+                            ],
+                            "team": 1,
+                            "tag": ""
+                        }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    delete:
+      description:  Delete post.
+      tags:
+        - Post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: post_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The post's id.
+      responses:
+        '200':
+          description: Deleted post.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: '"Post deleted."'
+        '400':
+          description: Bad request.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: '"You did not create this post."'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+  /api/v1/post/create_comment/{post_id}/:
+    put:
+      description:  Create new comment.
+      tags:
+        - Post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: post_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The post's id.
+        - in: query
+          name: page   # Note the name is the same as in the path
+          required: false
+          schema:
+            type: integer
+          description: The post's id.
+      responses:
+        '200':
+          description: Updated post.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comment"
+              examples:
+                '0':
+                  value: '{
+                            "context": "string"
+                        }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+  /api/v1/post/all_post/{team_id}/:
+    get:
+      description:  Get all posts of a team.
+      tags:
+        - Post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: team_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The team's id.
+      responses:
+        '200':
+          description: Get all posts of a team.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UpdatedPost"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "name": "string",
+                            "caption": "string",
+                            "status": "Drafts",
+                            "multimedia": [
+                                {
+                                    "id": 1,
+                                    "media": "/media/postfiles/1/HadiBadi.jpg"
+                                },
+                                {
+                                    "id": 2,
+                                    "media": "/media/postfiles/1/HadiBadi.jpg"
+                                }
+                            ],
+                            "team": 1,
+                            "tag": ""
+                        },
+                        {
+                            "id": 2,
+                            "name": "string",
+                            "caption": "string",
+                            "status": "Drafts",
+                            "multimedia": [
+                                {
+                                    "id": 1,
+                                    "media": "/media/postfiles/1/HadiBadi.jpg"
+                                },
+                                {
+                                    "id": 2,
+                                    "media": "/media/postfiles/1/HadiBadi.jpg"
+                                }
+                            ],
+                            "team": 1,
+                            "tag": ""
+                        }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+
+  /api/v1/post/all_comment/{post_id}/:
+    get:
+      description:  Get all comments of a post.
+      tags:
+        - Comment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: post_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The post's id.
+      responses:
+        '200':
+          description: Get all comments of a post.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comment"
+              examples:
+                '0':
+                  value: '[{
+                            "id": 1,
+                            "context": "string",
+                            "author": 
+                            {
+                                "id": 2,
+                                "email": "example@gmail.com",
+                                "first_name": "string",
+                                "last_name": "string",
+                                "profile_picture": null
+                            },
+                            "created_at": "2021-05-20T16:29:01.572745Z",
+                            "post":1
+                        },
+                        {
+                            "id": 2,
+                            "context": "string",
+                            "author": 
+                            {
+                                "id": 2,
+                                "email": "example@gmail.com",
+                                "first_name": "string",
+                                "last_name": "string",
+                                "profile_picture":null
+                            },
+                            "created_at": "2021-05-20T16:29:01.572745Z",
+                            "post":1
+                        }]'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+
+  /api/v1/post/delete_comment/{comment_id}/:
+    delete:
+      description:  Delete Comment.
+      tags:
+        - Comment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: comment_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The Comment's id.
+      responses:
+        '200':
+          description: Deleted Comment.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: 'Comment deleted.'
+        '400':
+          description: Bad request.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: '"You did not create this card."'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+
+  /api/v1/postideas/create_card/:
+    post:
+      description: Creates new card.
+      tags:
+        - Card
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+         application/json:
+            schema:
+              $ref: "#/components/schemas/Card"
+      responses:
+        '201':
+          description: card created.
+          content:
+            application/json:
+              schema:
+                $ref : "#/components/schemas/Card"
+              examples:
+                '0':
+                  value: '{
+                            "title": "string",
+                            "description": "some string",
+                            "status": "TO DO",
+                            "assignee": 1,
+                            "team": 1,
+                            "tag": "Low priority"
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+      
+  /api/v1/postideas/all_card/{team_id}/:
+    get:
+      description:  Get all cards of a team.
+      tags:
+        - Card
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: team_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The team's id.
+      responses:
+        '200':
+          description: Get all cards of a team.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Card"
+              examples:
+                '0':
+                  value: '{
+                            "ToDo": [  {          
+                            "id": 1,
+                            "title": "first test",
+                            "description": "lalallalalalal",
+                            "status": "TO DO",
+                            "assignee": 
+                              {     
+                                "id": 2,                
+                                "email": "example@yahoo.com",
+                                "first_name": null,
+                                "last_name": null,
+                                "profile_picture": null
+                              },
+                            "created_at": "2021-05-15T15:56:27.806050Z",
+                            "team": 1,
+                            "tag": "Low priority"
+                              }],
+                            "InProgress": [],
+                            "Done": []
+                          }'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+  /api/v1/postideas/Move_Card/{card_id}/:
+    put:
+      description:  move a card.
+      tags:
+        - Card
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: card_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The cars's id.
+      responses:
+        '200':
+          description: move a single card.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Card"
+              examples:
+                '0':
+                  value: '{
+                            "id": 1,
+                            "title": "string",
+                            "description": "some string",
+                            "status": "TO DO",
+                            "assignee": 
+                              {     
+                                "id": 2,                
+                                "email": "example@yahoo.com",
+                                "first_name": null,
+                                "last_name": null,
+                                "profile_picture": null
+                              },
+                            "created_at": "2021-05-15T15:56:27.806050Z",
+                            "team": 1,
+                            "tag": "Low priority"
+                          }'
+
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+
+  /api/v1/postideas/Delete_Card/{card_id}/:
+    delete:
+      description:  Delete card.
+      tags:
+        - Card
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: card_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The card's id.
+      responses:
+        '200':
+          description: Deleted card.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: 'card deleted.'
+        '400':
+          description: Bad request.
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                '0':
+                  value: '"You did not create this card."'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+    servers:
+      - url: 'https://api.stage.swan-app.ir'
+
   /api/v1/team/create_team:
     post:
       description: Creates new team.

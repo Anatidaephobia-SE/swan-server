@@ -9,11 +9,1121 @@
     "url" : "https://api.stage.swan-app.ir"
   } ],
   "paths" : {
+    "/api/v1/filestorage/upload/" : {
+      "post" : {
+        "description" : "upload new file.",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/inline_object",
+          "content" : {
+            "application/json" : {
+              "examples" : {
+                "0" : {
+                  "value" : {
+                    "team" : 1,
+                    "media" : "/media/postfiles/1/HadiBadi.jpg"
+                  }
+                }
+              },
+              "schema" : {
+                "properties" : {
+                  "name" : {
+                    "type" : "string"
+                  },
+                  "url" : {
+                    "type" : "string"
+                  }
+                },
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : {
+                      "media" : "http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example"
+                    }
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200"
+                }
+              }
+            },
+            "description" : "Successful upload."
+          },
+          "400" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"error\": \"media, team parameter(s) are required\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "Missing parameters."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "MediaStorage" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/filestorage/delete_media/{media_id}/" : {
+      "delete" : {
+        "description" : "Delete media.",
+        "parameters" : [ {
+          "description" : "The media's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "media_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "text/plain" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "\"Media deleted.\""
+                  }
+                },
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Deleted media."
+          },
+          "400" : {
+            "content" : {
+              "text/plain" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "\"You did not create this media.\""
+                  }
+                },
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Bad request."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "MediaStorage" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/filestorage/all_media/{team_id}/" : {
+      "get" : {
+        "description" : "Get all comments of a post.",
+        "parameters" : [ {
+          "description" : "The team's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "team_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        }, {
+          "description" : "Get all media of a team.",
+          "explode" : true,
+          "in" : "query",
+          "name" : "page",
+          "required" : false,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "form"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "2" : {
+                    "value" : "[{ \"id\": 1, \"media\":\"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example\" }, { \"id\": 2, \"media\":\"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example2\" } ]"
+                  }
+                },
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/MediaStorage"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Get all media of a team."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "MediaStorage" ]
+      }
+    },
+    "/api/v1/filestorage/single_media/{media_id}/" : {
+      "get" : {
+        "description" : "Get a single post information.",
+        "parameters" : [ {
+          "description" : "The media's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "media_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"id\": 1, \"media\":\"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example\" }"
+                  }
+                },
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/MediaStorage"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Get a single media information."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "MediaStorage" ]
+      }
+    },
+    "/api/v1/notification/create_template/" : {
+      "post" : {
+        "description" : "Creates new mail template.",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateTemplate"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "406" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "name"
+                  }
+                },
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Receivers API is wrong. You recieve this message when your API variables are not available in body_text. The returning value is the variable name in api."
+          },
+          "201" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"id\": 1, \"name\": \"string\", \"body_text\": \"string\", \"subject\": \"string\", \"reciviers\": \"string\", \"sender\": \"example@example.com\", \"template_team\": 1, \"created_at\": \"2021-06-19T21:38:19.413618+04:30\", \"schedule_time\": null, \"status\": \"Draft\", \"owner\": { \"email\" : \"example23@example.com\", \"first_name\" : \"string\", \"last_name\" : \"string\", \"profile_picture\" : \"string\", \"last_login\" : \"2021-06-19T21:38:19.413618+04:30\" } }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Template"
+                }
+              }
+            },
+            "description" : "Template created."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Notification" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/notification/update_template/{template_id}/" : {
+      "delete" : {
+        "description" : "Delete post.",
+        "parameters" : [ {
+          "description" : "The post's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "template_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "text/plain" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "\"Template deleted.\""
+                  }
+                },
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Deleted post."
+          },
+          "400" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "You did not create this template!"
+                  }
+                },
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Permisssion Denied."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Notification" ]
+      },
+      "get" : {
+        "description" : "Get updated Template information.",
+        "parameters" : [ {
+          "description" : "The template's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "template_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"id\": 1, \"name\": \"string\", \"body_text\": \"string\", \"subject\": \"string\", \"reciviers\": \"string\", \"sender\": \"example@example.com\", \"template_team\": 1, \"schedule_time\": null, \"status\": \"Draft\", \"owner\": { \"email\" : \"example23@example.com\", \"first_name\" : \"string\", \"last_name\" : \"string\", \"profile_picture\" : \"string\", \"last_login\" : \"2021-06-19T21:38:19.413618+04:30\" } }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/UpdateTemplate"
+                }
+              }
+            },
+            "description" : "Get updated Template."
+          },
+          "400" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "You did not create this template!"
+                  }
+                },
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Permisssion Denied."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Notification" ]
+      },
+      "put" : {
+        "description" : "Update Template information.",
+        "parameters" : [ {
+          "description" : "The post's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "template_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateTemplate"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"id\": 1, \"name\": \"string\", \"body_text\": \"string\", \"subject\": \"string\", \"reciviers\": \"string\", \"sender\": \"example@example.com\", \"template_team\": 1, \"schedule_time\": null, \"status\": \"Draft\", \"owner\": { \"email\" : \"example23@example.com\", \"first_name\" : \"string\", \"last_name\" : \"string\", \"profile_picture\" : \"string\", \"last_login\" : \"2021-06-19T21:38:19.413618+04:30\" } }"
+                  }
+                },
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/UpdateTemplate"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Updated post."
+          },
+          "400" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "You did not create this template!"
+                  }
+                },
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Permisssion Denied."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Notification" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/notification/single_template/{template_id}/" : {
+      "get" : {
+        "description" : "Get updated Template information.",
+        "parameters" : [ {
+          "description" : "The template's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "template_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"id\": 1, \"name\": \"string\", \"body_text\": \"string\", \"subject\": \"string\", \"reciviers\": \"string\", \"sender\": \"example@example.com\", \"template_team\": 1, \"schedule_time\": null, \"status\": \"Draft\", \"owner\": { \"email\" : \"example23@example.com\", \"first_name\" : \"string\", \"last_name\" : \"string\", \"profile_picture\" : \"string\", \"last_login\" : \"2021-06-19T21:38:19.413618+04:30\" } }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/UpdateTemplate"
+                }
+              }
+            },
+            "description" : "Get Template."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Notification" ]
+      }
+    },
+    "/api/v1/notification/all_template/{team_id}/" : {
+      "get" : {
+        "description" : "Get updated Template information.",
+        "parameters" : [ {
+          "description" : "The team id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "team_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"id\": 1, \"name\": \"string\", \"body_text\": \"string\", \"subject\": \"string\", \"reciviers\": \"string\", \"sender\": \"example@example.com\", \"template_team\": 1, \"schedule_time\": null, \"status\": \"Draft\", \"owner\": { \"email\" : \"example23@example.com\", \"first_name\" : \"string\", \"last_name\" : \"string\", \"profile_picture\" : \"string\", \"last_login\" : \"2021-06-19T21:38:19.413618+04:30\" } }"
+                  }
+                },
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/UpdateTemplate"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Get updated post."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Notification" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/post/create_post/" : {
+      "post" : {
+        "description" : "Creates new post.",
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreatePost"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"id\": 2, \"name\": \"string\", \"caption\": \"string\", \"status\": \"Drafts\", \"owner\": { \"id\": 2, \"email\": \"example@gmail.com\", \"first_name\": \"string\", \"last_name\": \"string\", \"profile_picture\": \"/media/userprofile/2/HadiBadi.jpg\" }, \"created_at\": \"2021-05-20T16:29:01.572745Z\", \"multimedia\": [ { \"id\": 3, \"media\": \"/media/postfiles/2/HadiBadi.jpg\" }, { \"id\": 4, \"media\": \"/media/postfiles/2/HadiBadi.png\" } ], \"team\": 1, \"tag\": \"Ads\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Post"
+                }
+              }
+            },
+            "description" : "Successful creation of post."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Post" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/post/update_post/{post_id}/" : {
+      "delete" : {
+        "description" : "Delete post.",
+        "parameters" : [ {
+          "description" : "The post's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "post_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "text/plain" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "\"Post deleted.\""
+                  }
+                },
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Deleted post."
+          },
+          "400" : {
+            "content" : {
+              "text/plain" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "\"You did not create this post.\""
+                  }
+                },
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Bad request."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Post" ]
+      },
+      "get" : {
+        "description" : "Get updated post information.",
+        "parameters" : [ {
+          "description" : "The post's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "post_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"id\": 1, \"name\": \"string\", \"caption\": \"string\", \"status\": \"Drafts\", \"multimedia\": [ { \"id\": 1, \"media\": \"/media/postfiles/1/HadiBadi.jpg\" }, { \"id\": 2, \"media\": \"/media/postfiles/1/HadiBadi.jpg\" } ], \"team\": 1, \"tag\": \"\" }"
+                  }
+                },
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/UpdatedPost"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Get updated post."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Post" ]
+      },
+      "put" : {
+        "description" : "Update post information.",
+        "parameters" : [ {
+          "description" : "The post's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "post_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"id\": 1, \"name\": \"string\", \"caption\": \"string\", \"status\": \"Drafts\", \"multimedia\": [ { \"id\": 1, \"media\": \"/media/postfiles/1/HadiBadi.jpg\" }, { \"id\": 2, \"media\": \"/media/postfiles/1/HadiBadi.jpg\" } ], \"team\": 1, \"tag\": \"\" }"
+                  }
+                },
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/UpdatedPost"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Updated post."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Post" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/post/create_comment/{post_id}/" : {
+      "put" : {
+        "description" : "Create new comment.",
+        "parameters" : [ {
+          "description" : "The post's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "post_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        }, {
+          "description" : "The post's id.",
+          "explode" : true,
+          "in" : "query",
+          "name" : "page",
+          "required" : false,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "form"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"context\": \"string\" }"
+                  }
+                },
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/Comment"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Updated post."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Post" ]
+      }
+    },
+    "/api/v1/post/all_post/{team_id}/" : {
+      "get" : {
+        "description" : "Get all posts of a team.",
+        "parameters" : [ {
+          "description" : "The team's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "team_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"id\": 1, \"name\": \"string\", \"caption\": \"string\", \"status\": \"Drafts\", \"multimedia\": [ { \"id\": 1, \"media\": \"/media/postfiles/1/HadiBadi.jpg\" }, { \"id\": 2, \"media\": \"/media/postfiles/1/HadiBadi.jpg\" } ], \"team\": 1, \"tag\": \"\" }, { \"id\": 2, \"name\": \"string\", \"caption\": \"string\", \"status\": \"Drafts\", \"multimedia\": [ { \"id\": 1, \"media\": \"/media/postfiles/1/HadiBadi.jpg\" }, { \"id\": 2, \"media\": \"/media/postfiles/1/HadiBadi.jpg\" } ], \"team\": 1, \"tag\": \"\" }"
+                  }
+                },
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/UpdatedPost"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Get all posts of a team."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Post" ]
+      }
+    },
+    "/api/v1/post/all_comment/{post_id}/" : {
+      "get" : {
+        "description" : "Get all comments of a post.",
+        "parameters" : [ {
+          "description" : "The post's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "post_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "[{ \"id\": 1, \"context\": \"string\", \"author\": { \"id\": 2, \"email\": \"example@gmail.com\", \"first_name\": \"string\", \"last_name\": \"string\", \"profile_picture\": null }, \"created_at\": \"2021-05-20T16:29:01.572745Z\", \"post\":1 }, { \"id\": 2, \"context\": \"string\", \"author\": { \"id\": 2, \"email\": \"example@gmail.com\", \"first_name\": \"string\", \"last_name\": \"string\", \"profile_picture\":null }, \"created_at\": \"2021-05-20T16:29:01.572745Z\", \"post\":1 }]"
+                  }
+                },
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/Comment"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Get all comments of a post."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Comment" ]
+      }
+    },
+    "/api/v1/post/delete_comment/{comment_id}/" : {
+      "delete" : {
+        "description" : "Delete Comment.",
+        "parameters" : [ {
+          "description" : "The Comment's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "comment_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "text/plain" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "Comment deleted."
+                  }
+                },
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Deleted Comment."
+          },
+          "400" : {
+            "content" : {
+              "text/plain" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "\"You did not create this card.\""
+                  }
+                },
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Bad request."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Comment" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/postideas/create_card/" : {
+      "post" : {
+        "description" : "Creates new card.",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Card"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"title\": \"string\", \"description\": \"some string\", \"status\": \"TO DO\", \"assignee\": 1, \"team\": 1, \"tag\": \"Low priority\" }"
+                  }
+                },
+                "schema" : {
+                  "$ref" : "#/components/schemas/Card"
+                }
+              }
+            },
+            "description" : "card created."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Card" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
+    "/api/v1/postideas/all_card/{team_id}/" : {
+      "get" : {
+        "description" : "Get all cards of a team.",
+        "parameters" : [ {
+          "description" : "The team's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "team_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"ToDo\": [  { \"id\": 1, \"title\": \"first test\", \"description\": \"lalallalalalal\", \"status\": \"TO DO\", \"assignee\": { \"id\": 2, \"email\": \"example@yahoo.com\", \"first_name\": null, \"last_name\": null, \"profile_picture\": null }, \"created_at\": \"2021-05-15T15:56:27.806050Z\", \"team\": 1, \"tag\": \"Low priority\" }], \"InProgress\": [], \"Done\": [] }"
+                  }
+                },
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/Card"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Get all cards of a team."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Card" ]
+      }
+    },
+    "/api/v1/postideas/Move_Card/{card_id}/" : {
+      "put" : {
+        "description" : "move a card.",
+        "parameters" : [ {
+          "description" : "The cars's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "card_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "{ \"id\": 1, \"title\": \"string\", \"description\": \"some string\", \"status\": \"TO DO\", \"assignee\": { \"id\": 2, \"email\": \"example@yahoo.com\", \"first_name\": null, \"last_name\": null, \"profile_picture\": null }, \"created_at\": \"2021-05-15T15:56:27.806050Z\", \"team\": 1, \"tag\": \"Low priority\" }"
+                  }
+                },
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/Card"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "move a single card."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Card" ]
+      }
+    },
+    "/api/v1/postideas/Delete_Card/{card_id}/" : {
+      "delete" : {
+        "description" : "Delete card.",
+        "parameters" : [ {
+          "description" : "The card's id.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "card_id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "text/plain" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "card deleted."
+                  }
+                },
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Deleted card."
+          },
+          "400" : {
+            "content" : {
+              "text/plain" : {
+                "examples" : {
+                  "0" : {
+                    "value" : "\"You did not create this card.\""
+                  }
+                },
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Bad request."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "servers" : [ {
+          "url" : "https://api.stage.swan-app.ir"
+        } ],
+        "tags" : [ "Card" ]
+      },
+      "servers" : [ {
+        "url" : "https://api.stage.swan-app.ir"
+      } ]
+    },
     "/api/v1/team/create_team" : {
       "post" : {
         "description" : "Creates new team.",
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/inline_object",
+          "$ref" : "#/components/requestBodies/inline_object_1",
           "content" : {
             "application/json" : {
               "examples" : {
@@ -45,7 +1155,7 @@
                   }
                 },
                 "schema" : {
-                  "$ref" : "#/components/schemas/inline_response_200"
+                  "$ref" : "#/components/schemas/inline_response_200_1"
                 }
               }
             },
@@ -98,7 +1208,7 @@
       "post" : {
         "description" : "Invites new user.",
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/inline_object_1",
+          "$ref" : "#/components/requestBodies/inline_object_2",
           "content" : {
             "application/json" : {
               "examples" : {
@@ -131,7 +1241,7 @@
                   }
                 },
                 "schema" : {
-                  "$ref" : "#/components/schemas/inline_response_200_1"
+                  "$ref" : "#/components/schemas/inline_response_200_2"
                 }
               }
             },
@@ -205,7 +1315,7 @@
       "post" : {
         "description" : "Accept invitation.",
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/inline_object_2",
+          "$ref" : "#/components/requestBodies/inline_object_3",
           "content" : {
             "application/json" : {
               "examples" : {
@@ -586,7 +1696,7 @@
                   }
                 },
                 "schema" : {
-                  "$ref" : "#/components/schemas/inline_response_200_2"
+                  "$ref" : "#/components/schemas/inline_response_200_3"
                 }
               }
             },
@@ -673,7 +1783,7 @@
                   }
                 },
                 "schema" : {
-                  "$ref" : "#/components/schemas/inline_response_200_3"
+                  "$ref" : "#/components/schemas/inline_response_200_4"
                 }
               }
             },
@@ -776,7 +1886,7 @@
       "put" : {
         "description" : "Updates the teams informations.",
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/inline_object_3",
+          "$ref" : "#/components/requestBodies/inline_object_4",
           "content" : {
             "application/json" : {
               "examples" : {
@@ -858,7 +1968,7 @@
       "post" : {
         "description" : "Sign up new user",
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/inline_object_4",
+          "$ref" : "#/components/requestBodies/inline_object_5",
           "content" : {
             "application/json" : {
               "examples" : {
@@ -928,7 +2038,7 @@
       "put" : {
         "description" : "update users profile",
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/inline_object_5",
+          "$ref" : "#/components/requestBodies/inline_object_6",
           "content" : {
             "multipart/form-data" : {
               "schema" : {
@@ -959,7 +2069,7 @@
                   }
                 },
                 "schema" : {
-                  "$ref" : "#/components/schemas/inline_response_200_4"
+                  "$ref" : "#/components/schemas/inline_response_200_5"
                 }
               }
             },
@@ -1015,7 +2125,7 @@
       "post" : {
         "description" : "Login",
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/inline_object_6",
+          "$ref" : "#/components/requestBodies/inline_object_7",
           "content" : {
             "application/json" : {
               "examples" : {
@@ -1047,7 +2157,7 @@
                   }
                 },
                 "schema" : {
-                  "$ref" : "#/components/schemas/inline_response_200_5"
+                  "$ref" : "#/components/schemas/inline_response_200_6"
                 }
               }
             },
@@ -1188,9 +2298,18 @@
           }
         }
       },
-      "inline_object_6" : {
+      "inline_object_7" : {
         "content" : {
           "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/inline_object_7"
+            }
+          }
+        }
+      },
+      "inline_object_6" : {
+        "content" : {
+          "multipart/form-data" : {
             "schema" : {
               "$ref" : "#/components/schemas/inline_object_6"
             }
@@ -1199,7 +2318,7 @@
       },
       "inline_object_5" : {
         "content" : {
-          "multipart/form-data" : {
+          "application/json" : {
             "schema" : {
               "$ref" : "#/components/schemas/inline_object_5"
             }
@@ -1271,6 +2390,295 @@
       "Error" : {
         "properties" : {
           "error" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "MediaStorage" : {
+        "properties" : {
+          "id" : {
+            "type" : "integer"
+          },
+          "team" : {
+            "type" : "integer"
+          },
+          "owner" : {
+            "type" : "integer"
+          },
+          "media" : {
+            "format" : "byte",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "CreateTemplate" : {
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "body_text" : {
+            "type" : "string"
+          },
+          "subject" : {
+            "type" : "string"
+          },
+          "reciviers" : {
+            "type" : "string"
+          },
+          "sender" : {
+            "type" : "string"
+          },
+          "template_team" : {
+            "type" : "integer"
+          },
+          "status" : {
+            "enum" : [ "Draft", "Send", "Schedule" ],
+            "type" : "string"
+          },
+          "schedule_time" : {
+            "format" : "date-time",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "Template" : {
+        "properties" : {
+          "id" : {
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "body_text" : {
+            "type" : "string"
+          },
+          "subject" : {
+            "type" : "string"
+          },
+          "reciviers" : {
+            "type" : "string"
+          },
+          "sender" : {
+            "type" : "string"
+          },
+          "template_team" : {
+            "type" : "integer"
+          },
+          "created_at" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "schedule_time" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "status" : {
+            "enum" : [ "Draft", "Send", "Schedule" ],
+            "type" : "string"
+          },
+          "owner" : {
+            "$ref" : "#/components/schemas/User"
+          }
+        },
+        "type" : "object"
+      },
+      "UpdateTemplate" : {
+        "properties" : {
+          "id" : {
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "body_text" : {
+            "type" : "string"
+          },
+          "subject" : {
+            "type" : "string"
+          },
+          "reciviers" : {
+            "type" : "string"
+          },
+          "sender" : {
+            "type" : "string"
+          },
+          "template_team" : {
+            "type" : "integer"
+          },
+          "schedule_time" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "status" : {
+            "enum" : [ "Draft", "Send", "Schedule" ],
+            "type" : "string"
+          },
+          "owner" : {
+            "$ref" : "#/components/schemas/User"
+          }
+        },
+        "type" : "object"
+      },
+      "Post" : {
+        "properties" : {
+          "id" : {
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "caption" : {
+            "type" : "string"
+          },
+          "status" : {
+            "enum" : [ "Schedule", "Draft", "Published" ],
+            "type" : "string"
+          },
+          "owner" : {
+            "$ref" : "#/components/schemas/User"
+          },
+          "created_at" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "multimedia" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Media"
+            },
+            "type" : "array"
+          },
+          "team" : {
+            "type" : "integer"
+          },
+          "tag" : {
+            "enum" : [ "Ads", "Branding", "Celebration", "News", "Quots", "Sales" ],
+            "type" : "string"
+          },
+          "schedule_time" : {
+            "format" : "date-time",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "Comment" : {
+        "properties" : {
+          "id" : {
+            "type" : "integer"
+          },
+          "context" : {
+            "type" : "string"
+          },
+          "author" : {
+            "$ref" : "#/components/schemas/User"
+          },
+          "created_at" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "post" : {
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "UpdatedPost" : {
+        "properties" : {
+          "id" : {
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "caption" : {
+            "type" : "string"
+          },
+          "status" : {
+            "enum" : [ "Schedule", "Draft", "Published" ],
+            "type" : "string"
+          },
+          "multimedia" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Media"
+            },
+            "type" : "array"
+          },
+          "team" : {
+            "type" : "integer"
+          },
+          "tag" : {
+            "enum" : [ "Ads", "Branding", "Celebration", "News", "Quots", "Sales" ],
+            "type" : "string"
+          },
+          "schedule_time" : {
+            "format" : "date-time",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "CreatePost" : {
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "caption" : {
+            "type" : "string"
+          },
+          "status" : {
+            "enum" : [ "Schedule", "Draft", "Published" ],
+            "type" : "string"
+          },
+          "multimedia" : {
+            "items" : {
+              "format" : "binary",
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "team" : {
+            "type" : "integer"
+          },
+          "tag" : {
+            "enum" : [ "Ads", "Branding", "Celebration", "News", "Quots", "Sales" ],
+            "type" : "string"
+          },
+          "schedule_time" : {
+            "format" : "date-time",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "Card" : {
+        "properties" : {
+          "title" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "assignee" : {
+            "$ref" : "#/components/schemas/User"
+          },
+          "created_at" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "sender" : {
+            "type" : "string"
+          },
+          "team" : {
+            "$ref" : "#/components/schemas/Team"
+          },
+          "tag" : {
+            "enum" : [ "Low priority", "High priority", "Medium priority" ],
             "type" : "string"
           }
         },
@@ -1373,12 +2781,31 @@
       "inline_response_200" : {
         "properties" : {
           "team" : {
-            "$ref" : "#/components/schemas/Team"
+            "$ref" : "#/components/schemas/MediaStorage"
           }
         },
         "type" : "object"
       },
       "inline_object_1" : {
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "url" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "inline_response_200_1" : {
+        "properties" : {
+          "team" : {
+            "$ref" : "#/components/schemas/Team"
+          }
+        },
+        "type" : "object"
+      },
+      "inline_object_2" : {
         "properties" : {
           "team_id" : {
             "type" : "integer"
@@ -1390,7 +2817,7 @@
         },
         "type" : "object"
       },
-      "inline_response_200_1" : {
+      "inline_response_200_2" : {
         "properties" : {
           "team" : {
             "$ref" : "#/components/schemas/User"
@@ -1398,7 +2825,7 @@
         },
         "type" : "object"
       },
-      "inline_object_2" : {
+      "inline_object_3" : {
         "properties" : {
           "team_id" : {
             "type" : "integer"
@@ -1406,7 +2833,7 @@
         },
         "type" : "object"
       },
-      "inline_response_200_2" : {
+      "inline_response_200_3" : {
         "properties" : {
           "team" : {
             "$ref" : "#/components/schemas/Team"
@@ -1417,7 +2844,7 @@
         },
         "type" : "object"
       },
-      "inline_response_200_3" : {
+      "inline_response_200_4" : {
         "properties" : {
           "members" : {
             "items" : {
@@ -1431,7 +2858,7 @@
         },
         "type" : "object"
       },
-      "inline_object_3" : {
+      "inline_object_4" : {
         "properties" : {
           "team_id" : {
             "type" : "integer"
@@ -1439,7 +2866,7 @@
         },
         "type" : "object"
       },
-      "inline_object_4" : {
+      "inline_object_5" : {
         "properties" : {
           "password" : {
             "type" : "string"
@@ -1453,7 +2880,7 @@
         },
         "type" : "object"
       },
-      "inline_object_5" : {
+      "inline_object_6" : {
         "properties" : {
           "first_name" : {
             "type" : "string"
@@ -1468,7 +2895,7 @@
         },
         "type" : "object"
       },
-      "inline_response_200_4" : {
+      "inline_response_200_5" : {
         "properties" : {
           "user" : {
             "$ref" : "#/components/schemas/User"
@@ -1476,7 +2903,7 @@
         },
         "type" : "object"
       },
-      "inline_object_6" : {
+      "inline_object_7" : {
         "properties" : {
           "password" : {
             "type" : "string"
@@ -1487,7 +2914,7 @@
         },
         "type" : "object"
       },
-      "inline_response_200_5" : {
+      "inline_response_200_6" : {
         "properties" : {
           "token" : {
             "type" : "string"
