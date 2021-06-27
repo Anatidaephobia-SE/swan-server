@@ -1,0 +1,14 @@
+    MediaStorage:
+      type: object
+      properties:
+        id:
+          type: integer
+        team:
+          type: integer
+        owner:
+          type: integer
+        media:
+          type: string
+          format: byte
+
+

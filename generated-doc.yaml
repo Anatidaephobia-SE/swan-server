@@ -37,8 +37,6 @@ components:
       properties:
         error:
           type: string
-
-    Post:
       type: object
       properties:
         id:
@@ -68,7 +66,6 @@ components:
           type: string
           format: date-time
     Comment:
-=======
     CreateTemplate:
       type: object
       properties:
@@ -288,97 +285,58 @@ components:
 
 
 paths:
-  /api/v1/post/create_post/:
+
+  /api/v1/filestorage/upload/:
     post:
-      description: Creates new post.
+      description: upload new file.
       tags:
-        - Post
-  /api/v1/notification/create_template/:
-    post:
-      description: Creates new mail template.
-      tags:
-        - Notification
+        - MediaStorage
       security:
         - bearerAuth: []
       requestBody:
         content:
-          multipart/form-data:
+
+          application/json:
             schema:
-              $ref: "#/components/schemas/CreatePost"
+              type: object
+              properties:
+                name:
+                  type: string
+                url:
+                  type: string
+            examples:
+              '0':
+                value: 
+                  {
+                      "team" : 1,
+                      "media": "/media/postfiles/1/HadiBadi.jpg"
+                      
+                  }
       responses:
-        '201':
-          description: Successful creation of post.
+        '200':
+          description: Successful upload.
           content:
             application/json:
               schema:
-                  $ref: "#/components/schemas/Post"
+                type: object
+                properties:
+                  team:
+                    $ref: "#/components/schemas/MediaStorage"
+              examples:
+                '0':
+                  value: {
+                          "media":"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example"
+                          }
+        '400':
+          description: Missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
               examples:
                 '0':
                   value: '{
-                            "id": 2,
-                            "name": "string",
-                            "caption": "string",
-                            "status": "Drafts",
-                            "owner": {
-                                "id": 2,
-                                "email": "example@gmail.com",
-                                "first_name": "string",
-                                "last_name": "string",
-                                "profile_picture": "/media/userprofile/2/HadiBadi.jpg"
-                            },
-                            "created_at": "2021-05-20T16:29:01.572745Z",
-                            "multimedia": [
-                                {
-                                    "id": 3,
-                                    "media": "/media/postfiles/2/HadiBadi.jpg"
-                                },
-                                {
-                                    "id": 4,
-                                    "media": "/media/postfiles/2/HadiBadi.png"
-                                }
-                            ],
-                            "team": 1,
-                            "tag": "Ads"
-                        }'
-         application/json:
-            schema:
-              $ref: "#/components/schemas/CreateTemplate"
-      responses:
-        '406':
-          description: Receivers API is wrong. You recieve this message when your API variables are not available in body_text. The returning value is the variable name in api.
-          content:
-            application/json:
-              schema:
-                type: string
-              examples:
-                '0':
-                  value: 'name'
-        '201':
-          description: Template created.
-          content:
-            application/json:
-              schema:
-                $ref : "#/components/schemas/Template"
-              examples:
-                '0':
-                  value: '{
-                            "id": 1,
-                            "name": "string",
-                            "body_text": "string",
-                            "subject": "string",
-                            "reciviers": "string",
-                            "sender": "example@example.com",
-                            "template_team": 1,
-                            "created_at": "2021-06-19T21:38:19.413618+04:30",
-                            "schedule_time": null,
-                            "status": "Draft",
-                            "owner": {
-                              "email" : "example23@example.com",
-                              "first_name" : "string",
-                              "last_name" : "string",
-                              "profile_picture" : "string",
-                              "last_login" : "2021-06-19T21:38:19.413618+04:30"
-                            }
+                            "error": "media, team parameter(s) are required"
                           }'
       servers:
         - url: 'https://api.stage.swan-app.ir'
@@ -548,7 +506,7 @@ paths:
                 type: string
               examples:
                 '0':
-                  value: '"Post deleted."'
+                  value: '"Media deleted."'
         '400':
           description: Bad request.
           content:
@@ -557,11 +515,18 @@ paths:
                 type: string
               examples:
                 '0':
-                  value: '"You did not create this post."'
+                  value: '"You did not create this media."'
       servers:
         - url: 'https://api.stage.swan-app.ir'
     servers:
       - url: 'https://api.stage.swan-app.ir'
+
+  /api/v1/filestorage/all_media/{team_id}/:
+    get:
+      description:  Get all comments of a post.
+      tags:
+        - MediaStorage
+=======
   /api/v1/post/create_comment/{post_id}/:
     put:
       description:  Create new comment.
@@ -571,6 +536,11 @@ paths:
         - bearerAuth: []
       parameters:
         - in: path
+          name: team_id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+          description: The team's id.
           name: post_id   # Note the name is the same as in the path
           required: true
           schema:
@@ -581,6 +551,9 @@ paths:
           required: false
           schema:
             type: integer
+          description: Get all media of a team.
+      responses:
+        '200':
           description: The post's id.
       responses:
         '200':
@@ -590,6 +563,25 @@ paths:
               schema:
                 type: array
                 items:
+                  $ref: "#/components/schemas/MediaStorage"
+              examples:
+                '2':
+                  value: '[{
+                            "id": 1,
+                            "media":"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example"
+                        },
+                        {
+                            "id": 2,
+                            "media":"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example2"
+                        }
+                        ]'
+      servers:
+        - url: 'https://api.stage.swan-app.ir'
+  /api/v1/filestorage/single_media/{media_id}/:
+    get:
+      description:  Get a single post information.
+      tags:
+        - MediaStorage
                   $ref: "#/components/schemas/Comment"
               examples:
                 '0':
@@ -681,84 +673,21 @@ paths:
         '200':
           description: Get all comments of a post.
 
-          content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Comment"
+                  $ref: "#/components/schemas/MediaStorage"
               examples:
                 '0':
-                  value: '[{
+                  value: '{
                             "id": 1,
-                            "context": "string",
-                            "author": 
-                            {
-                                "id": 2,
-                                "email": "example@gmail.com",
-                                "first_name": "string",
-                                "last_name": "string",
-                                "profile_picture": null
-                            },
-                            "created_at": "2021-05-20T16:29:01.572745Z",
-                            "post":1
-                        },
-                        {
-                            "id": 2,
-                            "context": "string",
-                            "author": 
-                            {
-                                "id": 2,
-                                "email": "example@gmail.com",
-                                "first_name": "string",
-                                "last_name": "string",
-                                "profile_picture":null
-                            },
-                            "created_at": "2021-05-20T16:29:01.572745Z",
-                            "post":1
-                        }]'
+                            "media":"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example"
+                        }'
       servers:
         - url: 'https://api.stage.swan-app.ir'
+  
 
-  /api/v1/post/delete_comment/{comment_id}/:
-    delete:
-      description:  Delete Comment.
-      tags:
-        - Comment
-
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: comment_id   # Note the name is the same as in the path
-          required: true
-          schema:
-            type: integer
-          description: The Comment's id.
-      responses:
-        '200':
-          description: Deleted Comment.
-          content:
-            text/plain:
-              schema:
-                type: string
-              examples:
-                '0':
-
-                  value: 'Comment deleted.'
-        '400':
-          description: Bad request.
-          content:
-            text/plain:
-              schema:
-                type: string
-              examples:
-                '0':
-                  value: '"You did not create this card."'
-      servers:
-        - url: 'https://api.stage.swan-app.ir'
-    servers:
-      - url: 'https://api.stage.swan-app.ir'
 
   /api/v1/team/create_team:
     post:
