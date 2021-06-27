@@ -34,23 +34,193 @@ components:
           type: string
     Error:
       type: object
-      properties:
-        error:
-          type: string
+      properties
     MediaStorage:
       type: object
       properties:
         id:
           type: integer
+
+        name:
+          type: string
+        caption:
+          type: string
+        status:
+          type: string
+          enum: [Schedule, Draft, Published]
+        owner:
+          $ref: "#/components/schemas/User"
+        created_at:
+          type: string
+          format: date-time
+        multimedia:
+          type: array
+          items:
+            $ref: "#/components/schemas/Media"
         team:
           type: integer
-        owner:
-          type: integer
-        media:
+        tag:
           type: string
-          format: byte
+          enum: [Ads, Branding, Celebration, News, Quots, Sales]
+        schedule_time:
+          type: string
+          format: date-time
+    Comment:
+    CreateTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+        body_text:
+          type: string
+        subject:
+          type: string
+        reciviers:
+          type: string
+        sender:
+          type: string
+        template_team:
+          type: integer
+        status:
+          type: string
+          enum: [Draft, Send, Schedule]
+        schedule_time:
+          type: string
+          format: date-time
+    Template:
+      type: object
+      properties:
+        id:
+          type: integer
+        context:
+          type: string
+        author:
+          $ref: "#/components/schemas/User"
+        created_at:
+          type: string
+          format: date-time
+        post:
+          type: integer
+
+    UpdatedPost:
+      type: object
+      properties:
+        id:
+            type: integer
+        name:
+          type: string
+        caption:
+          type: string
+        status:
+          type: string
+          enum: [Schedule, Draft, Published]
+        multimedia:
+          type: array
+          items:
+            $ref: "#/components/schemas/Media"
+        team:
+          type: integer
+        tag:
+          type: string
+          enum: [Ads, Branding, Celebration, News, Quots, Sales]
+        schedule_time:
+          type: string
+          format: date-time
+    CreatePost:
+      type: object
+      properties:
+        name:
+          type: string
+        caption:
+          type: string
+        status:
+          type: string
+          enum: [Schedule, Draft, Published]
+        multimedia:
+          type: array
+          items:
+            type: string
+            format: binary
+        team:
+          type: integer
+        tag:
+          type: string
+          enum: [Ads, Branding, Celebration, News, Quots, Sales]
+        schedule_time:
+          type: string
+          format: date-time
+
+        name:
+          type: string
+        body_text:
+          type: string
+        subject:
+          type: string
+        reciviers:
+          type: string
+        sender:
+          type: string
+        template_team:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        schedule_time:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [Draft, Send, Schedule]
+        owner:
+          $ref: "#/components/schemas/User"
+    UpdateTemplate:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        body_text:
+          type: string
+        subject:
+          type: string
+        reciviers:
+          type: string
+        sender:
+          type: string
+        template_team:
+          type: integer
+        schedule_time:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [Draft, Send, Schedule]
+        owner:
+          $ref: "#/components/schemas/User"
 
 
+    Card:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        assignee:
+          $ref: "#/components/schemas/User"
+        created_at:
+          type: string
+          format: date-time
+        sender:
+          type: string
+        team:
+          $ref: "#/components/schemas/Team"
+        tag:
+          type: string
+          enum: [Low priority, High priority, Medium priority]
 
 
     Team:
@@ -115,168 +285,23 @@ components:
 
 
 paths:
-  /api/v1/filestorage/upload/:
-    post:
-      description: upload new file.
-      tags:
-        - MediaStorage
-      security:
-        - bearerAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                url:
-                  type: string
-            examples:
-              '0':
-                value: 
-                  {
-                      "team" : 1,
-                      "media": "/media/postfiles/1/HadiBadi.jpg"
-                      
-                  }
-      responses:
-        '200':
-          description: Successful upload.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  team:
-                    $ref: "#/components/schemas/MediaStorage"
-              examples:
-                '0':
-                  value: {
-                          "media":"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example"
-                          }
-        '400':
-          description: Missing parameters.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-              examples:
-                '0':
-                  value: '{
-                            "error": "media, team parameter(s) are required"
-                          }'
-      servers:
-        - url: 'https://api.stage.swan-app.ir'
-    servers:
-      - url: 'https://api.stage.swan-app.ir'
-  /api/v1/filestorage/delete_media/{media_id}/:
-    delete:
-      description:  Delete media.
-      tags:
-        - MediaStorage
-      security:
         - bearerAuth: []
       parameters:
         - in: path
-          name: media_id   # Note the name is the same as in the path
-          required: true
-          schema:
-            type: integer
-          description: The media's id.
-      responses:
-        '200':
-          description: Deleted media.
-          content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                type: array
+                items:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
               examples:
                 '0':
-                  value: '"Media deleted."'
-        '400':
-          description: Bad request.
-          content:
-            text/plain:
-              schema:
-                type: string
-              examples:
-                '0':
-                  value: '"You did not create this media."'
-      servers:
-        - url: 'https://api.stage.swan-app.ir'
-    servers:
-      - url: 'https://api.stage.swan-app.ir'
+                  value: '{
+                            "id": 1,
 
-  /api/v1/filestorage/all_media/{team_id}/:
-    get:
-      description:  Get all comments of a post.
-      tags:
-        - MediaStorage
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: team_id   # Note the name is the same as in the path
-          required: true
-          schema:
-            type: integer
-          description: The team's id.
-        - in: query
-          name: page   # Note the name is the same as in the path
-          required: false
-          schema:
-            type: integer
-          description: Get all media of a team.
-      responses:
-        '200':
-          description:  Get all media of a team.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/MediaStorage"
-              examples:
-                '2':
-                  value: '[{
-                            "id": 1,
-                            "media":"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example"
-                        },
-                        {
-                            "id": 2,
-                            "media":"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example2"
-                        }
-                        ]'
-      servers:
-        - url: 'https://api.stage.swan-app.ir'
-  /api/v1/filestorage/single_media/{media_id}/:
-    get:
-      description:  Get a single post information.
-      tags:
-        - MediaStorage
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: media_id   # Note the name is the same as in the path
-          required: true
-          schema:
-            type: integer
-          description: The media's id.
-      responses:
-        '200':
-          description: Get a single media information.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/MediaStorage"
-              examples:
-                '0':
-                  value: '{
-                            "id": 1,
                             "media":"http://s3.stage.swan-app.ir/django-backend-dev-private/sample_team/example"
                         }'
       servers:

@@ -1,11 +1,4 @@
-    Media:
-      type: object
-      properties:
-        id:
-          type: integer
-        media:
-          type: string
-          format: byte
+
     Post:
       type: object
       properties:
