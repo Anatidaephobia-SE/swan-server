@@ -1,4 +1,4 @@
-   Post:
+    Post:
       type: object
       properties:
         id:
