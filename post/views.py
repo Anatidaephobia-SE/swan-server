@@ -58,7 +58,7 @@ class CreatePostView(generics.CreateAPIView):
                 sc.schedule_post(post, socialmedia, TaskType.Twitter, data['schedule_time'])
                 post.schedule_time=data['schedule_time']
                 post.save()
-                return Response(data={"message": "added to the queue", "date": sc.get_post_scheduled_date(post, TaskType.Twitter)},status=status.HTTP_200_OK)
+                # return Response(data={"message": "added to the queue", "date": sc.get_post_scheduled_date(post, TaskType.Twitter)},status=status.HTTP_200_OK)
         return Response(post_serializer.PostSerializer(post).data, status=status.HTTP_201_CREATED)
 
 class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
@@ -123,7 +123,7 @@ class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
                     sc.schedule_post(post, socialmedia, TaskType.Twitter, data['schedule_time'])
                     post.schedule_time=data['schedule_time']
                     post.save()
-                    return Response(data={"message": "added to tyhe queue", "date": sc.get_post_scheduled_date(post, TaskType.Twitter)},status=status.HTTP_200_OK)
+                    # return Response(data={"message": "added to tyhe queue", "date": sc.get_post_scheduled_date(post, TaskType.Twitter)},status=status.HTTP_200_OK)
             return Response(serializer.data,status=status.HTTP_200_OK)
             
         return Response("Bad request.", status=status.HTTP_400_BAD_REQUEST)

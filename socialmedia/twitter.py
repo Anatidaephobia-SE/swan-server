@@ -26,7 +26,7 @@ def Authorize_Address(team_id, modified):
     consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
     consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
     auth = OAuth1(client_key=consumer_key, client_secret=consumer_secret,
-                  callback_uri=f"http://localhost:8080/dispatch?team_id={team_id}&modify={modified}")
+                  callback_uri=f"https://stage.swan-app.ir/dispatch?team_id={team_id}&modify={modified}")
 
     response = requests.post(url=REQUEST_TOKEN_ADDRESS,
                              auth=auth, params={'lang': 'en'})
